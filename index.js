@@ -28,7 +28,19 @@ async function main() {
   try {
     await mongoose.connect(dburl);
     console.log("MongoDB Connected Successfully");
-    // ✅ THEN CREATE SESSION STORE
+   
+
+   
+    
+  } catch (err) {
+    console.error("MongoDB Error:", err);
+  }
+}
+
+main();
+
+
+ // ✅ THEN CREATE SESSION STORE
     const store = MongoStore.create({
       mongoUrl: dburl,
       crypto: { secret: process.env.SESSION_SECRET },
@@ -51,15 +63,6 @@ async function main() {
         },
       })
     );
-
-   
-    
-  } catch (err) {
-    console.error("MongoDB Error:", err);
-  }
-}
-
-main();
  // Passport
     app.use(passport.initialize());
     app.use(passport.session());
@@ -290,5 +293,6 @@ app.post("/admin/transactions/:id/verify", async (req, res) => {
 app.listen(3000, () => {
   console.log("Server running on port 3000");
 });
+
 
 
