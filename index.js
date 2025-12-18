@@ -59,17 +59,19 @@ async function main() {
     passport.serializeUser(User.serializeUser());
     passport.deserializeUser(User.deserializeUser());
 
-    // Current user
-    app.use((req, res, next) => {
-      res.locals.currentUser = req.user;
-      next();
-    });
+    
   } catch (err) {
     console.error("MongoDB Error:", err);
   }
 }
 
 main();
+
+// Current user
+    app.use((req, res, next) => {
+      res.locals.currentUser = req.user;
+      next();
+    });
 
 // ✅ =============== AUTH ROUTES ===============
 
@@ -287,3 +289,4 @@ app.post("/admin/transactions/:id/verify", async (req, res) => {
 app.listen(3000, () => {
   console.log("Server running on port 3000");
 });
+
