@@ -52,13 +52,7 @@ async function main() {
       })
     );
 
-    // Passport
-    app.use(passport.initialize());
-    app.use(passport.session());
-    passport.use(new LocalStrategy(User.authenticate()));
-    passport.serializeUser(User.serializeUser());
-    passport.deserializeUser(User.deserializeUser());
-
+   
     
   } catch (err) {
     console.error("MongoDB Error:", err);
@@ -66,6 +60,13 @@ async function main() {
 }
 
 main();
+ // Passport
+    app.use(passport.initialize());
+    app.use(passport.session());
+    passport.use(new LocalStrategy(User.authenticate()));
+    passport.serializeUser(User.serializeUser());
+    passport.deserializeUser(User.deserializeUser());
+
 
 // Current user
     app.use((req, res, next) => {
@@ -289,4 +290,5 @@ app.post("/admin/transactions/:id/verify", async (req, res) => {
 app.listen(3000, () => {
   console.log("Server running on port 3000");
 });
+
 
