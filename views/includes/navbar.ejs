@@ -1,0 +1,128 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-black border-bottom border-primary border-2" style="--bs-border-opacity: 0.3;">
+  <div class="container-fluid px-3 px-sm-4">
+    <!-- Brand with gaming logo effect -->
+    <a class="navbar-brand d-flex align-items-center" href="/">
+      <span class="fw-bold gradient-text" style="
+        background: linear-gradient(90deg, #00d4ff 0%, #6a00f4 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 1.5rem;
+        letter-spacing: 1px;
+      ">
+        <i class="fas fa-trophy me-2"></i>TourneyZone
+      </span>
+    </a>
+
+    <!-- Mobile Toggle Button -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navLinks" aria-expanded="false">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Nav Links - Enhanced for Gaming UI -->
+    <div class="collapse navbar-collapse" id="navLinks">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-3">
+        <% if (!currentUser) { %>
+        <!-- Guest Links -->
+        <li class="nav-item">
+          <a class="nav-link btn-hover-glow px-3 py-2 rounded" href="/login">
+            <i class="fas fa-sign-in-alt me-2"></i>Login
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link btn-hover-glow px-3 py-2 rounded" href="/signup" style="
+            background: linear-gradient(90deg, rgba(106,0,244,0.2) 0%, rgba(0,212,255,0.2) 100%);
+          ">
+            <i class="fas fa-user-plus me-2"></i>Sign Up
+          </a>
+        </li>
+        <% } else { %>
+          <!-- Player Specific -->
+          <% if (currentUser && currentUser.role === 'player') { %>
+          <li class="nav-item d-none d-lg-block">
+            <a class="nav-link position-relative px-3 py-2" href="/player/my-tournaments">
+              <i class="fas fa-gamepad me-2"></i>My Tournaments
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                <%- currentUser.tournamentsJoined?.length || 0 %>
+              </span>
+            </a>
+          </li>
+          <% } %>
+        <% if (currentUser && currentUser.role === 'organizer') { %>
+  <li class="nav-item d-none d-lg-block">
+    <a class="nav-link position-relative px-3 py-2" href="/organizer/wallet">
+      <i class="fas fa-wallet me-2"></i>My Wallet
+    </a>
+  </li>
+<% } %>
+
+          <!-- Dashboard Link -->
+          <li class="nav-item">
+            <a class="nav-link px-3 py-2 rounded-pill btn-hover-glow" href="/<%= currentUser.role %>" style="
+              background: rgba(255,255,255,0.1);
+            ">
+              <i class="fas fa-<%= currentUser.role === 'admin' ? 'shield-alt' : currentUser.role === 'organizer' ? 'chess-king' : 'user' %> me-2"></i>
+              Dashboard
+            </a>
+          </li>
+
+          <!-- Logout -->
+          <li class="nav-item">
+            <a class="nav-link px-3 py-2 text-danger" href="/logout">
+              <i class="fas fa-power-off me-2"></i>Logout
+            </a>
+          </li>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Add this CSS in your <head> or main stylesheet -->
+<style>
+  /* Navbar Hover Effects */
+  .btn-hover-glow {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-hover-glow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(106, 0, 244, 0.4);
+  }
+  
+  .btn-hover-glow::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(106, 0, 244, 0.1), transparent);
+    transform: translateX(-100%);
+    transition: 0.5s;
+  }
+  
+  .btn-hover-glow:hover::after {
+    transform: translateX(100%);
+  }
+  
+  /* Mobile Optimization */
+  @media (max-width: 991.98px) {
+    .navbar-collapse {
+      background: rgba(10, 10, 20, 0.95);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-top: 0.5rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+    
+    .nav-item {
+      margin: 0.25rem 0;
+    }
+    
+    .nav-link {
+      padding: 0.75rem 1rem !important;
+    }
+  }
+</style>

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wallet Management | Admin Panel</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4a6bff;
+      --success: #00c853;
+      --danger: #ff4444;
+      --dark: #2d3748;
+      --light: #f7fafc;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8f9fa;
+    }
+    
+    .navbar {
+      background-color: var(--dark);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+    
+    .card-header {
+      background-color: white;
+      border-bottom: 1px solid #e2e8f0;
+      font-weight: 600;
+      padding: 15px 20px;
+    }
+    
+    .badge-pill {
+      padding: 5px 10px;
+      font-weight: 500;
+    }
+    
+    .table-responsive {
+      overflow-x: auto;
+    }
+    
+    .table {
+      font-size: 0.9rem;
+    }
+    
+    .table th {
+      border-top: none;
+      font-weight: 600;
+      color: var(--dark);
+      background-color: #f8f9fa;
+    }
+    
+    .btn-action {
+      padding: 5px 12px;
+      font-size: 0.8rem;
+      border-radius: 6px;
+    }
+    
+    .nav-tabs .nav-link {
+      border: none;
+      color: #4a5568;
+      font-weight: 500;
+    }
+    
+    .nav-tabs .nav-link.active {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+    }
+    
+    #jsonInput {
+      font-family: 'Courier New', monospace;
+      min-height: 200px;
+    }
+    
+    .preview-card {
+      border-left: 4px solid var(--primary);
+    }
+    
+    .transaction-badge {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="#">
+        <i class="fas fa-wallet me-2"></i>Wallet Manager
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="#" id="withdrawalsTab">Withdrawals</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="depositsTab">Deposits</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="bulkDepositTab">Bulk Deposit</a>
+          </li>
+        </ul>
+        <div class="d-flex align-items-center">
+          <span class="text-light me-3">
+            <i class="fas fa-user-circle me-1"></i> Admin
+          </span>
+          <a href="/logout" class="btn btn-outline-light btn-sm">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <!-- Withdrawals Section (Default Visible) -->
+    <div id="withdrawalsSection">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Withdrawal Requests</h5>
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-sm btn-outline-primary active" id="pendingWithdrawalsBtn">Pending</button>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="completedWithdrawalsBtn">Completed</button>
+          </div>
+        </div>
+        
+        <!-- Pending Withdrawals Table -->
+        <div class="card-body" id="pendingWithdrawalsTable">
+          <% if (withdrawalProcessing.length === 0) { %>
+            <div class="alert alert-info">No pending withdrawal requests</div>
+          <% } else { %>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Amount</th>
+                    <th>UPI ID</th>
+                    <th>Request Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% withdrawalProcessing.forEach(txn => { %>
+                    <tr>
+                      <td><%= txn.user.username %></td>
+                      <td>₹<%= txn.amount.toLocaleString('en-IN') %></td>
+                      <td><code><%= txn.upiId %></code></td>
+                      <td><%= txn.date.toLocaleDateString() %></td>
+                      <td>
+                        <button class="btn btn-primary btn-action" data-bs-toggle="modal" data-bs-target="#processModal<%= txn._id %>">
+                          <i class="fas fa-rupee-sign me-1"></i> Process
+                        </button>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        </div>
+        
+        <!-- Completed Withdrawals Table -->
+        <div class="card-body d-none" id="completedWithdrawalsTable">
+          <% if (withdrawalHistory.length === 0) { %>
+            <div class="alert alert-secondary">No completed withdrawals</div>
+          <% } else { %>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Amount</th>
+                    <th>UPI ID</th>
+                    <th>UTR</th>
+                    <th>Completed Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% withdrawalHistory.forEach(txn => { %>
+                    <tr>
+                      <td><%= txn.user.username %></td>
+                      <td>₹<%= txn.amount.toLocaleString('en-IN') %></td>
+                      <td><code><%= txn.upiId %></code></td>
+                      <td><code><%= txn.transactionId %></code></td>
+                      <td><%= txn.date.toLocaleDateString() %></td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Deposits Section -->
+    <div id="depositsSection" class="d-none">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-coins me-2"></i>Deposit Requests</h5>
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-sm btn-outline-primary active" id="pendingDepositsBtn">Pending</button>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="completedDepositsBtn">Completed</button>
+          </div>
+        </div>
+        
+        <!-- Pending Deposits Table -->
+        <div class="card-body" id="pendingDepositsTable">
+          <% if (depositProcessing.length === 0) { %>
+            <div class="alert alert-info">No pending deposit requests</div>
+          <% } else { %>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Amount</th>
+                    <th>UTR</th>
+                    <th>Request Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% depositProcessing.forEach(txn => { %>
+                    <tr>
+                      <td><%= txn.user.username %></td>
+                      <td>₹<%= txn.amount.toLocaleString('en-IN') %></td>
+                      <td><code><%= txn.transactionId %></code></td>
+                      <td><%= txn.date.toLocaleDateString() %></td>
+                      <td>
+                        <button class="btn btn-success btn-action" data-bs-toggle="modal" data-bs-target="#verifyModal<%= txn._id %>">
+                          <i class="fas fa-check-circle me-1"></i> Verify
+                        </button>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        </div>
+        
+        <!-- Completed Deposits Table -->
+        <div class="card-body d-none" id="completedDepositsTable">
+          <% if (depositHistory.length === 0) { %>
+            <div class="alert alert-secondary">No completed deposits</div>
+          <% } else { %>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Amount</th>
+                    <th>UTR</th>
+                    <th>Completed Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% depositHistory.forEach(txn => { %>
+                    <tr>
+                      <td><%= txn.user.username %></td>
+                      <td>₹<%= txn.amount.toLocaleString('en-IN') %></td>
+                      <td><code><%= txn.transactionId %></code></td>
+                      <td><%= txn.date.toLocaleDateString() %></td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bulk Deposit Section -->
+    <div id="bulkDepositSection" class="d-none">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-boxes me-2"></i>Bulk Deposit Processing</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Enter JSON Data</label>
+                <textarea class="form-control" id="jsonInput" rows="10" placeholder='[
+  {
+    "utr": "UTR123456789",
+    "name": "John Doe",
+    "amount": 1000,
+    "isVerified": false
+  },
+  {
+    "utr": "UTR987654321",
+    "name": "Jane Smith",
+    "amount": 2500,
+    "isVerified": false
+  }
+]'></textarea>
+              </div>
+              <button class="btn btn-primary" id="previewBtn">
+                <i class="fas fa-eye me-1"></i> Preview Transactions
+              </button>
+            </div>
+            <div class="col-md-6">
+              <div class="card preview-card">
+                <div class="card-header">
+                  <h6 class="mb-0"><i class="fas fa-list-check me-2"></i>Transaction Preview <span id="previewCount">(0)</span></h6>
+                </div>
+                <div class="card-body">
+                  <div id="previewResults">
+                    <div class="alert alert-light mb-0">
+                      <i class="fas fa-info-circle me-2"></i> Enter JSON data and click "Preview Transactions"
+                    </div>
+                  </div>
+                  <form id="bulkDepositForm" action="/wallet/bulk-deposit" method="POST">
+                    <input type="hidden" name="transactions" id="transactionsInput">
+                    <button type="submit" class="btn btn-success w-100 mt-3 d-none" id="processBulkBtn">
+                      <i class="fas fa-check-circle me-1"></i> Process All Transactions
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Process Withdrawal Modals -->
+  <% withdrawalProcessing.forEach(txn => { %>
+    <div class="modal fade" id="processModal<%= txn._id %>" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Process Withdrawal</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <form action="/admin/transactions/<%= txn._id %>/update" method="POST">
+            <div class="modal-body">
+              <div class="text-center mb-3">
+                <div class="upi-qr-container">
+                  <img id="qr<%= txn._id %>" src="" alt="UPI QR Code" style="width: 180px; height: 180px;">
+                </div>
+                <p class="text-muted small mt-2">Scan to pay ₹<%= txn.amount.toLocaleString('en-IN') %></p>
+              </div>
+
+              <div class="payment-details">
+                <div class="mb-2"><strong>Amount:</strong> ₹<%= txn.amount.toLocaleString('en-IN') %></div>
+                <div class="mb-3"><strong>UPI ID:</strong> <code><%= txn.upiId %></code></div>
+                <div class="d-flex gap-2">
+                  <button type="button" class="btn btn-outline-primary btn-sm" onclick="copyToClipboard('<%= txn.upiId %>')">
+                    <i class="fas fa-copy me-1"></i> Copy UPI
+                  </button>
+                  <a href="#" id="upiLink<%= txn._id %>" class="btn btn-outline-success btn-sm">
+                    <i class="fas fa-external-link-alt me-1"></i> Open in UPI
+                  </a>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">UTR Number</label>
+                <input type="text" class="form-control" name="transactionId" placeholder="Enter transaction reference" required>
+              </div>
+              <input type="hidden" name="status" value="done">
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary">Mark as Paid</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById('processModal<%= txn._id %>').addEventListener('shown.bs.modal', function() {
+        const amount = <%= txn.amount %>;
+        const upiId = '<%= txn.upiId %>';
+        const upiString = `upi://pay?pa=${upiId}&pn=BattleZone&am=${amount}&cu=INR`;
+        
+        // Update QR Code
+        document.getElementById('qr<%= txn._id %>').src = 
+          `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(upiString)}&size=180x180`;
+        
+        // Update UPI Link
+        document.getElementById('upiLink<%= txn._id %>').href = upiString;
+      });
+    </script>
+  <% }); %>
+
+  <!-- Verify Deposit Modals -->
+  <% depositProcessing.forEach(txn => { %>
+    <div class="modal fade" id="verifyModal<%= txn._id %>" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Verify Deposit</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <form action="/admin/transactions/<%= txn._id %>/verify" method="POST">
+            <div class="modal-body">
+              <p>You are verifying a deposit of <strong>₹<%= txn.amount.toLocaleString('en-IN') %></strong> from:</p>
+              <p><strong><%= txn.user.username %></strong></p>
+              <p class="mb-3">UTR: <code><%= txn.transactionId %></code></p>
+              <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i> This will credit the amount to the user's wallet.
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-success">Confirm Verification</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  <% }); %>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Tab switching functionality
+    function switchTab(tabToShow) {
+      document.getElementById('withdrawalsSection').classList.add('d-none');
+      document.getElementById('depositsSection').classList.add('d-none');
+      document.getElementById('bulkDepositSection').classList.add('d-none');
+      document.getElementById(tabToShow + 'Section').classList.remove('d-none');
+      
+      // Update active tab styling
+      document.getElementById('withdrawalsTab').classList.remove('active');
+      document.getElementById('depositsTab').classList.remove('active');
+      document.getElementById('bulkDepositTab').classList.remove('active');
+      document.getElementById(tabToShow + 'Tab').classList.add('active');
+    }
+    
+    document.getElementById('withdrawalsTab').addEventListener('click', (e) => {
+      e.preventDefault();
+      switchTab('withdrawals');
+    });
+    
+    document.getElementById('depositsTab').addEventListener('click', (e) => {
+      e.preventDefault();
+      switchTab('deposits');
+    });
+    
+    document.getElementById('bulkDepositTab').addEventListener('click', (e) => {
+      e.preventDefault();
+      switchTab('bulkDeposit');
+    });
+
+    // Withdrawals sub-tab switching
+    document.getElementById('pendingWithdrawalsBtn').addEventListener('click', function() {
+      document.getElementById('pendingWithdrawalsTable').classList.remove('d-none');
+      document.getElementById('completedWithdrawalsTable').classList.add('d-none');
+      this.classList.add('active');
+      document.getElementById('completedWithdrawalsBtn').classList.remove('active');
+    });
+    
+    document.getElementById('completedWithdrawalsBtn').addEventListener('click', function() {
+      document.getElementById('completedWithdrawalsTable').classList.remove('d-none');
+      document.getElementById('pendingWithdrawalsTable').classList.add('d-none');
+      this.classList.add('active');
+      document.getElementById('pendingWithdrawalsBtn').classList.remove('active');
+    });
+    
+    // Deposits sub-tab switching
+    document.getElementById('pendingDepositsBtn').addEventListener('click', function() {
+      document.getElementById('pendingDepositsTable').classList.remove('d-none');
+      document.getElementById('completedDepositsTable').classList.add('d-none');
+      this.classList.add('active');
+      document.getElementById('completedDepositsBtn').classList.remove('active');
+    });
+    
+    document.getElementById('completedDepositsBtn').addEventListener('click', function() {
+      document.getElementById('completedDepositsTable').classList.remove('d-none');
+      document.getElementById('pendingDepositsTable').classList.add('d-none');
+      this.classList.add('active');
+      document.getElementById('pendingDepositsBtn').classList.remove('active');
+    });
+
+    // Bulk Deposit Preview
+    document.getElementById('previewBtn').addEventListener('click', function() {
+      try {
+        const jsonData = JSON.parse(document.getElementById('jsonInput').value);
+        
+        if (!Array.isArray(jsonData)) {
+          throw new Error('Input must be an array of transactions');
+        }
+        
+        let html = `
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>UTR</th>
+                  <th>Name</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>`;
+        
+        jsonData.forEach(txn => {
+          if (!txn.utr || !txn.name || !txn.amount) {
+            throw new Error('Each transaction must have utr, name, and amount fields');
+          }
+          
+          html += `
+            <tr>
+              <td><code class="text-nowrap">${txn.utr}</code></td>
+              <td>${txn.name}</td>
+              <td>₹${txn.amount.toLocaleString('en-IN')}</td>
+              <td>
+                <span class="badge transaction-badge bg-${txn.isVerified ? 'success' : 'warning'}">
+                  ${txn.isVerified ? 'Verified' : 'Pending'}
+                </span>
+              </td>
+            </tr>`;
+        });
+        
+        html += `</tbody></table></div>`;
+        
+        document.getElementById('previewResults').innerHTML = html;
+        document.getElementById('previewCount').textContent = `(${jsonData.length})`;
+        
+        // Enable process button and store data
+        document.getElementById('processBulkBtn').classList.remove('d-none');
+        document.getElementById('transactionsInput').value = document.getElementById('jsonInput').value;
+        
+      } catch (error) {
+        document.getElementById('previewResults').innerHTML = `
+          <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            ${error.message}
+          </div>`;
+        document.getElementById('processBulkBtn').classList.add('d-none');
+        document.getElementById('previewCount').textContent = '(0)';
+      }
+    });
+
+    // Bulk Deposit Form Submission
+    document.getElementById('bulkDepositForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Confirm before processing
+      if (confirm('Are you sure you want to process all these transactions? This action cannot be undone.')) {
+        // Show loading state
+        const btn = document.getElementById('processBulkBtn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Processing...';
+        btn.disabled = true;
+        
+        // Submit form
+        this.submit();
+      }
+    });
+
+    // Clipboard function
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard: ' + text);
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+      });
+    }
+  </script>
+</body>
+</html>

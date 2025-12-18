@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Tournaments | BattleZone</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary: #6c5ce7;
+      --secondary: #a29bfe;
+      --dark: #2d3436;
+      --light: #f5f6fa;
+      --accent: #fd79a8;
+      --warning: #fdcb6e;
+      --danger: #d63031;
+      --success: #00b894;
+    }
+
+    body {
+      background-color: #1a1a2e;
+      color: #f1f1f1;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .navbar {
+      background-color: rgba(26, 26, 46, 0.9) !important;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--primary);
+    }
+
+    h2 {
+      color: white;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      display: inline-block;
+      margin-bottom: 2rem;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(to right, var(--primary), var(--accent));
+      border-radius: 2px;
+    }
+
+    .tournament-card {
+      background: linear-gradient(135deg, rgba(44, 44, 84, 0.8) 0%, rgba(26, 26, 46, 0.9) 100%);
+      border-radius: 15px;
+      border: 1px solid var(--primary);
+      box-shadow: 0 10px 30px rgba(108, 92, 231, 0.2);
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .tournament-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(108, 92, 231, 0.3);
+      border-color: var(--accent);
+    }
+
+    .card-title {
+      color: white;
+      font-weight: 600;
+      font-size: 1.4rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-text {
+      color: var(--secondary);
+    }
+
+    .status-badge {
+      padding: 0.35rem 0.75rem;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+    }
+
+    .status-upcoming {
+      background-color: rgba(253, 203, 110, 0.2);
+      color: var(--warning);
+      border: 1px solid var(--warning);
+    }
+
+    .status-ongoing {
+      background-color: rgba(0, 184, 148, 0.2);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .status-completed {
+      background-color: rgba(214, 48, 49, 0.2);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    .btn-primary {
+      background: linear-gradient(to right, var(--primary), #8c7ae6);
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-success {
+      background: linear-gradient(to right, var(--success), #55efc4);
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline-light {
+      border-radius: 8px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover, .btn-success:hover, .btn-outline-light:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+    }
+
+    .create-btn {
+      background: linear-gradient(to right, var(--primary), var(--accent));
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+    }
+
+    .create-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+    }
+
+    .empty-state {
+      background: rgba(44, 44, 84, 0.5);
+      border-radius: 15px;
+      padding: 3rem;
+      text-align: center;
+      border: 2px dashed var(--primary);
+    }
+
+    /* Animated background elements */
+    .bg-circle {
+      position: fixed;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(108, 92, 231, 0.2) 0%, rgba(108, 92, 231, 0) 70%);
+      z-index: -1;
+    }
+
+    .circle-1 {
+      width: 300px;
+      height: 300px;
+      top: -100px;
+      right: -100px;
+    }
+
+    .circle-2 {
+      width: 200px;
+      height: 200px;
+      bottom: -50px;
+      left: -50px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      h2 {
+        font-size: 1.8rem;
+      }
+      
+      .empty-state {
+        padding: 2rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <%- include("../includes/navbar") %>
+
+  <!-- Animated background elements -->
+  <div class="bg-circle circle-1"></div>
+  <div class="bg-circle circle-2"></div>
+
+  <div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>MY TOURNAMENTS</h2>
+      <a href="/organizer/tournaments/new" class="create-btn">
+        <i class="fas fa-plus me-2"></i>CREATE NEW
+      </a>
+    </div>
+
+    <% if (tournaments.length === 0) { %>
+      <div class="empty-state">
+        <i class="fas fa-trophy fa-4x mb-4" style="color: var(--primary);"></i>
+        <h3 class="mb-3">No Tournaments Yet</h3>
+        <p class="text-muted mb-4">You haven't created any tournaments yet. Start organizing your first tournament now!</p>
+        <a href="/organizer/tournaments/new" class="create-btn">
+          <i class="fas fa-plus me-2"></i>CREATE FIRST TOURNAMENT
+        </a>
+      </div>
+    <% } else { %>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <% tournaments.forEach(t => { %>
+          <div class="col">
+            <div class="tournament-card h-100 p-4">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <h5 class="card-title m-0"><%= t.name %></h5>
+                <span class="status-badge <%= 'status-' + t.status %>">
+                  <%= t.status %>
+                </span>
+              </div>
+              
+              <p class="card-text mb-2">
+                <i class="fas fa-gamepad me-2" style="color: var(--secondary);"></i>
+                <%= t.game %>
+              </p>
+              
+              <p class="mb-3">
+                <i class="fas fa-align-left me-2" style="color: var(--secondary);"></i>
+                <%= t.description || "No description provided." %>
+              </p>
+              
+              <div class="mb-4">
+                <p class="mb-1">
+                  <i class="far fa-calendar-alt me-2" style="color: var(--secondary);"></i>
+                  <strong>Start:</strong> <%= t.startDate.toDateString() %>
+                </p>
+                <p class="mb-0">
+                  <i class="far fa-calendar-check me-2" style="color: var(--secondary);"></i>
+                  <strong>End:</strong> <%= t.endDate.toDateString() %>
+                </p>
+              </div>
+              
+              <div class="d-flex flex-wrap gap-2">
+                <% if (t.status === 'completed') { %>
+                  <a href="/organizer/tournaments/<%= t._id %>/results" class="btn btn-success flex-grow-1">
+                    <i class="fas fa-flag-checkered me-2"></i>Submit Results
+                  </a>
+                <% } else { %>
+                  <a href="/organizer/tournaments/<%= t._id %>/edit" class="btn btn-primary flex-grow-1">
+                    <i class="fas fa-edit me-2"></i>Edit
+                  </a>
+                <% } %>
+                
+                <a href="/organizer/tournaments/<%= t._id %>" class="btn btn-outline-light flex-grow-1">
+                  <i class="fas fa-eye me-2"></i>View
+                </a>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+  <%- include("../includes/footer") %>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

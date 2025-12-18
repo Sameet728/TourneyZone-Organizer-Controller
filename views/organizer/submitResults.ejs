@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit Results - <%= tournament.name %></title>
+
+  <!-- Bootstrap CSS (if not already included globally) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    .form-section {
+      background: var(--bs-dark-bg-subtle);
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    label {
+      font-weight: 500;
+      margin-top: 10px;
+    }
+    h2 i {
+      color: gold;
+    }
+    button[type="submit"] {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container py-5">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <h2 class="mb-4 text-center">
+        <i class="fas fa-trophy me-2"></i>
+        Submit Results: <%= tournament.name %>
+      </h2>
+
+      <% if (tournament.status !== 'completed') { %>
+        <div class="alert alert-warning text-center">
+          Tournament must be completed before submitting results
+        </div>
+      <% } else { %>
+        <div class="form-section">
+         <form action="/organizer/tournaments/<%= tournament._id %>/results" method="POST" class="form-section">
+
+  <!-- First Place -->
+  <div class="mb-3">
+    <label class="form-label">First Place Leader:</label>
+    <select name="firstLeaderUsername" class="form-select" required>
+      <option value="">Select Team</option>
+      <% tournament.teams.forEach(team => { %>
+        <option value="<%= team.leader.username %>">
+          <%= team.name %> (Leader: <%= team.leader.username %>)
+        </option>
+      <% }) %>
+    </select>
+  </div>
+
+  <!-- Second Place -->
+  <div class="mb-3">
+    <label class="form-label">Second Place Leader:</label>
+    <select name="secondLeaderUsername" class="form-select" required>
+      <option value="">Select Team</option>
+      <% tournament.teams.forEach(team => { %>
+        <option value="<%= team.leader.username %>">
+          <%= team.name %> (Leader: <%= team.leader.username %>)
+        </option>
+      <% }) %>
+    </select>
+  </div>
+
+  <!-- Third Place -->
+  <div class="mb-3">
+    <label class="form-label">Third Place Leader:</label>
+    <select name="thirdLeaderUsername" class="form-select" required>
+      <option value="">Select Team</option>
+      <% tournament.teams.forEach(team => { %>
+        <option value="<%= team.leader.username %>">
+          <%= team.name %> (Leader: <%= team.leader.username %>)
+        </option>
+      <% }) %>
+    </select>
+  </div>
+
+  <!-- Notes Section -->
+  <div class="mb-4">
+    <label class="form-label">Notes (optional):</label>
+    <textarea name="notes" class="form-control" rows="3" placeholder="Add any comments or details about the results..."></textarea>
+  </div>
+
+  <button type="submit" class="btn btn-success w-100">
+    <i class="fas fa-check-circle me-2"></i>Submit Results
+  </button>
+</form>
+
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS + Icons -->
+<script src="https://kit.fontawesome.com/a2e0e6ad66.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

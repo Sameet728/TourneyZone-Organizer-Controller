@@ -1,0 +1,7 @@
+.profile-icon{
+  right: 2px !important;
+  background-color: rgb(255, 255, 255) !important;
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 7rem !important;
+}
