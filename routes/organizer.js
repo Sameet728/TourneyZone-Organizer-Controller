@@ -10,7 +10,7 @@ router.get("/tournaments/new", (req, res) => {
   if (!req.user || req.user.role !== "organizer") {
     return res.status(403).send("Access Denied");
   }
-  res.render("organizer/newTournament");
+  res.render("organizer/newtournament");
 });
 
 router.post("/tournaments", async (req, res) => {
@@ -470,3 +470,4 @@ router.post("/wallet/withdraw", async (req, res) => {
 });
 
 module.exports = router;
+
