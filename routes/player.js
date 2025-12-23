@@ -1,184 +1,158 @@
 const express = require("express");
 const router = express.Router();
 const Tournament = require("../models/tournament");
-const User = require("../models/User");
-const WalletTransaction = require("../models/WalletTransaction");
+
+/* ================= MIDDLEWARE ================= */
+
+function isPlayer(req, res, next) {
+  if (!req.isAuthenticated() || req.user.role !== "player") {
+    return res.redirect("/login");
+  }
+  next();
+}
+
+/* ================= DASHBOARD ================= */
+
+router.get("/", isPlayer, async (req, res) => {
+  const tournaments = await Tournament.find();
+  res.render("dashboards/player", { tournaments });
+});
 
 
-// ✅ View all tournaments (latest on top)
-router.get("/tournaments", async (req, res) => {
+/* ================= BROWSE TOURNAMENTS ================= */
+
+router.get("/tournaments", isPlayer, async (req, res) => {
   try {
-    if (!req.user || req.user.role !== "player") {
-      return res.status(403).send("Access Denied");
-    }
+    const tournaments = await Tournament.find()
+      .populate("organizer", "username")
+      .sort({ createdAt: -1 });
 
-    const tournaments = await Tournament.find({}).sort({ createdAt: -1 }); // 🆕 sort by latest
     res.render("player/viewTournaments", { tournaments });
   } catch (err) {
-    console.error("Error fetching tournaments:", err);
-    res.status(500).send("Server Error");
+    console.error(err);
+    res.send("Unable to load tournaments");
   }
 });
 
+/* ================= JOINED TOURNAMENTS ================= */
 
-
-
-// ✅ My Tournaments Page
-router.get("/my-tournaments", async (req, res) => {
+router.get("/my-tournaments", isPlayer, async (req, res) => {
   try {
-    if (!req.user || req.user.role !== "player") {
-      return res.status(403).send("Access Denied");
-    }
+    const tournaments = await Tournament.find({
+      "registrations.user": req.user._id,
+    })
+      .populate("organizer", "username")
+      .sort({ startDate: 1 });
 
-    const user = await User.findById(req.user._id).populate("tournamentsJoined");
-    res.render("player/myTournaments", { tournaments: user.tournamentsJoined });
+    res.render("player/mytournaments", { tournaments });
   } catch (err) {
-    console.error("Error fetching player's tournaments:", err);
-    res.status(500).send("Server Error");
-  }
-});
-
-// Show Join Form
-router.get("/tournaments/:id/join", async (req, res) => {
-  try {
-    if (!req.user || req.user.role !== "player") {
-      return res.status(403).send("Only players can join tournaments.");
-    }
-
-    const tournament = await Tournament.findById(req.params.id);
-    if (!tournament) return res.status(404).send("Tournament not found");
-
-    const alreadyJoined = req.user.tournamentsJoined.includes(tournament._id);
-
-    res.render("player/joinTournamentForm", {
-      tournament,
-      alreadyJoined,
-      user: req.user
-    });
-  } catch (err) {
-    console.error("Error rendering join form:", err);
-    res.status(500).send("Server Error");
+    console.error(err);
+    res.send("Unable to load joined tournaments");
   }
 });
 
 
-router.post("/tournaments/:id/join", async (req, res) => {
+
+/* ================= VIEW TOURNAMENT ================= */
+
+router.get("/tournaments/:id", isPlayer, async (req, res) => {
+  const tournament = await Tournament.findById(req.params.id)
+    .populate("organizer", "username email")
+    .populate("registrations.user", "username");
+
+  if (!tournament) return res.send("Tournament not found");
+
+  // 🔑 find current player's registration
+  const registration = tournament.registrations.find(
+    (r) => r.user && r.user._id.equals(req.user._id)
+  );
+
+  res.render("player/tournamentShow", {
+    tournament,
+    registration,
+    user: req.user,
+  });
+});
+
+/* ================= JOIN FORM ================= */
+
+router.get("/tournaments/:id/join", isPlayer, async (req, res) => {
+  const tournament = await Tournament.findById(req.params.id).populate(
+    "organizer",
+    "upiId"
+  );
+
+  if (!tournament) return res.send("Tournament not found");
+
+  const registration = tournament.registrations.find(
+    (r) => r.user && r.user.equals(req.user._id)
+  );
+
+  res.render("player/joinTournamentForm", {
+    tournament,
+    registration,
+    user: req.user,
+  });
+});
+
+/* ================= SUBMIT REGISTRATION ================= */
+
+router.post("/tournaments/:id/register", isPlayer, async (req, res) => {
   try {
-    if (!req.user || req.user.role !== "player") {
-      return res.status(403).send("Access Denied");
-    }
-
     const tournament = await Tournament.findById(req.params.id);
-    if (!tournament) return res.status(404).send("Tournament not found");
+    if (!tournament) return res.send("Tournament not found");
 
-    const player = await User.findById(req.user._id);
+    // Prevent duplicate registration
+    const already = tournament.registrations.find(
+      (r) => r.user && r.user.equals(req.user._id)
+    );
+    if (already) return res.redirect("back");
 
-    // Already joined check
-    if (player.tournamentsJoined.includes(tournament._id)) {
-      return res.send("You have already joined this tournament.");
-    }
+    const { teamName, payerName, transactionId, amount } = req.body;
 
-    // Username check
-    if (!player.username) {
-      return res.status(400).send("Your profile must have a username.");
-    }
-
-    // Balance check
-    const entryFee = tournament.entryFee;
-    if (player.wallet < entryFee) {
-      return res.send("Insufficient wallet balance.");
-    }
-
-    const { teamName, member2, member3, member4 } = req.body;
-
-    // Deduct balance
-    player.wallet -= entryFee;
-
-    // Save transaction in WalletTransaction collection
-    const transaction = new WalletTransaction({
-      user: player._id,
-      amount: entryFee,
-      type: "debit",
-      status: "done",
-      transactionId: `T${Date.now()}`,
-      description: `Joined tournament: ${tournament.name}`
+    tournament.registrations.push({
+      user: req.user._id,
+      teamName,
+      payerName,
+      transactionId,
+      amount,
+      status: "pending",
     });
-    await transaction.save();
 
-    // Link transaction to player
-    player.walletHistroy.push(transaction._id);
-
-    // Add team
-    const newTeam = {
-      name: teamName,
-      leader: {
-        userId: player._id,
-        username: player.username
-      },
-      members: [member2, member3, member4].filter(Boolean)
-    };
-    tournament.teams.push(newTeam);
     await tournament.save();
-
-    // Update tournaments joined
-    player.tournamentsJoined.push(tournament._id);
-    await player.save();
-
-    console.log(`✅ ${player.username} joined ${tournament.name}, ₹${entryFee} debited.`);
-    res.redirect("/player/my-tournaments");
-
+    res.redirect(`/player/tournaments/${tournament._id}`);
   } catch (err) {
-    console.error("Error joining tournament:", err);
-    res.status(500).send("Server Error");
+    console.error(err);
+    res.send("Registration failed");
   }
 });
 
+/* ================= VIEW RESULTS ================= */
 
+/* ================= RESULTS : LIST ALL TOURNAMENTS ================= */
 
-// ✅ Route to view all completed tournaments with results
-router.get("/results", async (req, res) => {
+router.get("/results", isPlayer, async (req, res) => {
   try {
-    const completedTournaments = await Tournament.find({
-      endDate: { $lt: new Date() },
-      result: { $ne: null }
-    });
-    res.render("player/results", { tournaments: completedTournaments });
+    const tournaments = await Tournament.find({
+      result: { $exists: true, $ne: null }
+    }).sort({ endDate: -1 });
+
+    res.render("player/results", { tournaments });
   } catch (err) {
-    console.error("Error fetching results:", err);
-    res.status(500).send("Server Error");
+    console.error(err);
+    res.send("Unable to load results");
   }
 });
 
-// ✅ Route to view specific completed tournament result details
-router.get("/results/:id", async (req, res) => {
-  try {
-    const tournament = await Tournament.findById(req.params.id).populate("organizer");
-    if (!tournament || tournament.status !== "completed") {
-      return res.status(404).send("Tournament not found or not completed.");
-    }
-    res.render("player/showResult", { tournament });
-  } catch (err) {
-    console.error("Error loading result:", err);
-    res.status(500).send("Server Error");
-  }
-});
-//wallet rendering
-router.get("/wallet", async (req, res) => {
-  try {
-    const organizer = await User.findById(req.user._id);
-    const transactions = await WalletTransaction.find({ user: req.user._id })
-      .sort({ createdAt: -1 })
-      .populate("tournament", "name");
+router.get("/results/:id", isPlayer, async (req, res) => {
+  const tournament = await Tournament.findById(req.params.id)
+    .populate("organizer", "username email");
 
-    res.render("organizer/wallet", {
-      user: req.user,
-      walletBalance: organizer.wallet || 0,
-      transactions,
-    });
-  } catch (err) {
-    console.error("Wallet page error:", err);
-    res.status(500).send("Server Error");
+  if (!tournament || !tournament.result) {
+    return res.send("Results not available");
   }
+
+  res.render("player/showResult", { tournament });
 });
 
 

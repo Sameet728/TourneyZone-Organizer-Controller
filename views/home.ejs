@@ -1,238 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>TourneyZone | Competitive Gaming Platform</title>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Compete in esports tournaments, organize events, and join the gaming community">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TourneyZone | The Future of Esports</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              900: '#1e3a8a',
+            }
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'float-delayed': 'float 6s ease-in-out 3s infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-20px)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
-    :root {
-      --primary: #6a00f4;
-      --secondary: #00d4ff;
-      --dark: #0f0e17;
-      --light: #f8f8ff;
-      --success: #28a745;
+    @keyframes blob {
+      0% { transform: translate(0px, 0px) scale(1); }
+      33% { transform: translate(30px, -50px) scale(1.1); }
+      66% { transform: translate(-20px, 20px) scale(0.9); }
+      100% { transform: translate(0px, 0px) scale(1); }
     }
-    
-    body {
-      background-color: var(--dark);
-      color: var(--light);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      overflow-x: hidden;
-    }
-
-    .hero-section {
-      background: linear-gradient(135deg, rgba(15,14,23,0.9) 0%, rgba(26,26,46,0.9) 100%), 
-                  url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
-      background-size: cover;
-      background-position: center;
-      min-height: 80vh;
-      display: flex;
-      align-items: center;
-      position: relative;
-      padding: 4rem 0;
-    }
-
-    .hero-content {
-      z-index: 2;
-    }
-
-    .hero-title {
-      font-size: 3.5rem;
-      font-weight: 800;
-      background: linear-gradient(90deg, var(--secondary), var(--primary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 1.5rem;
-      line-height: 1.2;
-    }
-
-    .hero-subtitle {
-      font-size: 1.5rem;
-      color: rgba(255,255,255,0.8);
-      margin-bottom: 2rem;
-      max-width: 700px;
-    }
-
-    .btn-hero {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      border: none;
-      padding: 0.75rem 2rem;
-      border-radius: 8px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      transition: all 0.3s ease;
-      color: white;
-    }
-
-    .btn-hero:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(106, 0, 244, 0.4);
-      color: white;
-    }
-
-    .feature-section {
-      padding: 5rem 0;
-      background-color: rgba(15, 14, 23, 0.7);
-    }
-
-    .section-title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 3rem;
-      text-align: center;
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .feature-card {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(106, 0, 244, 0.3);
-      border-radius: 16px;
-      padding: 2rem;
-      height: 100%;
-      transition: all 0.3s ease;
-    }
-
-    .feature-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 15px 30px rgba(106, 0, 244, 0.2);
-      border-color: var(--primary);
-    }
-
-    .feature-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1.5rem;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .feature-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-    }
-
-    .feature-text {
-      color: rgba(255,255,255,0.7);
-    }
-
-    .tournament-highlights {
-      padding: 5rem 0;
-      background: linear-gradient(135deg, rgba(15,14,23,0.9) 0%, rgba(26,26,46,0.9) 100%);
-    }
-
-    .highlight-card {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 16px;
-      overflow: hidden;
-      transition: all 0.3s ease;
-      border: 1px solid rgba(106, 0, 244, 0.3);
-    }
-
-    .highlight-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(106, 0, 244, 0.3);
-    }
-
-    .highlight-img {
-      height: 200px;
-      object-fit: cover;
-      width: 100%;
-    }
-
-    .highlight-body {
-      padding: 1.5rem;
-    }
-
-    .highlight-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .highlight-meta {
-      display: flex;
-      justify-content: space-between;
-      color: rgba(255,255,255,0.6);
-      margin-bottom: 1rem;
-      font-size: 0.9rem;
-    }
-
-    .highlight-badge {
-      background: rgba(106, 0, 244, 0.2);
-      color: var(--secondary);
-      padding: 0.25rem 0.75rem;
-      border-radius: 50px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    .cta-section {
-      padding: 5rem 0;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      text-align: center;
-    }
-
-    .cta-title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      color: white;
-    }
-
-    .cta-text {
-      font-size: 1.25rem;
-      margin-bottom: 2rem;
-      color: rgba(255,255,255,0.9);
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    /* Mobile Optimizations */
-    @media (max-width: 768px) {
-      .hero-title {
-        font-size: 2.5rem;
-      }
-      
-      .hero-subtitle {
-        font-size: 1.25rem;
-      }
-      
-      .feature-section, .tournament-highlights, .cta-section {
-        padding: 3rem 0;
-      }
-      
-      .section-title {
-        font-size: 2rem;
-      }
-    }
+    .animate-blob { animation: blob 7s infinite; }
+    .animation-delay-2000 { animation-delay: 2s; }
+    .animation-delay-4000 { animation-delay: 4s; }
   </style>
 </head>
-<body>
-  <%- include("includes/navbar") %>
 
-  <!-- Hero Section -->
-  <section class="hero-section">
-    <div class="container">
-      <div class="row align-items-center">
-        <div class="col-lg-8 hero-content">
-          <h1 class="hero-title">ENTER THE ARENA</h1>
-          <p class="hero-subtitle">Compete in thrilling esports tournaments, organize competitive events, and join a growing community of gamers. Your next challenge awaits.</p>
-          <div class="d-flex gap-3">
-            <a href="/tournaments" class="btn btn-hero">
-              <i class="fas fa-trophy me-2"></i> Browse Tournaments
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative overflow-x-hidden">
+
+  <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+    <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+    <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute top-1/2 left-1/2 w-[600px] h-[600px] bg-pink-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+  </div>
+
+  <div class="relative z-50">
+    <%- include("includes/navbar") %>
+  </div>
+
+  <section class="relative pt-20 pb-20 lg:pt-32 lg:pb-32 overflow-hidden">
+    <div class="container mx-auto px-4 relative z-10">
+      <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+        
+        <div class="w-full lg:w-1/2 text-center lg:text-left">
+          <div class="inline-flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-1.5 mb-6 shadow-sm">
+            <span class="flex h-2 w-2 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-600">The #1 Platform for Gamers</span>
+          </div>
+          
+          <h1 class="text-5xl lg:text-7xl font-extrabold text-slate-900 tracking-tight leading-[1.1] mb-6">
+            Compete. Win.<br>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-purple-600">Become a Legend.</span>
+          </h1>
+          
+          <p class="text-lg text-slate-600 mb-8 leading-relaxed max-w-lg mx-auto lg:mx-0">
+            Host professional tournaments or compete for cash prizes. Experience the next generation of esports management.
+          </p>
+          
+          <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <a href="/player/tournaments" class="px-8 py-4 bg-slate-900 text-white font-bold rounded-2xl shadow-xl hover:bg-brand-600 hover:scale-105 transition-all duration-300">
+              Browse Tournaments
             </a>
             <% if (!currentUser) { %>
-            <a href="/signup" class="btn btn-outline-light">
-              <i class="fas fa-user-plus me-2"></i> Join Now
-            </a>
+              <a href="/signup" class="px-8 py-4 bg-white text-slate-900 border border-slate-200 font-bold rounded-2xl hover:bg-slate-50 hover:border-slate-300 transition-all duration-300 flex items-center justify-center gap-2">
+                Join for Free <i class="fas fa-arrow-right text-brand-600"></i>
+              </a>
+            <% } else { %>
+              <a href="/organizer/tournaments/new" class="px-8 py-4 bg-white text-slate-900 border border-slate-200 font-bold rounded-2xl hover:bg-slate-50 hover:border-slate-300 transition-all duration-300 flex items-center justify-center gap-2">
+                Host Event <i class="fas fa-plus text-brand-600"></i>
+              </a>
+            <% } %>
+          </div>
+
+          <div class="mt-12 flex items-center justify-center lg:justify-start gap-8 border-t border-slate-200 pt-8">
+            <div>
+              <p class="text-3xl font-extrabold text-slate-900">10k+</p>
+              <p class="text-xs text-slate-500 uppercase font-bold tracking-wider">Players</p>
+            </div>
+            <div class="h-10 w-px bg-slate-200"></div>
+            <div>
+              <p class="text-3xl font-extrabold text-slate-900">₹5M+</p>
+              <p class="text-xs text-slate-500 uppercase font-bold tracking-wider">Prize Pool</p>
+            </div>
+            <div class="h-10 w-px bg-slate-200"></div>
+            <div>
+              <p class="text-3xl font-extrabold text-slate-900">500+</p>
+              <p class="text-xs text-slate-500 uppercase font-bold tracking-wider">Events</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full lg:w-1/2 relative hidden md:block">
+          <div class="relative w-full h-[600px]">
+            
+            <div class="absolute top-10 right-10 z-20 w-72 bg-white/90 backdrop-blur-xl p-5 rounded-3xl shadow-2xl border border-white/40 animate-float">
+              <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center text-2xl">🏆</div>
+                <div>
+                  <p class="text-xs font-bold text-slate-400 uppercase">Champion</p>
+                  <p class="font-bold text-slate-900">Team Liquid</p>
+                </div>
+              </div>
+              <div class="bg-slate-50 rounded-xl p-3 flex justify-between items-center">
+                <span class="text-sm font-medium text-slate-500">Prize Won</span>
+                <span class="font-extrabold text-green-600">₹50,000</span>
+              </div>
+            </div>
+
+            <div class="absolute bottom-20 left-10 z-30 w-80 bg-slate-900 text-white p-6 rounded-3xl shadow-2xl border border-slate-700 animate-float-delayed">
+              <div class="flex justify-between items-center mb-6">
+                <span class="px-2 py-1 bg-red-500 rounded-md text-[10px] font-bold uppercase animate-pulse">Live</span>
+                <span class="text-xs text-slate-400">Grand Finals</span>
+              </div>
+              <div class="flex justify-between items-center mb-2">
+                <div class="text-center">
+                  <div class="w-12 h-12 bg-white/10 rounded-full mx-auto mb-2 flex items-center justify-center">🦅</div>
+                  <p class="font-bold text-sm">Falcons</p>
+                </div>
+                <div class="text-2xl font-extrabold text-slate-500">VS</div>
+                <div class="text-center">
+                  <div class="w-12 h-12 bg-white/10 rounded-full mx-auto mb-2 flex items-center justify-center">🐯</div>
+                  <p class="font-bold text-sm">Tigers</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="absolute inset-0 bg-gradient-to-tr from-brand-500 to-purple-500 rounded-[3rem] opacity-10 rotate-6 scale-90 -z-10"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Everything you need to run the show</h2>
+        <p class="text-slate-500 text-lg">Whether you are organizing a small scrim or a major championship, we have the tools.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <div class="p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-xl transition-all duration-300 group">
+          <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+            <i class="fas fa-sitemap"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mb-3">Automated Brackets</h3>
+          <p class="text-slate-500 leading-relaxed">
+            Forget manual spreadsheets. Our system generates fair brackets and updates them in real-time as matches conclude.
+          </p>
+        </div>
+
+        <div class="p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-xl transition-all duration-300 group">
+          <div class="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mb-3">Payment Verification</h3>
+          <p class="text-slate-500 leading-relaxed">
+            Secure entry fee collection. Organizers verify UPI payments with one click before slots are confirmed.
+          </p>
+        </div>
+
+        <div class="p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-xl transition-all duration-300 group">
+          <div class="w-14 h-14 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mb-3">Result Tracking</h3>
+          <p class="text-slate-500 leading-relaxed">
+            Build your legacy. Every win, loss, and podium finish is recorded in your permanent player profile.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20">
+    <div class="container mx-auto px-4">
+      <div class="relative bg-slate-900 rounded-[3rem] p-12 md:p-20 text-center overflow-hidden">
+        
+        <div class="absolute top-0 left-0 w-full h-full">
+           <div class="absolute top-0 right-0 w-96 h-96 bg-brand-500 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
+           <div class="absolute bottom-0 left-0 w-96 h-96 bg-purple-500 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
+        </div>
+
+        <div class="relative z-10">
+          <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-6">Ready to dominate?</h2>
+          <p class="text-slate-400 text-lg max-w-2xl mx-auto mb-10">
+            Join thousands of gamers who are already competing in daily tournaments. 
+            Create your account in seconds.
+          </p>
+          
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+             <% if (!currentUser) { %>
+              <a href="/signup" class="px-10 py-4 bg-brand-600 text-white font-bold rounded-2xl shadow-lg hover:bg-brand-500 hover:scale-105 transition-all duration-300">
+                Get Started
+              </a>
+              <a href="/tournaments" class="px-10 py-4 bg-transparent border border-slate-600 text-white font-bold rounded-2xl hover:bg-white/10 transition-all duration-300">
+                Explore First
+              </a>
+            <% } else { %>
+              <a href="/tournaments" class="px-10 py-4 bg-brand-600 text-white font-bold rounded-2xl shadow-lg hover:bg-brand-500 hover:scale-105 transition-all duration-300">
+                Find Tournaments
+              </a>
             <% } %>
           </div>
         </div>
@@ -240,147 +242,9 @@
     </div>
   </section>
 
-  <!-- Features Section -->
-  <section class="feature-section">
-    <div class="container">
-      <h2 class="section-title">WHY CHOOSE TOURNEYZONE?</h2>
-      <div class="row g-4">
-        <div class="col-md-4">
-          <div class="feature-card">
-            <div class="feature-icon">
-              <i class="fas fa-trophy"></i>
-            </div>
-            <h3 class="feature-title">Competitive Tournaments</h3>
-            <p class="feature-text">Join daily tournaments across multiple game titles with cash prizes and exclusive rewards.</p>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="feature-card">
-            <div class="feature-icon">
-              <i class="fas fa-chess-king"></i>
-            </div>
-            <h3 class="feature-title">Easy Organization</h3>
-            <p class="feature-text">Powerful tools to create and manage your own tournaments with custom rules and brackets.</p>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="feature-card">
-            <div class="feature-icon">
-              <i class="fas fa-wallet"></i>
-            </div>
-            <h3 class="feature-title">Secure Payments</h3>
-            <p class="feature-text">Safe and instant transactions with automated payouts for organizers and players.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <div class="mt-auto">
+    <%- include("includes/footer") %>
+  </div>
 
-  <!-- Tournament Highlights -->
-  <section class="tournament-highlights">
-    <div class="container">
-      <h2 class="section-title">UPCOMING TOURNAMENTS</h2>
-      <div class="row g-4">
-        <!-- Example Tournament 1 -->
-        <div class="col-md-4">
-          <div class="highlight-card">
-            <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
-                 alt="Valorant Tournament" class="highlight-img">
-            <div class="highlight-body">
-              <div class="highlight-meta">
-                <span><i class="fas fa-calendar-alt me-1"></i> Jun 15, 2023</span>
-                <span><i class="fas fa-users me-1"></i> 32/64 Teams</span>
-              </div>
-              <h3 class="highlight-title">Valorant Champions Cup</h3>
-              <p class="feature-text mb-3">$5,000 prize pool • Single Elimination</p>
-              <span class="highlight-badge">Entry Fee: ₹500</span>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Example Tournament 2 -->
-        <div class="col-md-4">
-          <div class="highlight-card">
-            <img src="https://images.unsplash.com/photo-1551103782-8ab07afd45c1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
-                 alt="Fortnite Tournament" class="highlight-img">
-            <div class="highlight-body">
-              <div class="highlight-meta">
-                <span><i class="fas fa-calendar-alt me-1"></i> Jun 18, 2023</span>
-                <span><i class="fas fa-users me-1"></i> 45/100 Players</span>
-              </div>
-              <h3 class="highlight-title">Fortnite Solo Showdown</h3>
-              <p class="feature-text mb-3">$2,500 prize pool • Battle Royale</p>
-              <span class="highlight-badge">Entry Fee: ₹300</span>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Example Tournament 3 -->
-        <div class="col-md-4">
-          <div class="highlight-card">
-            <img src="https://images.unsplash.com/photo-1638893298511-5d0b5e5b9b0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
-                 alt="CS:GO Tournament" class="highlight-img">
-            <div class="highlight-body">
-              <div class="highlight-meta">
-                <span><i class="fas fa-calendar-alt me-1"></i> Jun 22, 2023</span>
-                <span><i class="fas fa-users me-1"></i> 16/32 Teams</span>
-              </div>
-              <h3 class="highlight-title">CS:GO Elite Series</h3>
-              <p class="feature-text mb-3">$3,000 prize pool • Double Elimination</p>
-              <span class="highlight-badge">Entry Fee: ₹750</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="text-center mt-5">
-        <a href="/tournaments" class="btn btn-hero btn-lg">
-          <i class="fas fa-list me-2"></i> View All Tournaments
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA Section -->
-  <section class="cta-section">
-    <div class="container">
-      <h2 class="cta-title">READY TO COMPETE?</h2>
-      <p class="cta-text">Join thousands of gamers who are already competing in daily tournaments and winning amazing prizes.</p>
-      <% if (!currentUser) { %>
-        <a href="/signup" class="btn btn-dark btn-lg px-5 py-3">
-          <i class="fas fa-user-plus me-2"></i> Create Free Account
-        </a>
-      <% } else { %>
-        <a href="/tournaments" class="btn btn-dark btn-lg px-5 py-3">
-          <i class="fas fa-trophy me-2"></i> Join a Tournament
-        </a>
-      <% } %>
-    </div>
-  </section>
-
-  <%- include("includes/footer") %>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Simple animation for feature cards on scroll
-    document.addEventListener('DOMContentLoaded', function() {
-      const featureCards = document.querySelectorAll('.feature-card');
-      
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.style.opacity = 1;
-            entry.target.style.transform = 'translateY(0)';
-          }
-        });
-      }, { threshold: 0.1 });
-      
-      featureCards.forEach(card => {
-        card.style.opacity = 0;
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = 'all 0.5s ease';
-        observer.observe(card);
-      });
-    });
-  </script>
 </body>
 </html>

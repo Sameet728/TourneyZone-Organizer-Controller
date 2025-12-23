@@ -3,305 +3,306 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>All Tournaments | TourneyZone</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>Tournaments Arena | TourneyZone</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
-    :root {
-      --primary: #6a00f4;
-      --secondary: #00d4ff;
-      --dark: #0f0e17;
-      --light: #f8f8ff;
-      --success: #28a745;
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+    @keyframes blob {
+      0% { transform: translate(0px, 0px) scale(1); }
+      33% { transform: translate(30px, -50px) scale(1.1); }
+      66% { transform: translate(-20px, 20px) scale(0.9); }
+      100% { transform: translate(0px, 0px) scale(1); }
     }
-    
-    body {
-      background-color: var(--dark);
-      color: var(--light);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    
-    .page-header {
-      background: linear-gradient(135deg, rgba(15,14,23,0.9) 0%, rgba(26,26,46,0.9) 100%);
-      padding: 3rem 0;
-      margin-bottom: 3rem;
-      border-bottom: 1px solid rgba(106, 0, 244, 0.3);
-    }
-    
-    .page-title {
-      font-weight: 800;
-      background: linear-gradient(90deg, var(--secondary), var(--primary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-align: center;
-    }
-    
-    .card {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(106, 0, 244, 0.3);
-      border-radius: 16px;
-      transition: all 0.3s ease;
-      height: 100%;
-      overflow: hidden;
-    }
-    
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(106, 0, 244, 0.3);
-      border-color: var(--primary);
-    }
-    
-    .card-title {
-      font-weight: 600;
-      color: var(--light);
-      margin-bottom: 0.75rem;
-    }
-    
-    .game-badge {
-      background: rgba(106, 0, 244, 0.2);
-      color: var(--secondary);
-      padding: 0.25rem 0.75rem;
-      border-radius: 50px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      display: inline-block;
-      margin-bottom: 1rem;
-    }
-    
-    .status-badge {
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 0.35rem 0.75rem;
-      border-radius: 50px;
-    }
-    
-    .text-muted {
-      color: rgba(255,255,255,0.6) !important;
-    }
-    
-    .progress {
-      height: 10px;
-      background-color: rgba(255,255,255,0.1);
-      border-radius: 5px;
-      margin: 0.5rem 0 1rem;
-    }
-    
-    .progress-bar {
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-      border-radius: 5px;
-    }
-    
-    .btn-join {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      border: none;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      transition: all 0.3s ease;
-    }
-    
-    .btn-join:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(106, 0, 244, 0.4);
-    }
-    
-    .btn-share {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(106, 0, 244, 0.3);
-      color: var(--secondary);
-      transition: all 0.3s ease;
-    }
-    
-    .btn-share:hover {
-      background: rgba(106, 0, 244, 0.1);
-      border-color: var(--primary);
-      color: var(--light);
-    }
-    
-    .empty-state {
-      background: rgba(255,255,255,0.05);
-      border: 1px dashed rgba(106, 0, 244, 0.3);
-      border-radius: 16px;
-      padding: 3rem;
-      text-align: center;
-    }
-    
-    .empty-state-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    
-    /* Mobile Optimizations */
-    @media (max-width: 768px) {
-      .page-header {
-        padding: 2rem 0;
-      }
-      
-      .page-title {
-        font-size: 2rem;
-      }
-      
-      .card {
-        margin-bottom: 1.5rem;
-      }
-    }
+    .animate-blob { animation: blob 7s infinite; }
+    .animation-delay-2000 { animation-delay: 2s; }
+
+    /* Card Hover Lift */
+    .t-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
   </style>
 </head>
 
-<body>
-  <%- include("../includes/navbar") %>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative">
 
-  <header class="page-header">
-    <div class="container">
-      <h1 class="page-title"><i class="fas fa-trophy me-3"></i>TOURNAMENTS ARENA</h1>
-    </div>
-  </header>
-
-  <div class="container mb-5">
-    <% if (tournaments.length===0) { %>
-      <div class="empty-state">
-        <div class="empty-state-icon">
-          <i class="fas fa-trophy"></i>
-        </div>
-        <h3 class="text-light mb-3">No Active Tournaments</h3>
-        <p class="text-muted mb-4">Check back later or create your own tournament as an organizer.</p>
-        <% if (currentUser && currentUser.role === 'organizer') { %>
-          <a href="/organizer/tournaments/new" class="btn btn-join">
-            <i class="fas fa-plus me-2"></i> Create Tournament
-          </a>
-        <% } %>
-      </div>
-    <% } else { %>
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        <% tournaments.forEach(t=> {
-          const teamCount = t.teams?.length || 0;
-          const teamLimit = t.teamLimit || 0;
-          const progress = teamLimit > 0 ? Math.round((teamCount / teamLimit) * 100) : 0;
-          const isFull = teamLimit > 0 && teamCount >= teamLimit;
-          %>
-          <div class="col">
-            <div class="card">
-              <div class="card-body d-flex flex-column">
-                <div class="game-badge">
-                  <i class="fas fa-gamepad me-1"></i> <%= t.game %>
-                </div>
-                
-                <h3 class="card-title"><%= t.name %></h3>
-                
-                <p class="text-muted mb-3">
-                  <i class="fas fa-align-left me-1"></i> 
-                  <%= t.description || "No description provided." %>
-                </p>
-                
-                <div class="d-flex justify-content-between mb-2">
-                  <span class="text-muted">
-                    <i class="fas fa-rupee-sign me-1"></i> 
-                    <strong>₹<%= t.entryFee %></strong>
-                  </span>
-                  
-                  <span class="status-badge bg-<%= t.status==='upcoming' ? 'warning text-dark' : t.status==='ongoing' ? 'success' : 'secondary' %>">
-                    <%= t.status.toUpperCase() %>
-                  </span>
-                </div>
-                
-                <div class="d-flex justify-content-between text-muted small mb-2">
-                  <span><i class="far fa-calendar-alt me-1"></i> <%= t.startDate.toDateString() %></span>
-                  <span><i class="far fa-clock me-1"></i> <%= t.endDate.toDateString() %></span>
-                </div>
-                
-                <% if (teamLimit> 0) { %>
-                  <div class="mt-2 mb-3">
-                    <div class="d-flex justify-content-between small text-muted mb-1">
-                      <span>Teams: <strong><%= teamCount %>/<%= teamLimit %></strong></span>
-                      <span><%= progress %>% filled</span>
-                    </div>
-                    <div class="progress">
-                      <div class="progress-bar" role="progressbar" style="width: <%= progress %>%"></div>
-                    </div>
-                  </div>
-                <% } %>
-                
-                <div class="mt-auto d-flex justify-content-between align-items-center pt-2">
-                  <% if (isFull) { %>
-                    <button class="btn btn-danger btn-sm" disabled>
-                      <i class="fas fa-times-circle me-1"></i> FULL
-                    </button>
-                  <% } else { %>
-                    <a href="/tournament/<%= t._id %>" class="btn btn-join btn-sm">
-                      <i class="fas fa-sign-in-alt me-1"></i> JOIN
-                    </a>
-                  <% } %>
-                  
-                  <button class="btn btn-share btn-sm" onclick="shareTournament('<%= t._id %>', '<%= t.name %>')">
-                    <i class="fas fa-share-alt me-1"></i> SHARE
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        <% }) %>
-      </div>
-    <% } %>
+  <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
   </div>
 
-  <%- include("../includes/footer") %>
+  <div class="relative z-50">
+    <%- include("../includes/navbar") %>
+  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <div class="container mx-auto px-4 py-8 lg:py-12 flex-grow">
+
+    <% const featured = tournaments.find(t => t.status === 'upcoming'); %>
+    <% if (featured) { %>
+      <div class="relative w-full rounded-3xl overflow-hidden shadow-2xl mb-12 group">
+        <div class="absolute inset-0 bg-gradient-to-r from-brand-600 to-indigo-600"></div>
+        
+        <div class="absolute -right-20 -top-20 w-80 h-80 bg-white opacity-10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
+        
+        <div class="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div class="text-white max-w-2xl">
+            <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider mb-4 border border-white/20">
+              <i class="fas fa-star text-yellow-300"></i> Featured Event
+            </div>
+            <h2 class="text-3xl md:text-5xl font-extrabold mb-2 tracking-tight"><%= featured.name %></h2>
+            <div class="flex items-center gap-4 text-brand-100 font-medium text-lg">
+              <span><i class="fas fa-gamepad mr-2"></i><%= featured.game %></span>
+              <span>•</span>
+              <span><i class="fas fa-ticket-alt mr-2"></i>₹<%= featured.entryFee %> Entry</span>
+            </div>
+          </div>
+          
+          <a href="/tournament/<%= featured._id %>" class="bg-white text-brand-600 px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-brand-50 hover:scale-105 transition-all duration-300 whitespace-nowrap">
+            Join Now <i class="fas fa-rocket ml-2"></i>
+          </a>
+        </div>
+      </div>
+    <% } %>
+
+    <div class="bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg rounded-2xl p-4 md:p-6 mb-8 sticky top-4 z-40">
+      <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+        
+        <div class="relative w-full md:w-96">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+            <i class="fas fa-search"></i>
+          </div>
+          <input type="text" id="searchInput" placeholder="Search tournaments..." 
+            class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none transition-all text-slate-700 font-medium">
+        </div>
+
+        <div class="relative w-full md:w-64">
+           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+            <i class="fas fa-sort-amount-down"></i>
+          </div>
+          <select id="sortSelect" class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none transition-all text-slate-700 font-medium appearance-none cursor-pointer">
+            <option value="date">📅 Date (Earliest)</option>
+            <option value="price-low">💰 Fee (Low → High)</option>
+            <option value="price-high">💎 Fee (High → Low)</option>
+            <option value="slots">🔥 Slots Available</option>
+          </select>
+          <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
+            <i class="fas fa-chevron-down text-xs"></i>
+          </div>
+        </div>
+
+        <div class="bg-slate-100 p-1 rounded-xl flex w-full md:w-auto">
+          <button onclick="switchTab('upcoming')" id="btn-upcoming" class="toggle-btn flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all shadow-sm bg-white text-brand-600">
+            Upcoming
+          </button>
+          <button onclick="switchTab('completed')" id="btn-completed" class="toggle-btn flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 transition-all">
+            Completed
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 tournament-container min-h-[400px]">
+      
+      <% tournaments.forEach(t => { 
+          const teamCount = t.teams?.length || 0;
+          const slotsLeft = t.teamLimit - teamCount;
+          const percentFull = Math.round((teamCount / t.teamLimit) * 100);
+      %>
+        
+        <div class="t-card bg-white border border-slate-100 rounded-2xl p-5 hover:shadow-xl hover:-translate-y-1 relative group"
+             data-name="<%= t.name %>"
+             data-game="<%= t.game %>"
+             data-price="<%= t.entryFee %>"
+             data-date="<%= t.startDate.toISOString() %>"
+             data-slots="<%= slotsLeft %>"
+             data-status="<%= t.status %>">
+          
+          <div class="flex justify-between items-start mb-4">
+            <span class="px-3 py-1 bg-brand-50 text-brand-600 rounded-lg text-xs font-bold uppercase tracking-wider">
+              <%= t.game %>
+            </span>
+            <span class="text-slate-900 font-extrabold text-lg">₹<%= t.entryFee %></span>
+          </div>
+          
+          <h3 class="text-xl font-bold text-slate-900 mb-2 line-clamp-1 group-hover:text-brand-600 transition-colors">
+            <%= t.name %>
+          </h3>
+          
+          <div class="flex items-center text-slate-500 text-xs font-bold uppercase tracking-wider mb-4">
+            <i class="far fa-calendar-alt mr-2"></i> <%= t.startDate.toDateString() %>
+          </div>
+
+          <% if (t.status !== 'completed') { %>
+            <div class="mb-5">
+              <div class="flex justify-between text-xs font-bold text-slate-400 mb-1">
+                <span>Slots Filled</span>
+                <span class="<%= percentFull > 80 ? 'text-red-500' : 'text-brand-500' %>"><%= percentFull %>%</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                <div class="bg-brand-500 h-1.5 rounded-full transition-all" style="width: <%= percentFull %>%"></div>
+              </div>
+              <div class="text-xs text-slate-400 mt-1"><%= slotsLeft %> spots left</div>
+            </div>
+          <% } else { %>
+            <div class="mb-5">
+              <div class="w-full bg-slate-50 rounded-lg py-2 text-center border border-slate-100">
+                <span class="text-xs font-bold text-slate-400 uppercase">Ended</span>
+              </div>
+            </div>
+          <% } %>
+
+          <div class="grid grid-cols-4 gap-2">
+            <a href="/tournament/<%= t._id %>" class="col-span-3 bg-slate-900 text-white font-bold py-3 rounded-xl text-center hover:bg-brand-600 transition-colors shadow-lg shadow-slate-200">
+              <%= t.status === 'completed' ? 'See Results' : 'View Details' %>
+            </a>
+            <button onclick="shareTournament('<%= t._id %>')" class="col-span-1 bg-slate-100 text-slate-500 rounded-xl flex items-center justify-center hover:bg-slate-200 transition-colors">
+              <i class="fas fa-share-alt"></i>
+            </button>
+          </div>
+
+        </div>
+
+      <% }) %>
+
+      <div id="no-results" class="hidden col-span-full text-center py-12">
+        <div class="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300 text-3xl">
+          <i class="fas fa-search"></i>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900">No tournaments found</h3>
+        <p class="text-slate-500">Try adjusting your search or filters.</p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="mt-auto">
+    <%- include("../includes/footer") %>
+  </div>
 
   <script>
-    // Enhanced share function with gaming-style notifications
-    function shareTournament(id, name) {
-      const shareUrl = `${window.location.origin}/tournament/${id}`;
-      const title = `🎮 Tournament: ${name}`;
+    let activeTab = 'upcoming';
 
-      if (navigator.share) {
-        navigator.share({
-          title: title,
-          text: "Join this tournament on TourneyZone!",
-          url: shareUrl,
-        })
-        .then(() => showNotification('✅ Shared successfully', 'success'))
-        .catch((err) => showNotification('❌ Share failed', 'error'));
+    function switchTab(tab) {
+      activeTab = tab;
+      
+      // Update Button Styles
+      document.querySelectorAll('.toggle-btn').forEach(b => {
+        b.classList.remove('bg-white', 'text-brand-600', 'shadow-sm');
+        b.classList.add('text-slate-500');
+      });
+      
+      const activeBtn = document.getElementById('btn-' + tab);
+      activeBtn.classList.remove('text-slate-500');
+      activeBtn.classList.add('bg-white', 'text-brand-600', 'shadow-sm');
+
+      filterAndSort();
+    }
+
+    function filterAndSort() {
+      const term = document.getElementById('searchInput').value.toLowerCase();
+      const sort = document.getElementById('sortSelect').value;
+      const cards = Array.from(document.querySelectorAll('.t-card'));
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const name = card.dataset.name.toLowerCase();
+        const game = card.dataset.game.toLowerCase();
+        const status = card.dataset.status;
+
+        // Basic Filter Logic
+        let matches = (name.includes(term) || game.includes(term));
+
+        // Tab Logic:
+        // If tab is 'upcoming', show 'upcoming' AND 'ongoing'
+        // If tab is 'completed', show only 'completed'
+        if (activeTab === 'upcoming') {
+          if (status === 'completed') matches = false;
+        } else {
+          if (status !== 'completed') matches = false;
+        }
+
+        if (matches) {
+          card.style.display = 'block';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      // Sorting Logic
+      const container = document.querySelector('.tournament-container');
+      const visibleCards = cards.filter(c => c.style.display !== 'none');
+
+      visibleCards.sort((a, b) => {
+        if (sort === 'price-low') return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+        if (sort === 'price-high') return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+        if (sort === 'slots') return parseInt(b.dataset.slots) - parseInt(a.dataset.slots);
+        // Default: Date
+        return Date.parse(a.dataset.date) - Date.parse(b.dataset.date);
+      });
+
+      // Re-append sorted cards
+      visibleCards.forEach(c => container.appendChild(c));
+
+      // Show/Hide Empty State
+      const noResults = document.getElementById('no-results');
+      if (visibleCount === 0) {
+        noResults.classList.remove('hidden');
       } else {
-        navigator.clipboard.writeText(shareUrl)
-          .then(() => showNotification('📋 Link copied to clipboard!', 'success'))
-          .catch(() => showNotification('❌ Failed to copy link', 'error'));
+        noResults.classList.add('hidden');
       }
     }
 
-    // Gaming-style notification
-    function showNotification(message, type) {
-      const notification = document.createElement('div');
-      notification.className = `position-fixed bottom-0 end-0 m-3 p-3 rounded-3 shadow-lg ${
-        type === 'success' ? 'bg-success' : 'bg-danger'
-      }`;
-      notification.style.zIndex = '9999';
-      notification.style.transition = 'all 0.3s ease';
-      notification.style.transform = 'translateY(100px)';
-      notification.style.opacity = '0';
-      notification.innerHTML = `
-        <div class="d-flex align-items-center">
-          <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
-          <span>${message}</span>
-        </div>
-      `;
+    // Event Listeners
+    document.getElementById('searchInput').addEventListener('input', filterAndSort);
+    document.getElementById('sortSelect').addEventListener('change', filterAndSort);
+
+    // Initial Load
+    filterAndSort();
+
+    // Share Function
+    function shareTournament(id) {
+      const url = `${window.location.origin}/tournament/${id}`;
+      navigator.clipboard.writeText(url);
       
-      document.body.appendChild(notification);
+      // Create temporary toast
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-4 right-4 bg-slate-900 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-bold z-50 animate-bounce';
+      toast.innerHTML = '<i class="fas fa-check mr-2 text-green-400"></i> Link Copied!';
+      document.body.appendChild(toast);
       
-      setTimeout(() => {
-        notification.style.transform = 'translateY(0)';
-        notification.style.opacity = '1';
-      }, 10);
-      
-      setTimeout(() => {
-        notification.style.transform = 'translateY(100px)';
-        notification.style.opacity = '0';
-        setTimeout(() => notification.remove(), 300);
-      }, 3000);
+      setTimeout(() => toast.remove(), 2000);
     }
   </script>
+
 </body>
 </html>

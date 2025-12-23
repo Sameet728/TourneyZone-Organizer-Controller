@@ -2,57 +2,61 @@ const mongoose = require("mongoose");
 const passportLocalMongoose = require("passport-local-mongoose");
 
 const userSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+  },
+
   email: {
     type: String,
     required: true,
     unique: true,
+    trim: true,
   },
+
   role: {
     type: String,
     enum: ["admin", "organizer", "player"],
     default: "player",
   },
-  name: {
+
+  // Organizer payment info
+  upiId: {
     type: String,
-    required: false,
-  },
-  wallet: {
-    type: Number,
-    default: 100,
-  },
-  joinedAt: {
-    type: Date,
-    default: Date.now,
+    default: null,
   },
 
-  // ✅ Tournaments this user has joined (for players)
+  // Wallet system
+  wallet: {
+    type: Number,
+    default: 0,
+  },
+
+  // Player tournaments
   tournamentsJoined: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Tournament",
     },
   ],
-  // ✅ Tournaments this user has joined (for players)
+
+  // Organizer tournaments
   tournamentsCreated: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Tournament",
     },
   ],
-  // ✅ Tournaments this user has joined (for players)
-  walletHistroy: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "WalletTransaction",
-    },
-  ],
-  verifiedAt: Date,
-  verifiedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 
-userSchema.plugin(passportLocalMongoose); // Adds username, password, methods
+// 🔐 Passport plugin (adds hash, salt, authenticate etc.)
+userSchema.plugin(passportLocalMongoose);
 
 module.exports = mongoose.model("User", userSchema);

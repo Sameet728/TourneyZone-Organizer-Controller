@@ -1,128 +1,96 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-black border-bottom border-primary border-2" style="--bs-border-opacity: 0.3;">
-  <div class="container-fluid px-3 px-sm-4">
-    <!-- Brand with gaming logo effect -->
-    <a class="navbar-brand d-flex align-items-center" href="/">
-      <span class="fw-bold gradient-text" style="
-        background: linear-gradient(90deg, #00d4ff 0%, #6a00f4 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-size: 1.5rem;
-        letter-spacing: 1px;
-      ">
-        <i class="fas fa-trophy me-2"></i>TourneyZone
+<nav class="fixed w-full z-50 top-0 start-0 border-b border-white/20 bg-white/80 backdrop-blur-xl transition-all duration-300" id="mainNavbar">
+  <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+    
+    <a href="/" class="flex items-center space-x-2 rtl:space-x-reverse group">
+      <div class="w-10 h-10 bg-brand-600 text-white rounded-xl flex items-center justify-center text-xl shadow-lg shadow-brand-500/30 group-hover:scale-110 transition-transform">
+        <i class="fas fa-bolt"></i>
+      </div>
+      <span class="self-center text-2xl font-extrabold whitespace-nowrap text-slate-900 tracking-tight">
+        Tourney<span class="text-brand-600">Zone</span>
       </span>
     </a>
 
-    <!-- Mobile Toggle Button -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navLinks" aria-expanded="false">
-      <span class="navbar-toggler-icon"></span>
+    <button data-collapse-toggle="navbar-sticky" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-slate-500 rounded-lg md:hidden hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-200" aria-controls="navbar-sticky" aria-expanded="false" onclick="toggleMobileMenu()">
+      <span class="sr-only">Open main menu</span>
+      <i class="fas fa-bars text-xl"></i>
     </button>
 
-    <!-- Nav Links - Enhanced for Gaming UI -->
-    <div class="collapse navbar-collapse" id="navLinks">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-3">
+    <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
+      <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-slate-100 rounded-2xl bg-slate-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-transparent">
+        
+        <li>
+          <a href="/player/tournaments" class="block py-2 px-3 text-slate-700 rounded hover:bg-slate-100 md:hover:bg-transparent md:hover:text-brand-600 md:p-0 transition-colors">
+            Tournaments
+          </a>
+        </li>
+
         <% if (!currentUser) { %>
-        <!-- Guest Links -->
-        <li class="nav-item">
-          <a class="nav-link btn-hover-glow px-3 py-2 rounded" href="/login">
-            <i class="fas fa-sign-in-alt me-2"></i>Login
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link btn-hover-glow px-3 py-2 rounded" href="/signup" style="
-            background: linear-gradient(90deg, rgba(106,0,244,0.2) 0%, rgba(0,212,255,0.2) 100%);
-          ">
-            <i class="fas fa-user-plus me-2"></i>Sign Up
-          </a>
-        </li>
+          <li class="md:hidden border-t border-slate-200 my-2 pt-2"></li>
+          <li class="flex flex-col md:flex-row gap-2">
+            <a href="/login" class="px-5 py-2 text-sm font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 hover:text-brand-600 transition-all text-center">
+              Log In
+            </a>
+            <a href="/signup" class="px-5 py-2 text-sm font-bold text-white bg-slate-900 rounded-xl hover:bg-brand-600 shadow-lg hover:shadow-brand-500/30 transition-all text-center">
+              Sign Up
+            </a>
+          </li>
         <% } else { %>
-          <!-- Player Specific -->
-          <% if (currentUser && currentUser.role === 'player') { %>
-          <li class="nav-item d-none d-lg-block">
-            <a class="nav-link position-relative px-3 py-2" href="/player/my-tournaments">
-              <i class="fas fa-gamepad me-2"></i>My Tournaments
-              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                <%- currentUser.tournamentsJoined?.length || 0 %>
-              </span>
-            </a>
-          </li>
+          
+          <% if (currentUser.role === 'player') { %>
+            <li>
+              <a href="/player/my-tournaments" class="block py-2 px-3 text-slate-700 rounded hover:bg-slate-100 md:hover:bg-transparent md:hover:text-brand-600 md:p-0 transition-colors">
+                My Matches
+                <% if (currentUser.tournamentsJoined?.length > 0) { %>
+                  <span class="inline-flex items-center justify-center w-5 h-5 ms-2 text-xs font-semibold text-white bg-red-500 rounded-full">
+                    <%= currentUser.tournamentsJoined.length %>
+                  </span>
+                <% } %>
+              </a>
+            </li>
           <% } %>
-        <% if (currentUser && currentUser.role === 'organizer') { %>
-  <li class="nav-item d-none d-lg-block">
-    <a class="nav-link position-relative px-3 py-2" href="/organizer/wallet">
-      <i class="fas fa-wallet me-2"></i>My Wallet
-    </a>
-  </li>
-<% } %>
 
-          <!-- Dashboard Link -->
-          <li class="nav-item">
-            <a class="nav-link px-3 py-2 rounded-pill btn-hover-glow" href="/<%= currentUser.role %>" style="
-              background: rgba(255,255,255,0.1);
-            ">
-              <i class="fas fa-<%= currentUser.role === 'admin' ? 'shield-alt' : currentUser.role === 'organizer' ? 'chess-king' : 'user' %> me-2"></i>
-              Dashboard
+          <% if (currentUser.role === 'organizer') { %>
+            <li>
+              <a href="/organizer/tournaments/new" class="block py-2 px-3 text-slate-700 rounded hover:bg-slate-100 md:hover:bg-transparent md:hover:text-brand-600 md:p-0 transition-colors">
+                <i class="fas fa-plus-circle mr-1"></i> Host Event
+              </a>
+            </li>
+          <% } %>
+
+          <li class="md:ml-4 mt-4 md:mt-0">
+            <div class="relative group">
+              <a href="/<%= currentUser.role %>" class="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-900 rounded-xl hover:bg-slate-200 transition-colors font-bold text-sm w-full justify-center md:w-auto">
+                <div class="w-6 h-6 bg-brand-500 text-white rounded-full flex items-center justify-center text-xs">
+                  <i class="fas fa-user"></i>
+                </div>
+                <span>Dashboard</span>
+              </a>
+            </div>
+          </li>
+
+          <li class="md:hidden">
+            <a href="/logout" class="block py-2 px-3 text-red-600 rounded hover:bg-red-50 font-bold text-center mt-2">
+              Log Out
+            </a>
+          </li>
+          
+          <li class="hidden md:block">
+            <a href="/logout" class="text-slate-400 hover:text-red-500 transition-colors" title="Logout">
+              <i class="fas fa-sign-out-alt"></i>
             </a>
           </li>
 
-          <!-- Logout -->
-          <li class="nav-item">
-            <a class="nav-link px-3 py-2 text-danger" href="/logout">
-              <i class="fas fa-power-off me-2"></i>Logout
-            </a>
-          </li>
         <% } %>
       </ul>
     </div>
   </div>
 </nav>
 
-<!-- Add this CSS in your <head> or main stylesheet -->
-<style>
-  /* Navbar Hover Effects */
-  .btn-hover-glow {
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+<div class="h-20"></div>
+
+<script>
+  function toggleMobileMenu() {
+    const menu = document.getElementById('navbar-sticky');
+    menu.classList.toggle('hidden');
   }
-  
-  .btn-hover-glow:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(106, 0, 244, 0.4);
-  }
-  
-  .btn-hover-glow::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(106, 0, 244, 0.1), transparent);
-    transform: translateX(-100%);
-    transition: 0.5s;
-  }
-  
-  .btn-hover-glow:hover::after {
-    transform: translateX(100%);
-  }
-  
-  /* Mobile Optimization */
-  @media (max-width: 991.98px) {
-    .navbar-collapse {
-      background: rgba(10, 10, 20, 0.95);
-      padding: 1rem;
-      border-radius: 0.5rem;
-      margin-top: 0.5rem;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    }
-    
-    .nav-item {
-      margin: 0.25rem 0;
-    }
-    
-    .nav-link {
-      padding: 0.75rem 1rem !important;
-    }
-  }
-</style>
+</script>

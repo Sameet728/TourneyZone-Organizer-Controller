@@ -1,167 +1,142 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
-
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Player Dashboard</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <!-- Google Fonts for Gaming Vibe -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?&family=Oxanium:wght@400;600;700&display=swap" rel="stylesheet">
-  <!-- Font Awesome for Icons -->
+  <title>Player Dashboard | TourneyZone</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
-    :root {
-      --primary-glow: #00e5ff; /* Changed to cyan for players */
-      --secondary-glow: #9f5dff; /* Changed to purple for players */
-      --dark-bg: #111119;
-      --card-bg: #1c1c27;
-      --border-color: rgba(255, 255, 255, 0.1);
+    @keyframes blob {
+      0% { transform: translate(0px, 0px) scale(1); }
+      33% { transform: translate(30px, -50px) scale(1.1); }
+      66% { transform: translate(-20px, 20px) scale(0.9); }
+      100% { transform: translate(0px, 0px) scale(1); }
     }
-
-    body {
-      font-family: 'Oxanium', sans-serif;
-      background-color: var(--dark-bg);
-      color: #f0f0f0;
-      background-image:
-        radial-gradient(at 0% 0%, hsla(183, 100%, 35%, 0.3) 0px, transparent 50%),
-        radial-gradient(at 98% 97%, hsla(253, 48%, 29%, 0.3) 0px, transparent 50%);
-    }
-
-    .page-header {
-      margin-bottom: 3rem;
-    }
-
-    .page-header h2 {
-      font-weight: 700;
-      font-size: 2.5rem;
-    }
-    
-    .page-header h2 .username {
-        color: var(--primary-glow);
-    }
-
-    .action-card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 0.75rem;
-      text-align: center;
-      padding: 2.5rem 1.5rem;
-      transition: all 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .action-card:hover {
-      transform: translateY(-8px);
-      border-color: var(--primary-glow);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
-    
-    .card-icon {
-        font-size: 4rem;
-        color: var(--secondary-glow);
-        margin-bottom: 1.5rem;
-        text-shadow: 0 0 15px var(--secondary-glow);
-        transition: color 0.3s ease;
-    }
-
-    .action-card:hover .card-icon {
-        color: var(--primary-glow);
-        text-shadow: 0 0 15px var(--primary-glow);
-    }
-    
-    .action-card .card-title {
-        font-weight: 700;
-        font-size: 1.5rem;
-        color: #fff;
-    }
-
-    .action-card .card-text {
-        color: #aab;
-        margin-bottom: 2rem;
-    }
-    
-    .btn-glow {
-      text-decoration: none;
-      background-color: var(--primary-glow);
-      border: none;
-      color: #000; /* Dark text on cyan button */
-      padding: 10px 25px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      border-radius: 6px;
-      transition: all 0.3s ease;
-    }
-
-    .btn-glow:hover {
-      background-color: #33ebff;
-      box-shadow: 0 0 15px var(--primary-glow);
-    }
+    .animate-blob { animation: blob 7s infinite; }
+    .animation-delay-2000 { animation-delay: 2s; }
   </style>
 </head>
 
-<body>
-  <!-- Navbar -->
-  <%- include("../includes/navbar") %>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative">
 
-  <!-- Page Content -->
-  <div class="container my-5">
-    <div class="page-header">
-      <h2>Welcome, <span class="username"><%= currentUser.username %></span> 🎮</h2>
-      <p class="text-white-50">Ready for the next challenge? Let's dive in!</p>
-    </div>
-
-    <div class="row g-4 justify-content-center">
-      
-      <!-- Browse Tournaments Card -->
-      <div class="col-lg-4 col-md-6">
-        <div class="action-card h-100">
-          <div>
-            <div class="card-icon"><i class="fas fa-search"></i></div>
-            <h5 class="card-title">Browse Tournaments</h5>
-            <p class="card-text">Explore upcoming tournaments and join the battle.</p>
-          </div>
-          <a href="/player/tournaments" class="btn btn-glow">Browse</a>
-        </div>
-      </div>
-
-      <!-- My Tournaments Card -->
-      <div class="col-lg-4 col-md-6">
-        <div class="action-card h-100">
-          <div>
-            <div class="card-icon"><i class="fas fa-crosshairs"></i></div>
-            <h5 class="card-title">My Tournaments</h5>
-            <p class="card-text">View the tournaments you've joined and track their status.</p>
-          </div>
-          <a href="/player/my-tournaments" class="btn btn-glow">View Joined</a>
-        </div>
-      </div>
-
-      <!-- View Results Card -->
-      <div class="col-lg-4 col-md-6">
-        <div class="action-card h-100">
-          <div>
-            <div class="card-icon"><i class="fas fa-trophy"></i></div>
-            <h5 class="card-title">View Results</h5>
-            <p class="card-text">Check the final results of completed tournaments.</p>
-          </div>
-          <a href="/player/results" class="btn btn-glow">Results</a>
-        </div>
-      </div>
-      
-    </div>
+  <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+    <div class="absolute top-0 right-1/4 w-96 h-96 bg-brand-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+    <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
   </div>
-  <%- include("../includes/footer") %>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <div class="relative z-50">
+    <%- include("../includes/navbar") %>
+  </div>
+
+  <div class="container mx-auto px-4 py-8 lg:py-12 flex-grow">
+    
+    <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-4">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+          Hello, <span class="text-brand-600"><%= currentUser.username %></span> 🎮
+        </h1>
+        <p class="text-slate-500 mt-2 font-medium">Ready for your next victory?</p>
+      </div>
+      
+      <div class="hidden md:flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200 text-sm font-bold text-slate-500">
+        <i class="far fa-calendar-alt text-brand-500"></i>
+        <span><%= new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) %></span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+      <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Status</div>
+        <div class="text-green-500 font-extrabold text-lg flex items-center gap-1">
+          <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Online
+        </div>
+      </div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Role</div>
+        <div class="text-brand-600 font-extrabold text-lg">Player</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
+      
+      <div class="group relative bg-white border border-slate-200 rounded-3xl p-8 shadow-lg hover:shadow-2xl hover:border-brand-200 transition-all duration-300 hover:-translate-y-1">
+        <div class="w-14 h-14 bg-brand-100 text-brand-600 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-inner group-hover:scale-110 transition-transform">
+          <i class="fas fa-search"></i>
+        </div>
+        
+        <h3 class="text-xl font-bold text-slate-900 mb-2">Find Battles</h3>
+        <p class="text-slate-500 mb-8 leading-relaxed text-sm">
+          Browse upcoming tournaments, check prize pools, and join the competition.
+        </p>
+        
+        <a href="/player/tournaments" class="inline-flex items-center justify-center w-full px-6 py-3 bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-700 transition-all shadow-lg hover:shadow-brand-500/30">
+          Browse Now
+        </a>
+      </div>
+
+      <div class="group relative bg-white border border-slate-200 rounded-3xl p-8 shadow-lg hover:shadow-2xl hover:border-purple-200 transition-all duration-300 hover:-translate-y-1">
+        <div class="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-inner group-hover:scale-110 transition-transform">
+          <i class="fas fa-crosshairs"></i>
+        </div>
+        
+        <h3 class="text-xl font-bold text-slate-900 mb-2">My Matches</h3>
+        <p class="text-slate-500 mb-8 leading-relaxed text-sm">
+          Track your active tournaments, view brackets, and access room credentials.
+        </p>
+        
+        <a href="/player/my-tournaments" class="inline-flex items-center justify-center w-full px-6 py-3 bg-white text-slate-700 border-2 border-slate-200 font-bold rounded-xl hover:border-purple-500 hover:text-purple-600 transition-all">
+          View Active
+        </a>
+      </div>
+
+      <div class="group relative bg-white border border-slate-200 rounded-3xl p-8 shadow-lg hover:shadow-2xl hover:border-yellow-200 transition-all duration-300 hover:-translate-y-1">
+        <div class="w-14 h-14 bg-yellow-100 text-yellow-600 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-inner group-hover:scale-110 transition-transform">
+          <i class="fas fa-trophy"></i>
+        </div>
+        
+        <h3 class="text-xl font-bold text-slate-900 mb-2">Results</h3>
+        <p class="text-slate-500 mb-8 leading-relaxed text-sm">
+          Check the hall of fame and see results from completed tournaments.
+        </p>
+        
+        <a href="/player/results" class="inline-flex items-center justify-center w-full px-6 py-3 bg-white text-slate-700 border-2 border-slate-200 font-bold rounded-xl hover:border-yellow-500 hover:text-yellow-600 transition-all">
+          View History
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="mt-auto">
+    <%- include("../includes/footer") %>
+  </div>
+
 </body>
-
 </html>

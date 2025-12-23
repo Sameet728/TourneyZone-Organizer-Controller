@@ -1,287 +1,349 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
-
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>
-    <%= tournament.name %> Details
-  </title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <!-- Google Fonts for Gaming Vibe -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?&family=Oxanium:wght@400;600;700&display=swap" rel="stylesheet">
-  <!-- Font Awesome for Icons -->
+  <title><%= tournament.name %> | Details</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              500: '#3b82f6',
+              600: '#2563eb',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
-    :root {
-      --primary-glow: #9f5dff;
-      --secondary-glow: #00e5ff;
-      --dark-bg: #111119;
-      --card-bg: #1c1c27;
-      --border-color: rgba(255, 255, 255, 0.1);
+    @keyframes blob {
+      0% { transform: translate(0px, 0px) scale(1); }
+      33% { transform: translate(30px, -50px) scale(1.1); }
+      66% { transform: translate(-20px, 20px) scale(0.9); }
+      100% { transform: translate(0px, 0px) scale(1); }
     }
-
-    body {
-      font-family: 'Oxanium', sans-serif;
-      background-color: var(--dark-bg);
-      color: #f0f0f0;
-      background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
-      background-size: 20px 20px;
-    }
-
-    .tournament-header {
-      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://source.unsplash.com/1600x900/?<%= encodeURIComponent(tournament.game) %>') no-repeat center center;
-      background-size: cover;
-      padding: 4rem 2rem;
-      border-radius: 0.5rem;
-      margin-bottom: 2rem;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-    }
-
-    .tournament-title {
-      font-weight: 700;
-      font-size: 3rem;
-    }
-
-    .game-tag {
-      font-weight: 600;
-      color: var(--secondary-glow);
-      letter-spacing: 1px;
-    }
-
-    .card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      transition: all 0.3s ease;
-    }
-
-    .card:hover {
-      border-color: var(--primary-glow);
-    }
-
-    .status-badge.bg-warning {
-      background-color: #ffc107 !important;
-      color: #000 !important;
-    }
-
-    .status-badge.bg-success {
-      background-color: #28a745 !important;
-    }
-
-    .status-badge.bg-secondary {
-      background-color: #6c757d !important;
-    }
-
-    .btn-glow {
-      position: relative;
-      color: #fff;
-      padding: 12px 30px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      border: 2px solid transparent;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-    }
-
-    .btn-glow-primary {
-      background-color: var(--primary-glow);
-      box-shadow: 0 0 10px var(--primary-glow), 0 0 20px var(--primary-glow);
-    }
-
-    .btn-glow-primary:hover {
-      background-color: #b37eff;
-      box-shadow: 0 0 15px #b37eff, 0 0 30px #b37eff;
-    }
-
-    .btn-glow-secondary {
-      background-color: transparent;
-      border: 2px solid var(--border-color);
-    }
-
-    .btn-glow-secondary:hover {
-      background-color: var(--card-bg);
-      border-color: #fff;
-    }
-
-    .info-list li {
-      background-color: rgba(0, 0, 0, 0.2);
-      padding: 0.75rem 1rem;
-      border-radius: 6px;
-      margin-bottom: 0.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .progress {
-      height: 1.25rem;
-      background-color: #2a2a3a;
-      font-size: 0.8rem;
-    }
-
-    .progress-bar {
-      background: linear-gradient(90deg, var(--secondary-glow), var(--primary-glow));
-    }
+    .animate-blob { animation: blob 7s infinite; }
+    .animation-delay-2000 { animation-delay: 2s; }
   </style>
 </head>
 
-<body>
-  <%- include("../includes/navbar") %>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative">
 
-    <div class="container my-5">
-      <!-- Main Tournament Header -->
-      <div class="tournament-header">
-        <h1 class="tournament-title">
-          <%= tournament.name %>
-        </h1>
-        <p class="lead game-tag text-uppercase">
-          <i class="fas fa-gamepad"></i> Game: <%= tournament.game %>
-        </p>
-      </div>
+  <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+    <div class="absolute top-0 right-1/4 w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob"></div>
+    <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
+  </div>
 
-      <div class="row g-4">
-        <!-- Left Column: Details -->
-        <div class="col-lg-7">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title text-light mb-3">About Tournament</h5>
-              <p class="text-white-50">
-                <%= tournament.description || "No description provided." %>
-              </p>
-              <hr>
-              <ul class="list-unstyled info-list">
-                <li>
-                  <span><i class="fa-solid fa-calendar-day me-2 text-primary"></i>Start Date</span>
-                  <span class="fw-bold">
-                    <%= tournament.startDate.toDateString() %>
-                  </span>
-                </li>
-                <li>
-                  <span><i class="fa-solid fa-calendar-check me-2 text-primary"></i>End Date</span>
-                  <span class="fw-bold">
-                    <%= tournament.endDate.toDateString() %>
-                  </span>
-                </li>
-                <li>
-                  <span><i class="fa-solid fa-user-tie me-2 text-primary"></i>Organizer</span>
-                  <span class="fw-bold">
-                    <%= tournament.organizer?.username || "Unknown" %>
-                  </span>
-                </li>
-              </ul>
+  <div class="relative z-50">
+    <%- include("../includes/navbar") %>
+  </div>
+
+  <div class="container mx-auto px-4 py-8 lg:py-12 flex-grow">
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+
+      <div class="lg:col-span-2 space-y-8">
+        
+        <div>
+          <div class="flex flex-wrap items-center gap-3 mb-4">
+            <span class="px-3 py-1 rounded-lg bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider">
+              <i class="fas fa-gamepad mr-1"></i> <%= tournament.game %>
+            </span>
+            <span class="px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border
+              <%= tournament.status === 'upcoming' ? 'bg-amber-50 text-amber-600 border-amber-200' : '' %>
+              <%= tournament.status === 'ongoing' ? 'bg-green-50 text-green-600 border-green-200' : '' %>
+              <%= tournament.status === 'completed' ? 'bg-slate-100 text-slate-500 border-slate-200' : '' %>
+            ">
+              <%= tournament.status %>
+            </span>
+          </div>
+          
+          <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4">
+            <%= tournament.name %>
+          </h1>
+
+          <div class="flex items-center gap-2 text-slate-500 font-medium">
+             <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xs">
+               <i class="fas fa-user"></i>
+             </div>
+             <span>Hosted by <strong class="text-slate-700"><%= tournament.organizer?.username || "Unknown" %></strong></span>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm">
+          <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center">
+            <i class="fas fa-align-left text-brand-500 mr-2"></i> About Tournament
+          </h3>
+          <p class="text-slate-600 leading-relaxed whitespace-pre-line">
+            <%= tournament.description || "No description provided by the organizer." %>
+          </p>
+
+          <hr class="my-6 border-slate-100">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                <i class="far fa-calendar-alt"></i>
+              </div>
+              <div>
+                <p class="text-xs font-bold text-slate-400 uppercase">Start Date</p>
+                <p class="font-bold text-slate-800"><%= tournament.startDate.toDateString() %></p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                <i class="far fa-calendar-check"></i>
+              </div>
+              <div>
+                <p class="text-xs font-bold text-slate-400 uppercase">End Date</p>
+                <p class="font-bold text-slate-800"><%= tournament.endDate.toDateString() %></p>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Right Column: Status & Actions -->
-        <div class="col-lg-5">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title text-light mb-3">Status & Registration</h5>
+        <% if (
+          tournament.result &&
+          tournament.result.firstPlace &&
+          tournament.result.firstPlace.teamName
+        ) { %>
+          <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-8 shadow-xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-yellow-500 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
 
-              <!-- Status Badge -->
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-white-50">Status</span>
-                <% if (tournament.status==='upcoming' ) { %>
-                  <span class="badge fs-6 rounded-pill status-badge bg-warning text-dark">Upcoming</span>
-                  <% } else if (tournament.status==='ongoing' ) { %>
-                    <span class="badge fs-6 rounded-pill status-badge bg-success">Ongoing</span>
-                    <% } else { %>
-                      <span class="badge fs-6 rounded-pill status-badge bg-secondary">Completed</span>
-                      <% } %>
-              </div>
+            <h3 class="text-xl font-bold mb-6 flex items-center relative z-10">
+              <i class="fas fa-trophy text-yellow-400 mr-2"></i> Tournament Results
+            </h3>
 
-              <!-- Entry Fee -->
-              <div class="d-flex justify-content-between align-items-center mb-4">
-                <span class="text-white-50">Entry Fee</span>
-                <span class="fw-bold fs-4" style="color: var(--secondary-glow);">₹<%= tournament.entryFee %></span>
-              </div>
-
-              <!-- Teams Joined Progress -->
-              <div class="mb-3">
-                <div class="d-flex justify-content-between mb-1 text-white-50">
-                  <span>Teams Joined</span>
-                  <span>
-                    <%= tournament.teams.length %> / <%= tournament.teamLimit %>
-                  </span>
+            <div class="space-y-4 relative z-10">
+              <div class="flex items-center justify-between bg-white/10 backdrop-blur-sm border border-yellow-500/50 p-4 rounded-xl">
+                <div class="flex items-center gap-4">
+                  <div class="text-2xl">🥇</div>
+                  <div>
+                    <p class="text-yellow-400 text-xs font-bold uppercase tracking-wider">Champion</p>
+                    <p class="text-lg font-bold"><%= tournament.result.firstPlace.teamName %></p>
+                  </div>
                 </div>
-                <div class="progress" role="progressbar">
-                  <div class="progress-bar"
-                    style="width: <%= (tournament.teams.length / tournament.teamLimit) * 100 %>%"></div>
+                <div class="text-right hidden sm:block">
+                  <p class="text-xs text-slate-400">Leader</p>
+                  <p class="text-sm font-medium"><%= tournament.result.firstPlace.leader %></p>
                 </div>
               </div>
 
-              <!-- Action Buttons -->
-              <div class="d-grid gap-2 mt-4">
-                <% if (user && user.role==='player' && tournament.status !=='completed' ) { %>
-                  <% if (alreadyJoined) { %>
-                    <button class="btn btn-glow btn-glow-secondary" disabled>
-                      <i class="fa-solid fa-check me-2"></i>You've already joined
-                    </button>
-                    <% } else if (tournament.teams.length>= tournament.teamLimit) { %>
-                      <button class="btn btn-danger" disabled>
-                        <i class="fa-solid fa-ban me-2"></i>Tournament Full
-                      </button>
-                      <% } else { %>
-                        <% if (tournament.entryFee> 0) { %>
-                          <!-- Modern, styled <a> tag for payment -->
-                          <a href="/player/tournaments/<%= tournament._id %>/join"
-                            class="btn btn-glow btn-glow-primary">
-                            Pay ₹<%= tournament.entryFee %> & Join
-                          </a>
-                          <% } else { %>
-                            <a href="/player/tournaments/<%= tournament._id %>/join"
-                              class="btn btn-glow btn-glow-primary">Join Free</a>
-                            <% } %>
-                              <% } %>
-                                <% } %>
-
-                                  <button class="btn btn-glow btn-glow-secondary"
-                                    onclick="shareTournament('<%= tournament._id %>', '<%= tournament.name %>')">
-                                    <i class="fa-solid fa-share-alt me-2"></i>Share
-                                  </button>
+              <div class="flex items-center justify-between bg-white/5 backdrop-blur-sm border border-slate-500/30 p-4 rounded-xl">
+                <div class="flex items-center gap-4">
+                  <div class="text-2xl">🥈</div>
+                  <div>
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">Runner Up</p>
+                    <p class="text-lg font-bold"><%= tournament.result.secondPlace.teamName %></p>
+                  </div>
+                </div>
+                 <div class="text-right hidden sm:block">
+                  <p class="text-xs text-slate-400">Leader</p>
+                  <p class="text-sm font-medium"><%= tournament.result.secondPlace.leader %></p>
+                </div>
               </div>
 
+              <div class="flex items-center justify-between bg-white/5 backdrop-blur-sm border border-orange-500/30 p-4 rounded-xl">
+                <div class="flex items-center gap-4">
+                  <div class="text-2xl">🥉</div>
+                  <div>
+                    <p class="text-orange-400 text-xs font-bold uppercase tracking-wider">Third Place</p>
+                    <p class="text-lg font-bold"><%= tournament.result.thirdPlace.teamName %></p>
+                  </div>
+                </div>
+                 <div class="text-right hidden sm:block">
+                  <p class="text-xs text-slate-400">Leader</p>
+                  <p class="text-sm font-medium"><%= tournament.result.thirdPlace.leader %></p>
+                </div>
+              </div>
+            </div>
+
+            <% if (tournament.result.notes) { %>
+              <div class="mt-6 pt-4 border-t border-white/10 text-slate-300 text-sm italic">
+                <strong><i class="fas fa-quote-left mr-2"></i>Notes:</strong> <%= tournament.result.notes %>
+              </div>
+            <% } %>
+          </div>
+        <% } %>
+
+      </div>
+
+      <div class="lg:col-span-1">
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-lg p-6 sticky top-24">
+          
+          <h4 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Registration Details</h4>
+          
+          <div class="flex items-end justify-between mb-6">
+            <div>
+              <p class="text-slate-500 text-sm font-medium mb-1">Entry Fee</p>
+              <p class="text-3xl font-extrabold text-slate-900">₹<%= tournament.entryFee %></p>
+            </div>
+            <div class="text-right">
+               <% const percent = Math.round((tournament.acceptedCount / tournament.teamLimit) * 100); %>
+               <div class="inline-flex items-center justify-center w-12 h-12 rounded-full border-4 border-brand-100 text-brand-600 font-bold text-xs">
+                 <%= percent %>%
+               </div>
             </div>
           </div>
+
+          <div class="mb-2">
+            <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+              <div class="bg-brand-500 h-2.5 rounded-full" style="width: <%= percent %>%"></div>
+            </div>
+          </div>
+          <div class="flex justify-between text-xs font-bold text-slate-500 mb-6">
+            <span><%= tournament.acceptedCount %> Teams Joined</span>
+            <span><%= tournament.teamLimit %> Limit</span>
+          </div>
+
+          <hr class="border-slate-100 mb-6">
+
+          <% if (user && user.role === "player") { %>
+
+            <% if (!registration) { %>
+
+              <% if (tournament.status !== "upcoming") { %>
+                <button disabled class="w-full py-3.5 rounded-xl bg-slate-100 text-slate-400 font-bold cursor-not-allowed">
+                  Registration Closed
+                </button>
+              <% } else if (tournament.availableSlots <= 0) { %>
+                <button disabled class="w-full py-3.5 rounded-xl bg-red-50 text-red-500 font-bold cursor-not-allowed border border-red-100">
+                  <i class="fas fa-ban mr-2"></i> Tournament Full
+                </button>
+              <% } else { %>
+                <a href="/player/tournaments/<%= tournament._id %>/join"
+                   class="block w-full text-center py-3.5 rounded-xl bg-brand-600 text-white font-bold hover:bg-brand-700 transition-all shadow-lg hover:shadow-brand-500/30 transform hover:-translate-y-1">
+                  Join Tournament 🚀
+                </a>
+              <% } %>
+
+            <% } else if (registration.status === "pending") { %>
+
+              <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
+                <div class="w-12 h-12 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-2 text-xl animate-pulse">
+                  <i class="fas fa-hourglass-half"></i>
+                </div>
+                <h5 class="text-amber-800 font-bold">Approval Pending</h5>
+                <p class="text-amber-600 text-xs mt-1">Organizer is reviewing your payment.</p>
+              </div>
+
+            <% } else if (registration.status === "accepted") { %>
+
+              <div class="bg-green-50 border border-green-200 rounded-xl p-4 text-center mb-4">
+                <div class="flex items-center justify-center gap-2 mb-2">
+                  <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                  <h5 class="text-green-800 font-bold">Registration Accepted</h5>
+                </div>
+                <p class="text-green-600 text-xs">You are officially in the lineup!</p>
+              </div>
+
+              <% if (tournament.roomDetails && tournament.roomDetails.roomId) { %>
+                <div class="bg-slate-900 rounded-xl p-4 text-left border border-slate-700 relative overflow-hidden group">
+                  <div class="absolute top-0 right-0 p-2 opacity-10">
+                    <i class="fas fa-key text-4xl text-white"></i>
+                  </div>
+                  
+                  <h6 class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3">
+                    <i class="fas fa-lock-open mr-1 text-green-400"></i> Room Credentials
+                  </h6>
+                  
+                  <div class="space-y-3">
+                    <div>
+                      <p class="text-slate-500 text-[10px] uppercase font-bold">Room ID</p>
+                      <div class="flex items-center justify-between">
+                        <p class="text-white font-mono text-lg font-bold tracking-wider select-all"><%= tournament.roomDetails.roomId %></p>
+                        <i class="far fa-copy text-slate-600 hover:text-white cursor-pointer transition-colors" onclick="copyToClipboard('<%= tournament.roomDetails.roomId %>')"></i>
+                      </div>
+                    </div>
+                    <div>
+                      <p class="text-slate-500 text-[10px] uppercase font-bold">Password</p>
+                      <p class="text-white font-mono text-lg font-bold tracking-wider select-all"><%= tournament.roomDetails.roomPassword %></p>
+                    </div>
+                  </div>
+                </div>
+                <p class="text-center text-[10px] text-slate-400 mt-2">
+                  Updated: <%= new Date(tournament.roomDetails.sharedAt).toLocaleTimeString() %>
+                </p>
+              <% } else { %>
+                <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 flex items-start gap-3">
+                  <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+                  <p class="text-blue-700 text-xs">Room ID & Password will be displayed here when shared by the organizer.</p>
+                </div>
+              <% } %>
+
+            <% } else { %>
+
+              <div class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+                <div class="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-2 text-xl">
+                  <i class="fas fa-times"></i>
+                </div>
+                <h5 class="text-red-800 font-bold">Registration Rejected</h5>
+                <p class="text-red-600 text-xs mt-1"><%= registration.rejectionReason || "Invalid UTR" %></p>
+              </div>
+
+            <% } %>
+
+          <% } else { %>
+
+            <div class="bg-slate-50 rounded-xl p-4 text-center border border-slate-100">
+              <p class="text-slate-500 text-sm mb-3">Login as a player to join.</p>
+              <a href="/login" class="text-brand-600 font-bold text-sm hover:underline">Go to Login</a>
+            </div>
+
+          <% } %>
+
+          <button onclick="shareTournament('<%= tournament._id %>', '<%= tournament.name %>')" 
+             class="w-full mt-4 flex items-center justify-center gap-2 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors">
+            <i class="fas fa-share-nodes"></i> Share Link
+          </button>
+
         </div>
       </div>
+
     </div>
+
+  </div>
+
+  <div class="mt-auto">
     <%- include("../includes/footer") %>
+  </div>
 
-    <!-- Bootstrap & Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-
-
-    <!-- ✅ Share Script (NO CHANGES TO LOGIC) -->
-    <script>
-      function shareTournament(id, name) {
-        const shareUrl = `${window.location.origin}/tournaments/${id}`; // Corrected path to be more generic
-        const title = `Check out this tournament: ${name}`;
-
-        if (navigator.share) {
-          navigator
-            .share({
-              title: title,
-              text: "Join this tournament and compete for the prize!",
-              url: shareUrl,
-            })
-            .then(() => console.log("✅ Shared"))
-            .catch((err) => console.warn("❌ Share failed:", err));
-        } else {
-          navigator.clipboard
-            .writeText(shareUrl)
-            .then(() => alert("📋 Link copied to clipboard!"))
-            .catch(() => alert("❌ Failed to copy link"));
-        }
+  <script>
+    function shareTournament(id, name) {
+      const url = `${window.location.origin}/tournaments/${id}`;
+      if (navigator.share) {
+        navigator.share({ title: name, url });
+      } else {
+        navigator.clipboard.writeText(url);
+        // Simple visual feedback instead of alert
+        const btn = document.querySelector('button[onclick^="share"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check text-green-500"></i> Copied!';
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+        }, 2000);
       }
-    </script>
-</body>
+    }
 
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text);
+      // Optional: Add toast notification here
+    }
+  </script>
+
+</body>
 </html>

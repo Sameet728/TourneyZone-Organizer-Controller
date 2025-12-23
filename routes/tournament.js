@@ -1,32 +1,37 @@
+// routes/tournament.js
+
 const express = require("express");
 const router = express.Router();
 const Tournament = require("../models/tournament");
-// Show detailed tournament page
+
+// ================= SHOW TOURNAMENT (PLAYER VIEW) =================
 router.get("/:id", async (req, res) => {
   try {
-    const tournament = await Tournament.findById(req.params.id).populate("organizer");
+    const tournament = await Tournament.findById(req.params.id)
+      .populate("organizer", "username email")
+      .populate("registrations.user", "username email");
+
     if (!tournament) {
-      return res.status(404).send("Tournament not found.");
+      return res.status(404).send("Tournament not found");
     }
 
-    // Check if logged-in player has already joined
-    let alreadyJoined = false;
-    if (req.user && req.user.role === 'player') {
-      alreadyJoined = req.user.tournamentsJoined.includes(tournament._id);
+    let registration = null;
+
+    if (req.user && req.user.role === "player") {
+      registration = tournament.registrations.find(
+        (r) => r.user && r.user._id.equals(req.user._id)
+      );
     }
 
     res.render("player/tournamentshow", {
       tournament,
-      alreadyJoined,
-      user: req.user
-      // razorpayKey removed ✅
+      user: req.user,
+      registration,
     });
   } catch (err) {
-    console.error("Error loading tournament:", err);
-    res.status(500).send("Server error");
+    console.error("❌ Error loading tournament:", err);
+    res.status(500).send("Server Error");
   }
 });
-
-
 
 module.exports = router;

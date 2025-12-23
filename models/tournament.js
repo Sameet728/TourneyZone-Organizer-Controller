@@ -1,13 +1,14 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-// Team Schema (embedded)
+/* ================= TEAM SCHEMA ================= */
 const teamSchema = new Schema(
   {
     name: {
       type: String,
       required: true,
     },
+
     leader: {
       userId: {
         type: Schema.Types.ObjectId,
@@ -19,50 +20,96 @@ const teamSchema = new Schema(
         required: true,
       },
     },
-    members: [String], // Only store names (strings) of optional members
+
+    members: {
+      type: [String],
+      default: [],
+    },
   },
   { _id: false }
 );
 
-// Main Tournament Schema
+/* ================= REGISTRATION SCHEMA ================= */
+const registrationSchema = new Schema(
+  {
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
+    teamName: {
+      type: String,
+      required: true,
+    },
+
+    payerName: {
+      type: String,
+      required: true,
+    },
+
+    transactionId: {
+      type: String, // UTR
+      required: true,
+    },
+
+    amount: {
+      type: Number,
+      required: true,
+    },
+
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "rejected"],
+      default: "pending",
+    },
+
+    rejectionReason: {
+      type: String,
+      default: "",
+    },
+
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { _id: true } // IMPORTANT → allows reg._id
+);
+
+/* ================= TOURNAMENT SCHEMA ================= */
 const tournamentSchema = new Schema(
   {
     name: {
       type: String,
       required: true,
     },
+
     game: {
       type: String,
       required: true,
     },
+
     description: String,
+
+    entryFee: {
+      type: Number,
+      default: 0,
+    },
+
+    teamLimit: {
+      type: Number,
+      required: true,
+    },
 
     type: {
       type: String,
       enum: ["regular", "scrim"],
       default: "regular",
     },
-    entryFee: {
-      type: Number,
-      default: 0,
-    },
-    teamLimit: {
-      type: Number,
-      default: 50,
-    },
 
     timeSlot: {
       type: String,
-      enum: [
-        "9 AM - 12 PM",
-        "12 PM - 3 PM",
-        "3 PM - 6 PM",
-        "6 PM - 9 PM",
-        "9 PM - 12 AM",
-      ],
-      required: function () {
-        return this.type === "scrim";
-      },
     },
 
     organizer: {
@@ -71,32 +118,42 @@ const tournamentSchema = new Schema(
       required: true,
     },
 
-    teams: [teamSchema], // Array of team objects
+    registrations: [registrationSchema],
+
+    teams: [teamSchema],
+
+    roomDetails: {
+      roomId: String,
+      roomPassword: String,
+      sharedAt: Date,
+    },
 
     startDate: {
       type: Date,
       required: true,
     },
+    matchTime: {
+  type: String, // e.g. "18:30" or "6:30 PM"
+  required: false,
+},
+
     endDate: {
       type: Date,
       required: true,
     },
-    isPaidToOrganizer: {
-      type: Boolean,
-      default: false,
-    },
+
     result: {
       firstPlace: {
         teamName: String,
-        score: Number,
+        leader: String,
       },
       secondPlace: {
         teamName: String,
-        score: Number,
+        leader: String,
       },
       thirdPlace: {
         teamName: String,
-        score: Number,
+        leader: String,
       },
       notes: String,
     },
@@ -104,7 +161,9 @@ const tournamentSchema = new Schema(
   { timestamps: true }
 );
 
-// ✅ Virtual "status" property (auto-calculated from dates)
+/* ================= VIRTUALS ================= */
+
+// Status
 tournamentSchema.virtual("status").get(function () {
   const now = new Date();
   if (now < this.startDate) return "upcoming";
@@ -112,8 +171,21 @@ tournamentSchema.virtual("status").get(function () {
   return "completed";
 });
 
-// ✅ Enable virtuals when converting to JSON or object
+// Accepted count
+tournamentSchema.virtual("acceptedCount").get(function () {
+  return this.registrations.filter(r => r.status === "accepted").length;
+});
+
+// Available slots
+tournamentSchema.virtual("availableSlots").get(function () {
+  return this.teamLimit - this.acceptedCount;
+});
+
+// Enable virtuals
 tournamentSchema.set("toJSON", { virtuals: true });
 tournamentSchema.set("toObject", { virtuals: true });
 
-module.exports = mongoose.model("Tournament", tournamentSchema);
+module.exports =
+  mongoose.models.Tournament ||
+  mongoose.model("Tournament", tournamentSchema);
+

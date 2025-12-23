@@ -1,258 +1,177 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
-
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>
-    <%= tournament.name %> - Results
-  </title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <!-- Google Fonts for Gaming Vibe -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?&family=Oxanium:wght@400;600;700&display=swap" rel="stylesheet">
-  <!-- Font Awesome for Icons -->
+  <title><%= tournament.name %> - Results</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              500: '#3b82f6',
+              600: '#2563eb',
+              900: '#1e3a8a',
+            }
+          },
+          animation: {
+            'bounce-slow': 'bounce 3s infinite',
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
-    :root {
-      --primary-glow: #9f5dff;
-      --dark-bg: #111119;
-      --card-bg: #1c1c27;
-      --border-color: rgba(255, 255, 255, 0.1);
-
-      --gold: #ffd700;
-      --silver: #c0c0c0;
-      --bronze: #cd7f32;
+    @keyframes blob {
+      0% { transform: translate(0px, 0px) scale(1); }
+      33% { transform: translate(30px, -50px) scale(1.1); }
+      66% { transform: translate(-20px, 20px) scale(0.9); }
+      100% { transform: translate(0px, 0px) scale(1); }
     }
+    .animate-blob { animation: blob 7s infinite; }
+    .animation-delay-2000 { animation-delay: 2s; }
 
-    body {
-      font-family: 'Oxanium', sans-serif;
-      background-color: var(--dark-bg);
-      color: #f0f0f0;
-      background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
-      background-size: 20px 20px;
-    }
-
-    .page-header {
-      text-align: center;
-      margin-bottom: 3rem;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    }
-
-    .page-header h2 {
-      font-weight: 700;
-      font-size: 2.5rem;
-    }
-
-    .game-tag {
-      font-weight: 600;
-      color: var(--primary-glow);
-      letter-spacing: 1px;
-    }
-
-    .podium-card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 0.5rem;
-      text-align: center;
-      padding: 2rem 1.5rem;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .podium-card:after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent 40%);
-      transform: rotate(45deg);
-      transition: all 0.5s ease;
-      opacity: 0;
-    }
-
-    .podium-card:hover:after {
-      opacity: 1;
-      transform: rotate(0deg);
-    }
-
-    .podium-card .trophy-icon {
-      font-size: 4rem;
-      margin-bottom: 1rem;
-      text-shadow: 0 0 15px;
-    }
-
-    .podium-card-gold {
-      border-top: 4px solid var(--gold);
-    }
-
-    .podium-card-gold .trophy-icon {
-      color: var(--gold);
-    }
-
-    .podium-card-gold .place-text {
-      color: var(--gold);
-    }
-
-    .podium-card-silver {
-      border-top: 4px solid var(--silver);
-    }
-
-    .podium-card-silver .trophy-icon {
-      color: var(--silver);
-    }
-
-    .podium-card-silver .place-text {
-      color: var(--silver);
-    }
-
-    .podium-card-bronze {
-      border-top: 4px solid var(--bronze);
-    }
-
-    .podium-card-bronze .trophy-icon {
-      color: var(--bronze);
-    }
-
-    .podium-card-bronze .place-text {
-      color: var(--bronze);
-    }
-
-    .place-text {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .team-name {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .team-score {
-      font-size: 1.1rem;
-      color: #aaa;
-    }
-
-    .notes-box {
-      background-color: var(--card-bg);
-      border-left: 4px solid var(--primary-glow);
-      padding: 1.5rem;
-      border-radius: 0.25rem;
-      margin-top: 3rem;
-    }
-
-    .notes-box p {
-      margin-bottom: 0;
-      font-style: italic;
-      color: #ddd;
-    }
-
-    .btn-glow-secondary {
-      display: inline-block;
-      text-decoration: none;
-      background-color: transparent;
-      border: 2px solid var(--border-color);
-      color: #fff;
-      padding: 10px 25px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-    }
-
-    .btn-glow-secondary:hover {
-      background-color: var(--card-bg);
-      border-color: #fff;
-      color: #fff;
+    /* Confetti Background for Winner */
+    .confetti-bg {
+      background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fbbf24' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
     }
   </style>
 </head>
 
-<body>
-  <%- include("../includes/navbar") %>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative">
 
-    <div class="container my-5">
-      <div class="page-header">
-        <h2>
-          <%= tournament.name %> - Final Results
-        </h2>
-        <p class="text-muted game-tag text-uppercase">
-          GAME: <%= tournament.game %> // ORGANIZER: <%= tournament.organizer?.username || "Unknown" %>
-        </p>
+  <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-brand-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+  </div>
+
+  <div class="relative z-50">
+    <%- include("../includes/navbar") %>
+  </div>
+
+  <div class="container mx-auto px-4 py-8 lg:py-12 flex-grow">
+    
+    <div class="text-center mb-16">
+      <h1 class="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-3">
+        Final Results 🏆
+      </h1>
+      <div class="inline-flex items-center gap-2 bg-white px-4 py-1.5 rounded-full border border-slate-200 shadow-sm">
+        <span class="text-xs font-bold uppercase tracking-widest text-brand-600"><%= tournament.game %></span>
+        <span class="text-slate-300">|</span>
+        <span class="text-xs font-bold text-slate-500">Org: <%= tournament.organizer?.username || "Unknown" %></span>
       </div>
-
-      <!-- Podium Section -->
-      <h4><i class="fas fa-medal me-2"></i>Winner's Podium</h4>
-      <hr class="mb-4">
-      <div class="row justify-content-center g-4">
-
-        <!-- 2nd Place -->
-        <div class="col-lg-4 col-md-6 order-md-1 order-2">
-          <div class="podium-card podium-card-silver h-100">
-            <i class="fas fa-trophy trophy-icon"></i>
-            <div class="place-text">2nd Place</div>
-            <div class="team-name">
-              <%= tournament.result.secondPlace.teamName %>
-            </div>
-            <div class="team-score">Score: <%= tournament.result.secondPlace.score %>
-            </div>
-          </div>
-        </div>
-
-        <!-- 1st Place -->
-        <div class="col-lg-4 col-md-6 order-md-2 order-1">
-          <div class="podium-card podium-card-gold h-100" style="transform: scale(1.05);">
-            <i class="fas fa-trophy trophy-icon"></i>
-            <div class="place-text">1st Place</div>
-            <div class="team-name">
-              <%= tournament.result.firstPlace.teamName %>
-            </div>
-            <div class="team-score">Score: <%= tournament.result.firstPlace.score %>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3rd Place -->
-        <div class="col-lg-4 col-md-6 order-md-3 order-3">
-          <div class="podium-card podium-card-bronze h-100">
-            <i class="fas fa-trophy trophy-icon"></i>
-            <div class="place-text">3rd Place</div>
-            <div class="team-name">
-              <%= tournament.result.thirdPlace.teamName %>
-            </div>
-            <div class="team-score">Score: <%= tournament.result.thirdPlace.score %>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Organizer's Notes -->
-      <% if (tournament.result.notes) { %>
-        <div class="notes-box mt-5">
-          <h5 class="text-light"><i class="fas fa-clipboard-list me-2"></i>Organizer's Notes</h5>
-          <p class="text-white-50 mt-3">
-            <%= tournament.result.notes %>
-          </p>
-        </div>
-        <% } %>
-
-          <div class="text-center mt-5">
-            <a href="/player/results" class="btn-glow-secondary"><i class="fas fa-arrow-left me-2"></i>Back to All
-              Results</a>
-          </div>
     </div>
 
-    <%- include("../includes/footer") %>
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-end max-w-5xl mx-auto">
 
+      <div class="order-2 lg:order-1">
+        <div class="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-3xl p-6 text-center shadow-lg relative overflow-hidden transform hover:-translate-y-1 transition-all duration-300">
+          <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-slate-300 to-slate-400"></div>
+          
+          <div class="relative -mt-10 mb-4 inline-block">
+             <div class="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full border-4 border-white shadow-md flex items-center justify-center text-3xl mx-auto">
+               🥈
+             </div>
+          </div>
+          
+          <h3 class="text-slate-400 font-bold uppercase text-xs tracking-widest mb-1">Runner Up</h3>
+          <h2 class="text-xl font-bold text-slate-800 mb-2 truncate"><%= tournament.result.secondPlace.teamName %></h2>
+          
+          <div class="bg-slate-50 rounded-xl py-2 px-4 inline-block border border-slate-100">
+             <span class="text-xs font-bold text-slate-400 uppercase mr-1">Score</span>
+             <span class="text-lg font-extrabold text-slate-700"><%= tournament.result.secondPlace.score %></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="order-1 lg:order-2 lg:-mt-12 z-10">
+        <div class="bg-white border-2 border-yellow-200 rounded-3xl p-8 text-center shadow-2xl relative overflow-hidden transform hover:-translate-y-2 transition-all duration-300 confetti-bg">
+          
+          <div class="absolute top-4 right-4 text-yellow-400 opacity-20 text-4xl transform rotate-12">
+            <i class="fas fa-crown"></i>
+          </div>
+
+          <div class="relative -mt-16 mb-6 inline-block">
+             <div class="w-28 h-28 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-full border-4 border-white shadow-xl flex items-center justify-center text-5xl mx-auto animate-bounce-slow">
+               🏆
+             </div>
+             <div class="absolute bottom-0 right-0 bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm border-2 border-white">
+               #1
+             </div>
+          </div>
+          
+          <h3 class="text-yellow-600 font-bold uppercase text-sm tracking-widest mb-1">Grand Champion</h3>
+          <h2 class="text-3xl font-extrabold text-slate-900 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-600 to-yellow-500 truncate">
+            <%= tournament.result.firstPlace.teamName %>
+          </h2>
+          
+          <div class="bg-yellow-50 rounded-2xl py-3 px-6 inline-block border border-yellow-100 shadow-inner">
+             <span class="text-xs font-bold text-yellow-600 uppercase mr-2">Final Score</span>
+             <span class="text-2xl font-extrabold text-slate-800"><%= tournament.result.firstPlace.score %></span>
+          </div>
+
+          <div class="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-yellow-400 opacity-5 blur-3xl rounded-full"></div>
+        </div>
+      </div>
+
+      <div class="order-3 lg:order-3">
+        <div class="bg-white/80 backdrop-blur-xl border border-orange-100 rounded-3xl p-6 text-center shadow-lg relative overflow-hidden transform hover:-translate-y-1 transition-all duration-300">
+          <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-orange-300 to-orange-400"></div>
+          
+          <div class="relative -mt-10 mb-4 inline-block">
+             <div class="w-20 h-20 bg-gradient-to-br from-orange-50 to-orange-100 rounded-full border-4 border-white shadow-md flex items-center justify-center text-3xl mx-auto">
+               🥉
+             </div>
+          </div>
+          
+          <h3 class="text-orange-400 font-bold uppercase text-xs tracking-widest mb-1">3rd Place</h3>
+          <h2 class="text-xl font-bold text-slate-800 mb-2 truncate"><%= tournament.result.thirdPlace.teamName %></h2>
+          
+          <div class="bg-orange-50/50 rounded-xl py-2 px-4 inline-block border border-orange-100">
+             <span class="text-xs font-bold text-orange-400 uppercase mr-1">Score</span>
+             <span class="text-lg font-extrabold text-slate-700"><%= tournament.result.thirdPlace.score %></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <% if (tournament.result.notes) { %>
+      <div class="max-w-2xl mx-auto mt-16">
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 relative">
+          <div class="absolute -top-3 left-6 bg-white px-3 py-1 border border-slate-200 rounded-full text-xs font-bold text-slate-500 uppercase tracking-wide">
+            <i class="fas fa-quote-left mr-1"></i> Organizer's Notes
+          </div>
+          <p class="text-slate-600 italic leading-relaxed text-center">
+            "<%= tournament.result.notes %>"
+          </p>
+        </div>
+      </div>
+    <% } %>
+
+    <div class="text-center mt-12 pb-8">
+      <a href="/player/results" class="inline-flex items-center text-slate-500 hover:text-brand-600 font-bold transition-colors group">
+        <i class="fas fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform"></i>
+        Back to All Results
+      </a>
+    </div>
+
+  </div>
+
+  <div class="mt-auto">
+    <%- include("../includes/footer") %>
+  </div>
+
+</body>
 </html>
