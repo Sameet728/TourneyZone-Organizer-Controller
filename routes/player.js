@@ -44,7 +44,7 @@ router.get("/my-tournaments", isPlayer, async (req, res) => {
       .populate("organizer", "username")
       .sort({ startDate: 1 });
 
-    res.render("player/mytournaments", { tournaments });
+    res.render("player/myTournaments", { tournaments });
   } catch (err) {
     console.error(err);
     res.send("Unable to load joined tournaments");
@@ -158,3 +158,4 @@ router.get("/results/:id", isPlayer, async (req, res) => {
 
 
 module.exports = router;
+
