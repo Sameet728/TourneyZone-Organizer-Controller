@@ -174,93 +174,83 @@ router.post(
 
 /* ================= SEND ROOM DETAILS + MATCH TIME ================= */
 
+const Brevo = require("@getbrevo/brevo");
+
 router.post("/tournaments/:id/room", isOrganizer, async (req, res) => {
   try {
     const { roomId, roomPassword, matchTime } = req.body;
 
-    // 1️⃣ Fetch tournament with registered users
+    // 1️⃣ Fetch tournament with users + organizer
     const tournament = await Tournament.findById(req.params.id)
-      .populate("registrations.user", "email username")
+      .populate("registrations.user", "username email")
       .populate("organizer", "username email");
 
     if (!tournament) {
       return res.send("Tournament not found");
     }
 
-    // 2️⃣ Save room details
+    // 2️⃣ Save room + match time
     tournament.roomDetails = {
       roomId,
       roomPassword,
       sharedAt: new Date(),
     };
-
-    // 3️⃣ Save match time (STRING)
     tournament.matchTime = matchTime;
-
     await tournament.save();
 
-    // 4️⃣ Email setup
-    const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com', // Fallback ensures it never hits localhost
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+    // 3️⃣ Brevo API init
+    const apiInstance = new Brevo.TransactionalEmailsApi();
+    apiInstance.setApiKey(
+      Brevo.TransactionalEmailsApiApiKeys.apiKey,
+      process.env.BREVO_API_KEY
+    );
 
-    // 5️⃣ Filter accepted players
-    const acceptedPlayers = tournament.registrations.filter(function (r) {
-      return r.status === "accepted" && r.user && r.user.email;
-    });
+    // 4️⃣ Organizer fallback protection
+    const organizerName =
+      tournament.organizer?.username || "Tournament Organizer";
+    const organizerEmail =
+      tournament.organizer?.email || "support@tourneyzone.com";
+
+    // 5️⃣ Accepted players only
+    const acceptedPlayers = tournament.registrations.filter(
+      r => r.status === "accepted" && r.user?.email
+    );
 
     // 6️⃣ Send email to each accepted player
-    for (let r of acceptedPlayers) {
-      await transporter.sendMail({
-        to: r.user.email,
-
-        subject: `🎮 You're In! Match Details for ${tournament.name} 🏆`,
-
-        html: `
+    for (const r of acceptedPlayers) {
+      await apiInstance.sendTransacEmail({
+        sender: {
+          name: "TourneyZone",
+          email: "sameetpisal@gmail.com",
+        },
+        to: [
+          {
+            email: r.user.email,
+            name: r.user.username,
+          },
+        ],
+        subject: `🎮 Match Ready! ${tournament.name} Room Details 🏆`,
+        htmlContent: `
 <!DOCTYPE html>
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
 
-<body style="
-  margin:0;
-  padding:0;
-  background:#f5f7fb;
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
-">
+<body style="margin:0;padding:0;background:#f5f7fb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;">
 
   <table width="100%" cellpadding="0" cellspacing="0" style="padding:20px;">
     <tr>
       <td align="center">
 
-        <!-- MAIN CARD -->
         <table width="100%" cellpadding="0" cellspacing="0"
-          style="
-            max-width:560px;
-            background:#ffffff;
-            border-radius:14px;
-            overflow:hidden;
-            box-shadow:0 10px 30px rgba(0,0,0,0.08);
-          ">
+          style="max-width:560px;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.08);">
 
           <!-- HEADER -->
           <tr>
-            <td style="
-              padding:26px;
-              background:linear-gradient(135deg,#6a11cb,#2575fc);
-              color:#ffffff;
-            ">
-              <h2 style="margin:0;font-size:22px;">
-                🎮 Match Room Details
-              </h2>
-              <p style="margin:6px 0 0;font-size:14px;opacity:0.9;">
+            <td style="padding:28px;background:linear-gradient(135deg,#6366f1,#22d3ee);color:#ffffff;">
+              <h2 style="margin:0;font-size:22px;">🎮 Match Room Details</h2>
+              <p style="margin:6px 0 0;font-size:14px;opacity:0.95;">
                 ${tournament.name}
               </p>
             </td>
@@ -268,74 +258,46 @@ router.post("/tournaments/:id/room", isOrganizer, async (req, res) => {
 
           <!-- CONTENT -->
           <tr>
-            <td style="padding:26px;color:#333333;">
+            <td style="padding:28px;color:#1f2937;">
 
-              <p style="margin:0 0 12px;font-size:15px;">
+              <p style="margin:0 0 14px;font-size:15px;">
                 Hi <strong>${r.user.username}</strong> 👋
               </p>
 
-              <p style="margin:0 0 18px;font-size:14px;color:#555;">
-                Congratulations! You have been <strong>successfully accepted</strong>
-                into the tournament. Below are your official match details.
+              <p style="margin:0 0 18px;font-size:14px;color:#4b5563;">
+                You are officially <strong>accepted</strong> into the tournament.
+                Below are your match details.
               </p>
 
-              <!-- DETAILS BOX -->
-              <table width="100%" cellpadding="0" cellspacing="0"
-                style="
-                  background:#f7f9fc;
-                  border-radius:10px;
-                  padding:18px;
-                ">
+              <!-- DETAILS -->
+              <div style="background:#f8fafc;border-radius:12px;padding:18px;">
+                <p style="margin:6px 0;font-size:15px;">
+                  🔑 <strong>Room ID:</strong>
+                  <span style="color:#2563eb;font-weight:600;">${roomId}</span>
+                </p>
+                <p style="margin:6px 0;font-size:15px;">
+                  🔒 <strong>Password:</strong>
+                  <span style="color:#2563eb;font-weight:600;">${roomPassword}</span>
+                </p>
+                <p style="margin:6px 0;font-size:15px;">
+                  ⏰ <strong>Match Time:</strong>
+                  <span style="color:#dc2626;font-weight:600;">${matchTime}</span>
+                </p>
+              </div>
 
-                <tr>
-                  <td style="padding:8px 0;font-size:15px;">
-                    🔑 <strong>Room ID:</strong>
-                    <span style="color:#2575fc;font-weight:600;">
-                      ${roomId}
-                    </span>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="padding:8px 0;font-size:15px;">
-                    🔒 <strong>Password:</strong>
-                    <span style="color:#2575fc;font-weight:600;">
-                      ${roomPassword}
-                    </span>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="padding:8px 0;font-size:15px;">
-                    ⏰ <strong>Match Time:</strong>
-                    <span style="color:#e5533d;font-weight:600;">
-                      ${matchTime}
-                    </span>
-                  </td>
-                </tr>
-
-              </table>
-
-              <p style="margin:16px 0 0;font-size:13px;color:#666;">
-                Please join the room at least <strong>10 minutes early</strong>
-                to avoid any last-minute issues.
+              <p style="margin:16px 0 0;font-size:13px;color:#6b7280;">
+                Please join the room at least <strong>10 minutes early</strong>.
               </p>
 
               <!-- ORGANIZER -->
-              <div style="
-                margin-top:24px;
-                padding-top:16px;
-                border-top:1px solid #e6e8ef;
-              ">
-                <p style="margin:0;font-size:13px;color:#555;">
+              <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e5e7eb;">
+                <p style="margin:0;font-size:13px;color:#374151;">
                   📞 <strong>Organizer Contact</strong>
                 </p>
-
                 <p style="margin:6px 0 0;font-size:13px;">
-                  ${tournament.organizer.username}<br/>
-                  <a href="mailto:${tournament.organizer.email}"
-                     style="color:#2575fc;text-decoration:none;">
-                    ${tournament.organizer.email}
+                  ${organizerName}<br/>
+                  <a href="mailto:${organizerEmail}" style="color:#2563eb;text-decoration:none;">
+                    ${organizerEmail}
                   </a>
                 </p>
               </div>
@@ -345,19 +307,13 @@ router.post("/tournaments/:id/room", isOrganizer, async (req, res) => {
 
           <!-- FOOTER -->
           <tr>
-            <td align="center" style="
-              padding:18px;
-              background:#fafafa;
-              font-size:12px;
-              color:#999;
-            ">
+            <td align="center" style="padding:18px;background:#f9fafb;font-size:12px;color:#9ca3af;">
               🚀 Powered by <strong>TourneyZone</strong><br/>
-              Best of luck & play fair!
+              Play fair. Win big.
             </td>
           </tr>
 
         </table>
-        <!-- END CARD -->
 
       </td>
     </tr>
@@ -365,17 +321,18 @@ router.post("/tournaments/:id/room", isOrganizer, async (req, res) => {
 
 </body>
 </html>
-  `,
+        `,
       });
     }
 
     // 7️⃣ Done
-    res.redirect("back");
+    res.redirect(req.get("Referrer") || "/organizer");
   } catch (err) {
-    console.error(err);
+    console.error("Brevo send error:", err);
     res.send("Failed to send room details");
   }
 });
+
 
 /* ================= SUBMIT RESULTS ================= */
 
@@ -451,5 +408,6 @@ router.post("/tournaments/:id/results", isOrganizer, async (req, res) => {
 });
 
 module.exports = router;
+
 
 
