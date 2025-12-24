@@ -201,12 +201,18 @@ router.post("/tournaments/:id/room", isOrganizer, async (req, res) => {
 
     // 4️⃣ Email setup
     const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
+  host: process.env.SMTP_HOST, // e.g., smtp.gmail.com
+  port: 587,                   // Use 587 for TLS
+  secure: false,               // Must be false for port 587
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+  // Add this 'tls' block to prevent some certificate errors
+  tls: {
+    ciphers: 'SSLv3' 
+  }
+});
 
     // 5️⃣ Filter accepted players
     const acceptedPlayers = tournament.registrations.filter(function (r) {
@@ -449,3 +455,4 @@ router.post("/tournaments/:id/results", isOrganizer, async (req, res) => {
 });
 
 module.exports = router;
+
