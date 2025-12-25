@@ -88,7 +88,7 @@ router.get("/tournaments/:id", isPlayer, async (req, res) => {
       (r) => r.user && r.user._id.equals(req.user._id)
     );
 
-    res.render("player/tournamentShow", {
+    res.render("player/tournamentshow", {
       tournament,
       registration,
       user: req.user,
@@ -186,3 +186,4 @@ router.get("/results/:id", isPlayer, async (req, res) => {
 
 
 module.exports = router;
+
