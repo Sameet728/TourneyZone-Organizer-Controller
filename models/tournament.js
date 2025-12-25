@@ -4,27 +4,12 @@ const Schema = mongoose.Schema;
 /* ================= TEAM SCHEMA ================= */
 const teamSchema = new Schema(
   {
-    name: {
-      type: String,
-      required: true,
-    },
-
+    name: { type: String, required: true },
     leader: {
-      userId: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-      },
-      username: {
-        type: String,
-        required: true,
-      },
+      userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+      username: { type: String, required: true },
     },
-
-    members: {
-      type: [String],
-      default: [],
-    },
+    members: { type: [String], default: [] },
   },
   { _id: false }
 );
@@ -32,129 +17,53 @@ const teamSchema = new Schema(
 /* ================= REGISTRATION SCHEMA ================= */
 const registrationSchema = new Schema(
   {
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-
-    teamName: {
-      type: String,
-      required: true,
-    },
-
-    payerName: {
-      type: String,
-      required: true,
-    },
-
-    transactionId: {
-      type: String, // UTR
-      required: true,
-    },
-
-    amount: {
-      type: Number,
-      required: true,
-    },
-
+    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    teamName: { type: String, required: true },
+    payerName: { type: String, required: true },
+    transactionId: { type: String, required: true },
+    amount: { type: Number, required: true },
     status: {
       type: String,
       enum: ["pending", "accepted", "rejected"],
       default: "pending",
     },
-
-    rejectionReason: {
-      type: String,
-      default: "",
-    },
-
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
+    rejectionReason: { type: String, default: "" },
+    createdAt: { type: Date, default: Date.now },
   },
-  { _id: true } // IMPORTANT → allows reg._id
+  { _id: true }
 );
 
 /* ================= TOURNAMENT SCHEMA ================= */
 const tournamentSchema = new Schema(
   {
-    name: {
-      type: String,
-      required: true,
-    },
-
-    game: {
-      type: String,
-      required: true,
-    },
-
+    name: { type: String, required: true },
+    game: { type: String, required: true },
     description: String,
+    entryFee: { type: Number, default: 0 },
+    prizePool: { type: Number, default: 0 },
+    upiId: { type: String, required: false },
+    teamLimit: { type: Number, required: true },
+    
+    // 🔥 DATE & TIME
+    tournamentDate: { type: Date, required: true },
+    matchTime: { type: String }, // e.g. "6:30 PM"
+    registrationCloseTime: { type: String }, // e.g. "4:20 PM"
 
-    entryFee: {
-      type: Number,
-      default: 0,
-    },
-
-    teamLimit: {
-      type: Number,
-      required: true,
-    },
-
-    type: {
-      type: String,
-      enum: ["regular", "scrim"],
-      default: "regular",
-    },
-
-    timeSlot: {
-      type: String,
-    },
-
-    organizer: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-
+    type: { type: String, enum: ["regular", "scrim"], default: "regular" },
+    timeSlot: { type: String },
+    organizer: { type: Schema.Types.ObjectId, ref: "User", required: true },
     registrations: [registrationSchema],
-
     teams: [teamSchema],
-
     roomDetails: {
       roomId: String,
       roomPassword: String,
+      slotNumber: { type: Number, default: null },
       sharedAt: Date,
     },
-
-    startDate: {
-      type: Date,
-      required: true,
-    },
-    matchTime: {
-  type: String, // e.g. "18:30" or "6:30 PM"
-  required: false,
-},
-
-    endDate: {
-      type: Date,
-      required: true,
-    },
-
     result: {
-      firstPlace: {
-        teamName: String,
-        leader: String,
-      },
-      secondPlace: {
-        teamName: String,
-        leader: String,
-      },
-      thirdPlace: {
-        teamName: String,
-        leader: String,
-      },
+      firstPlace: { teamName: String, leader: String },
+      secondPlace: { teamName: String, leader: String },
+      thirdPlace: { teamName: String, leader: String },
       notes: String,
     },
   },
@@ -163,17 +72,26 @@ const tournamentSchema = new Schema(
 
 /* ================= VIRTUALS ================= */
 
-// Status
+// Tournament status
 tournamentSchema.virtual("status").get(function () {
-  const now = new Date();
-  if (now < this.startDate) return "upcoming";
-  if (now >= this.startDate && now <= this.endDate) return "ongoing";
-  return "completed";
+  if (!this.tournamentDate) return "upcoming";
+
+  // Normalize dates to midnight (ignore time for status label)
+  const tDate = new Date(this.tournamentDate);
+  tDate.setHours(0, 0, 0, 0);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (tDate > today) return "upcoming"; // Future date
+  if (tDate < today) return "completed"; // Past date
+  return "ongoing"; // Today
 });
 
-// Accepted count
+// Accepted teams count
 tournamentSchema.virtual("acceptedCount").get(function () {
-  return this.registrations.filter(r => r.status === "accepted").length;
+  if (!this.registrations) return 0;
+  return this.registrations.filter((r) => r.status === "accepted").length;
 });
 
 // Available slots
@@ -181,11 +99,7 @@ tournamentSchema.virtual("availableSlots").get(function () {
   return this.teamLimit - this.acceptedCount;
 });
 
-// Enable virtuals
 tournamentSchema.set("toJSON", { virtuals: true });
 tournamentSchema.set("toObject", { virtuals: true });
 
-module.exports =
-  mongoose.models.Tournament ||
-  mongoose.model("Tournament", tournamentSchema);
-
+module.exports = mongoose.models.Tournament || mongoose.model("Tournament", tournamentSchema);

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Player Dashboard | TourneyZone</title>
+  <title>Player Dashboard | SVx Arena</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   
@@ -19,11 +19,38 @@
           },
           colors: {
             brand: {
-              50: '#eff6ff',
-              100: '#dbeafe',
-              500: '#3b82f6',
-              600: '#2563eb',
-              900: '#1e3a8a',
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              900: '#4c1d95',
+            }
+          },
+          animation: {
+            'float': 'float 4s ease-in-out infinite',
+            'wave': 'wave 2.5s infinite',
+            'shine': 'shine 3s infinite',
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-8px)' },
+            },
+            wave: {
+              '0%': { transform: 'rotate(0.0deg)' },
+              '10%': { transform: 'rotate(14.0deg)' },
+              '20%': { transform: 'rotate(-8.0deg)' },
+              '30%': { transform: 'rotate(14.0deg)' },
+              '40%': { transform: 'rotate(-4.0deg)' },
+              '50%': { transform: 'rotate(10.0deg)' },
+              '60%': { transform: 'rotate(0.0deg)' },
+              '100%': { transform: 'rotate(0.0deg)' },
+            },
+            shine: {
+              '0%': { left: '-100%' },
+              '20%': { left: '100%' },
+              '100%': { left: '100%' },
             }
           }
         }
@@ -32,6 +59,11 @@
   </script>
 
   <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f5f3ff; }
+    ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 10px; }
+
     @keyframes blob {
       0% { transform: translate(0px, 0px) scale(1); }
       33% { transform: translate(30px, -50px) scale(1.1); }
@@ -43,7 +75,7 @@
   </style>
 </head>
 
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative overflow-x-hidden">
 
   <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
     <div class="absolute top-0 right-1/4 w-96 h-96 bg-brand-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
@@ -56,77 +88,103 @@
 
   <div class="container mx-auto px-4 py-8 lg:py-12 flex-grow">
     
-    <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-4">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
       <div>
-        <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
-          Hello, <span class="text-brand-600"><%= currentUser.username %></span> 🎮
+        <div class="inline-flex items-center gap-2 bg-white px-3 py-1 rounded-full border border-slate-100 shadow-sm mb-2 animate-pulse-slow">
+          <span class="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
+          <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Server Online</span>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight">
+          Hello, <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-purple-600"><%= currentUser.username %></span> <span class="inline-block animate-wave origin-bottom-right">🎮</span>
         </h1>
-        <p class="text-slate-500 mt-2 font-medium">Ready for your next victory?</p>
+        <p class="text-slate-500 mt-2 font-medium text-lg">Ready for your next victory?</p>
       </div>
       
-      <div class="hidden md:flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200 text-sm font-bold text-slate-500">
-        <i class="far fa-calendar-alt text-brand-500"></i>
-        <span><%= new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) %></span>
+      <div class="hidden md:flex items-center gap-3 bg-white px-5 py-3 rounded-2xl shadow-lg shadow-brand-500/10 border border-slate-100 transform hover:scale-105 transition-transform cursor-default">
+        <div class="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center text-brand-600">
+          <i class="far fa-calendar-alt text-xl"></i>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase">Today's Date</p>
+          <p class="font-bold text-slate-900"><%= new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %></p>
+        </div>
       </div>
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-      <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
-        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Status</div>
-        <div class="text-green-500 font-extrabold text-lg flex items-center gap-1">
-          <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Online
+      <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center hover:shadow-md transition-all group">
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Player Status</div>
+        <div class="text-green-500 font-extrabold text-lg flex items-center gap-2 bg-green-50 px-3 py-1 rounded-full group-hover:scale-110 transition-transform">
+          <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Active
         </div>
       </div>
-      <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
-        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Role</div>
-        <div class="text-brand-600 font-extrabold text-lg">Player</div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center hover:shadow-md transition-all group">
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Current Rank</div>
+        <div class="text-brand-600 font-extrabold text-lg flex items-center gap-2 bg-brand-50 px-3 py-1 rounded-full group-hover:scale-110 transition-transform">
+          <i class="fas fa-star text-sm"></i> Player
+        </div>
       </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
       
-      <div class="group relative bg-white border border-slate-200 rounded-3xl p-8 shadow-lg hover:shadow-2xl hover:border-brand-200 transition-all duration-300 hover:-translate-y-1">
-        <div class="w-14 h-14 bg-brand-100 text-brand-600 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-inner group-hover:scale-110 transition-transform">
+      <div class="group relative bg-white border border-slate-200 rounded-[2rem] p-8 shadow-xl hover:shadow-2xl hover:border-brand-200 transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+        <div class="absolute -top-6 -right-6 p-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500">
+          <i class="fas fa-search text-9xl text-brand-600 transform rotate-12 group-hover:rotate-45 transition-transform duration-700"></i>
+        </div>
+
+        <div class="w-16 h-16 bg-gradient-to-br from-brand-100 to-blue-100 text-brand-600 rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-inner group-hover:scale-110 transition-transform duration-300 animate-float">
           <i class="fas fa-search"></i>
         </div>
         
-        <h3 class="text-xl font-bold text-slate-900 mb-2">Find Battles</h3>
-        <p class="text-slate-500 mb-8 leading-relaxed text-sm">
+        <h3 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-brand-600 transition-colors">Find Battles</h3>
+        <p class="text-slate-500 mb-8 leading-relaxed text-sm font-medium">
           Browse upcoming tournaments, check prize pools, and join the competition.
         </p>
         
-        <a href="/player/tournaments" class="inline-flex items-center justify-center w-full px-6 py-3 bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-700 transition-all shadow-lg hover:shadow-brand-500/30">
-          Browse Now
+        <a href="/player/tournaments" class="relative overflow-hidden inline-flex items-center justify-center w-full px-6 py-4 bg-brand-600 text-white font-bold rounded-xl shadow-lg shadow-brand-500/30 hover:bg-brand-700 transition-all group/btn">
+          <div class="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 animate-shine"></div>
+          <span class="relative z-10 flex items-center gap-2">
+            Browse Now <i class="fas fa-arrow-right group-hover/btn:translate-x-1 transition-transform"></i>
+          </span>
         </a>
       </div>
 
-      <div class="group relative bg-white border border-slate-200 rounded-3xl p-8 shadow-lg hover:shadow-2xl hover:border-purple-200 transition-all duration-300 hover:-translate-y-1">
-        <div class="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-inner group-hover:scale-110 transition-transform">
+      <div class="group relative bg-white border border-slate-200 rounded-[2rem] p-8 shadow-xl hover:shadow-2xl hover:border-purple-200 transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+        <div class="absolute -top-6 -right-6 p-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500">
+          <i class="fas fa-crosshairs text-9xl text-purple-600 transform -rotate-12 group-hover:-rotate-45 transition-transform duration-700"></i>
+        </div>
+
+        <div class="w-16 h-16 bg-gradient-to-br from-purple-100 to-pink-100 text-purple-600 rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-inner group-hover:scale-110 transition-transform duration-300 animate-float" style="animation-delay: 1s;">
           <i class="fas fa-crosshairs"></i>
         </div>
         
-        <h3 class="text-xl font-bold text-slate-900 mb-2">My Matches</h3>
-        <p class="text-slate-500 mb-8 leading-relaxed text-sm">
+        <h3 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-purple-600 transition-colors">My Matches</h3>
+        <p class="text-slate-500 mb-8 leading-relaxed text-sm font-medium">
           Track your active tournaments, view brackets, and access room credentials.
         </p>
         
-        <a href="/player/my-tournaments" class="inline-flex items-center justify-center w-full px-6 py-3 bg-white text-slate-700 border-2 border-slate-200 font-bold rounded-xl hover:border-purple-500 hover:text-purple-600 transition-all">
-          View Active
+        <a href="/player/my-tournaments" class="inline-flex items-center justify-center w-full px-6 py-4 bg-white text-slate-700 border-2 border-slate-200 font-bold rounded-xl hover:border-purple-500 hover:text-purple-600 hover:bg-purple-50 transition-all shadow-sm group/btn">
+          <span>View Active</span> <i class="fas fa-gamepad ml-2 group-hover/btn:scale-110 transition-transform"></i>
         </a>
       </div>
 
-      <div class="group relative bg-white border border-slate-200 rounded-3xl p-8 shadow-lg hover:shadow-2xl hover:border-yellow-200 transition-all duration-300 hover:-translate-y-1">
-        <div class="w-14 h-14 bg-yellow-100 text-yellow-600 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-inner group-hover:scale-110 transition-transform">
+      <div class="group relative bg-white border border-slate-200 rounded-[2rem] p-8 shadow-xl hover:shadow-2xl hover:border-yellow-200 transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+        <div class="absolute -top-6 -right-6 p-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500">
+          <i class="fas fa-trophy text-9xl text-yellow-500 transform rotate-12 group-hover:rotate-12 transition-transform duration-700"></i>
+        </div>
+
+        <div class="w-16 h-16 bg-gradient-to-br from-yellow-100 to-orange-100 text-yellow-600 rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-inner group-hover:scale-110 transition-transform duration-300 animate-float" style="animation-delay: 2s;">
           <i class="fas fa-trophy"></i>
         </div>
         
-        <h3 class="text-xl font-bold text-slate-900 mb-2">Results</h3>
-        <p class="text-slate-500 mb-8 leading-relaxed text-sm">
+        <h3 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-yellow-600 transition-colors">Results</h3>
+        <p class="text-slate-500 mb-8 leading-relaxed text-sm font-medium">
           Check the hall of fame and see results from completed tournaments.
         </p>
         
-        <a href="/player/results" class="inline-flex items-center justify-center w-full px-6 py-3 bg-white text-slate-700 border-2 border-slate-200 font-bold rounded-xl hover:border-yellow-500 hover:text-yellow-600 transition-all">
-          View History
+        <a href="/player/results" class="inline-flex items-center justify-center w-full px-6 py-4 bg-white text-slate-700 border-2 border-slate-200 font-bold rounded-xl hover:border-yellow-500 hover:text-yellow-600 hover:bg-yellow-50 transition-all shadow-sm group/btn">
+          <span>View History</span> <i class="fas fa-history ml-2 group-hover/btn:rotate-180 transition-transform duration-500"></i>
         </a>
       </div>
 

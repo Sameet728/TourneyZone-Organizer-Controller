@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login | TourneyZone</title>
+  <title>Login | SVx Arena</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   
@@ -19,18 +19,37 @@
           },
           colors: {
             brand: {
-              500: '#3b82f6',
-              600: '#2563eb',
-              900: '#1e3a8a',
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              900: '#4c1d95',
             }
           },
           animation: {
             'float': 'float 6s ease-in-out infinite',
+            'wave': 'wave 2.5s infinite',
+            'shine': 'shine 3s infinite',
           },
           keyframes: {
             float: {
               '0%, 100%': { transform: 'translateY(0)' },
               '50%': { transform: 'translateY(-10px)' },
+            },
+            wave: {
+              '0%': { transform: 'rotate(0.0deg)' },
+              '10%': { transform: 'rotate(14.0deg)' },
+              '20%': { transform: 'rotate(-8.0deg)' },
+              '30%': { transform: 'rotate(14.0deg)' },
+              '40%': { transform: 'rotate(-4.0deg)' },
+              '50%': { transform: 'rotate(10.0deg)' },
+              '60%': { transform: 'rotate(0.0deg)' },
+              '100%': { transform: 'rotate(0.0deg)' },
+            },
+            shine: {
+              '0%': { left: '-100%' },
+              '20%': { left: '100%' },
+              '100%': { left: '100%' },
             }
           }
         }
@@ -57,69 +76,80 @@
       30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
       40%, 60% { transform: translate3d(4px, 0, 0); }
     }
+
+    /* Input Focus Lift */
+    .input-lift:focus-within {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.1), 0 8px 10px -6px rgba(124, 58, 237, 0.1);
+    }
   </style>
 </head>
 
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex items-center justify-center relative overflow-hidden">
 
   <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-    <div class="absolute top-0 left-1/4 w-96 h-96 bg-brand-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-brand-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
   </div>
 
   <div class="w-full max-w-md px-4">
     
-    <div class="bg-white/80 backdrop-blur-xl border border-white/50 shadow-2xl rounded-3xl p-8 md:p-10 relative overflow-hidden">
+    <div class="bg-white/80 backdrop-blur-xl border border-white/60 shadow-2xl rounded-[2rem] p-8 md:p-10 relative overflow-hidden">
       
-      <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-400 via-brand-600 to-purple-600"></div>
+      <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-400 via-purple-500 to-indigo-500"></div>
 
       <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-16 h-16 bg-brand-50 text-brand-600 rounded-2xl mb-4 text-3xl shadow-sm animate-float">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-brand-50 text-brand-600 rounded-2xl mb-4 text-3xl shadow-sm border border-brand-100 animate-float">
           <i class="fas fa-gamepad"></i>
         </div>
-        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Welcome Back! 👋</h2>
-        <p class="text-slate-500 mt-2 text-sm">Enter your credentials to access the arena.</p>
+        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Welcome Back! <span class="inline-block animate-wave origin-bottom-right">👋</span></h2>
+        <p class="text-slate-500 mt-2 text-sm font-medium">Enter your credentials to access the arena.</p>
       </div>
 
-      <form action="/login" method="post" id="loginForm" class="space-y-5" novalidate>
+      <form action="/login" method="post" id="loginForm" class="space-y-6" novalidate>
         
-        <div class="space-y-1">
-          <label for="username" class="block text-sm font-bold text-slate-700 ml-1">Username</label>
+        <div class="space-y-1 input-lift transition-transform duration-200 rounded-xl">
+          <label for="username" class="block text-xs font-bold text-slate-500 uppercase ml-1">Username</label>
           <div class="relative group">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-500 transition-colors">
               <i class="fas fa-user"></i>
             </div>
-            <input type="text" name="username" id="username" placeholder="ProGamer123" required
-              class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all text-slate-800 font-medium placeholder-slate-400">
+            <input type="text" name="username" id="username" placeholder="e.g. ProGamer123" required
+              class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all text-slate-800 font-bold placeholder-slate-400">
           </div>
         </div>
 
-        <div class="space-y-1">
+        <div class="space-y-1 input-lift transition-transform duration-200 rounded-xl">
           <div class="flex justify-between items-center ml-1">
-            <label for="password" class="block text-sm font-bold text-slate-700">Password</label>
-            <a href="/forgot-pass" class="text-xs font-bold text-brand-600 hover:text-brand-800 transition-colors">Forgot Password?</a>
+            <label for="password" class="block text-xs font-bold text-slate-500 uppercase">Password</label>
+            <a href="/forgot-pass" class="text-xs font-bold text-brand-600 hover:text-brand-800 transition-colors hover:underline">Forgot Password?</a>
           </div>
           <div class="relative group">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-500 transition-colors">
               <i class="fas fa-lock"></i>
             </div>
             <input type="password" name="password" id="password" placeholder="••••••••" required
-              class="w-full pl-11 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all text-slate-800 font-medium placeholder-slate-400">
+              class="w-full pl-11 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all text-slate-800 font-bold placeholder-slate-400">
             
-            <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer focus:outline-none">
+            <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-brand-600 cursor-pointer focus:outline-none transition-colors">
               <i class="far fa-eye" id="toggleIcon"></i>
             </button>
           </div>
         </div>
 
         <button type="submit" 
-          class="w-full py-4 px-4 bg-slate-900 text-white font-bold rounded-xl shadow-lg hover:bg-brand-600 hover:shadow-brand-500/30 transform transition-all duration-200 hover:-translate-y-1 focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 mt-4 group">
-          LOG IN <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+          class="w-full group relative overflow-hidden py-4 px-4 bg-brand-600 text-white font-bold rounded-xl shadow-lg shadow-brand-500/30 hover:bg-brand-700 hover:-translate-y-0.5 transition-all duration-300 active:scale-95">
+          
+          <div class="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-shine"></div>
+          
+          <span class="relative z-10 flex items-center justify-center gap-2">
+            LOG IN <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+          </span>
         </button>
 
       </form>
 
-      <div class="mt-8 text-center">
+      <div class="mt-8 text-center pt-6 border-t border-slate-100">
         <p class="text-slate-500 text-sm">
           New to TourneyZone? 
           <a href="/signup" class="font-bold text-brand-600 hover:text-brand-800 transition-colors underline decoration-2 decoration-brand-200 hover:decoration-brand-600">
@@ -130,7 +160,7 @@
 
     </div>
     
-    <div class="text-center mt-6 text-slate-400 text-xs font-medium flex items-center justify-center gap-2">
+    <div class="text-center mt-8 text-slate-400 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 opacity-60">
       <i class="fas fa-shield-alt"></i> Secure SSL Encryption
     </div>
 
@@ -164,11 +194,12 @@
         const invalidInput = form.querySelector('input:invalid');
         if (invalidInput) {
           invalidInput.focus();
-          invalidInput.parentElement.classList.add('shake');
+          const container = invalidInput.closest('.input-lift'); // Shake the container
+          container.classList.add('shake');
           
           // Remove class after animation
           setTimeout(() => {
-            invalidInput.parentElement.classList.remove('shake');
+            container.classList.remove('shake');
           }, 500);
         }
       }

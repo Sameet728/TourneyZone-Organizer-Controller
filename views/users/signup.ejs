@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign Up | TourneyZone</title>
+  <title>Sign Up | SVx Arena</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   
@@ -19,14 +19,17 @@
           },
           colors: {
             brand: {
-              500: '#3b82f6',
-              600: '#2563eb',
-              900: '#1e3a8a',
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              900: '#4c1d95',
             }
           },
           animation: {
             'float': 'float 6s ease-in-out infinite',
             'slide-down': 'slideDown 0.3s ease-out forwards',
+            'shine': 'shine 3s infinite',
           },
           keyframes: {
             float: {
@@ -36,6 +39,11 @@
             slideDown: {
               '0%': { opacity: '0', transform: 'translateY(-10px)', height: '0' },
               '100%': { opacity: '1', transform: 'translateY(0)', height: 'auto' },
+            },
+            shine: {
+              '0%': { left: '-100%' },
+              '20%': { left: '100%' },
+              '100%': { left: '100%' },
             }
           }
         }
@@ -61,9 +69,10 @@
       40%, 60% { transform: translate3d(4px, 0, 0); }
     }
 
-    /* Transition for UPI field visibility */
-    #upiField {
-      transition: all 0.3s ease-in-out;
+    /* Input Focus Lift */
+    .input-lift:focus-within {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.1), 0 8px 10px -6px rgba(124, 58, 237, 0.1);
     }
   </style>
 </head>
@@ -71,56 +80,56 @@
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex items-center justify-center relative overflow-x-hidden py-10">
 
   <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-    <div class="absolute top-0 right-1/4 w-96 h-96 bg-brand-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-    <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute top-0 right-1/4 w-96 h-96 bg-brand-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+    <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
   </div>
 
   <div class="w-full max-w-lg px-4">
     
-    <div class="bg-white/80 backdrop-blur-xl border border-white/50 shadow-2xl rounded-3xl p-8 md:p-10 relative overflow-hidden">
+    <div class="bg-white/80 backdrop-blur-xl border border-white/60 shadow-2xl rounded-[2rem] p-8 md:p-10 relative overflow-hidden">
       
-      <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-500 via-brand-600 to-brand-400"></div>
+      <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-500 via-brand-600 to-brand-400"></div>
 
       <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-16 h-16 bg-brand-50 text-brand-600 rounded-2xl mb-4 text-3xl shadow-sm animate-float">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-brand-50 text-brand-600 rounded-2xl mb-4 text-3xl shadow-sm border border-brand-100 animate-float">
           <i class="fas fa-user-plus"></i>
         </div>
-        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Create Account</h2>
-        <p class="text-slate-500 mt-2 text-sm">Join the arena and start your journey today.</p>
+        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Join the Arena 🚀</h2>
+        <p class="text-slate-500 mt-2 text-sm font-medium">Create your account and start competing today.</p>
       </div>
 
       <form action="/signup" method="post" id="signupForm" class="space-y-5" novalidate>
         
-        <div class="space-y-1">
-          <label for="email" class="block text-sm font-bold text-slate-700 ml-1">Email Address</label>
+        <div class="space-y-1 input-lift transition-transform duration-200 rounded-xl">
+          <label for="email" class="block text-xs font-bold text-slate-500 uppercase ml-1">Email Address</label>
           <div class="relative group">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-500 transition-colors">
               <i class="fas fa-envelope"></i>
             </div>
             <input type="email" name="email" id="email" placeholder="you@example.com" required
-              class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all text-slate-800 font-medium placeholder-slate-400">
+              class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all text-slate-800 font-bold placeholder-slate-400">
           </div>
         </div>
 
-        <div class="space-y-1">
-          <label for="username" class="block text-sm font-bold text-slate-700 ml-1">Gamer Tag / Username</label>
+        <div class="space-y-1 input-lift transition-transform duration-200 rounded-xl">
+          <label for="username" class="block text-xs font-bold text-slate-500 uppercase ml-1">Gamer Tag / Username</label>
           <div class="relative group">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-500 transition-colors">
               <i class="fas fa-user-astronaut"></i>
             </div>
             <input type="text" name="username" id="username" placeholder="e.g. ShadowSlayer" required
-              class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all text-slate-800 font-medium placeholder-slate-400">
+              class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all text-slate-800 font-bold placeholder-slate-400">
           </div>
         </div>
 
-        <div class="space-y-1">
-          <label for="role" class="block text-sm font-bold text-slate-700 ml-1">I want to...</label>
+        <div class="space-y-1 input-lift transition-transform duration-200 rounded-xl">
+          <label for="role" class="block text-xs font-bold text-slate-500 uppercase ml-1">I want to...</label>
           <div class="relative group">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-500 transition-colors">
               <i class="fas fa-compass"></i>
             </div>
             <select name="role" id="role" required
-              class="w-full pl-11 pr-10 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all text-slate-800 font-medium appearance-none cursor-pointer">
+              class="w-full pl-11 pr-10 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all text-slate-800 font-bold appearance-none cursor-pointer">
               <option value="" disabled selected>Choose your path...</option>
               <option value="player">🎮 Compete as a Player</option>
               <option value="organizer">🏆 Host Tournaments (Organizer)</option>
@@ -132,51 +141,56 @@
         </div>
 
         <div id="upiField" class="hidden overflow-hidden transition-all duration-300">
-          <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 space-y-2">
-            <div class="flex items-center gap-2 text-amber-800 text-sm font-bold">
-               <i class="fas fa-wallet"></i> Organizer Payment Details
+          <div class="bg-amber-50 border border-amber-100 rounded-2xl p-5 space-y-2 animate-slide-down">
+            <div class="flex items-center gap-2 text-amber-800 text-sm font-bold uppercase tracking-wide">
+               <i class="fas fa-wallet text-amber-500"></i> Organizer Payment Details
             </div>
             <div class="relative group">
               <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-amber-400">
                 <i class="fas fa-rupee-sign"></i>
               </div>
               <input type="text" name="upiId" id="upiId" placeholder="yourname@upi"
-                class="w-full pl-11 pr-4 py-3 bg-white border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-all text-slate-800 font-medium placeholder-slate-400">
+                class="w-full pl-11 pr-4 py-3 bg-white border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none transition-all text-slate-800 font-bold placeholder-slate-400">
             </div>
-            <p class="text-xs text-amber-600 leading-tight">
-              * Required to receive entry fees from players directly.
+            <p class="text-[10px] text-amber-600/80 leading-tight font-medium pl-1">
+              * Required to receive entry fees directly to your UPI ID.
             </p>
           </div>
         </div>
 
-        <div class="space-y-1">
-          <label for="password" class="block text-sm font-bold text-slate-700 ml-1">Password</label>
+        <div class="space-y-1 input-lift transition-transform duration-200 rounded-xl">
+          <label for="password" class="block text-xs font-bold text-slate-500 uppercase ml-1">Password</label>
           <div class="relative group">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-500 transition-colors">
               <i class="fas fa-lock"></i>
             </div>
             <input type="password" name="password" id="password" placeholder="Create a strong password" required minlength="8"
-              class="w-full pl-11 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all text-slate-800 font-medium placeholder-slate-400">
+              class="w-full pl-11 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all text-slate-800 font-bold placeholder-slate-400">
             
-            <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer focus:outline-none">
+            <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-brand-600 cursor-pointer focus:outline-none transition-colors">
               <i class="far fa-eye" id="toggleIcon"></i>
             </button>
           </div>
           
           <div class="h-1.5 w-full bg-slate-100 rounded-full mt-2 overflow-hidden">
-             <div id="strengthMeter" class="h-full w-0 transition-all duration-300 bg-red-500"></div>
+             <div id="strengthMeter" class="h-full w-0 transition-all duration-500 bg-red-500"></div>
           </div>
-          <p class="text-xs text-slate-400 text-right mt-1" id="strengthText">Min 8 chars</p>
+          <p class="text-[10px] text-slate-400 text-right mt-1 font-medium" id="strengthText">Min 8 characters</p>
         </div>
 
         <button type="submit" 
-          class="w-full py-4 px-4 bg-brand-600 text-white font-bold rounded-xl shadow-lg hover:bg-brand-700 hover:shadow-brand-500/30 transform transition-all duration-200 hover:-translate-y-1 focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 mt-2 group">
-          CREATE ACCOUNT <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+          class="w-full group relative overflow-hidden py-4 px-4 bg-brand-600 text-white font-bold rounded-xl shadow-lg shadow-brand-500/30 hover:bg-brand-700 hover:-translate-y-0.5 transition-all duration-300 active:scale-95 mt-2">
+          
+          <div class="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-shine"></div>
+          
+          <span class="relative z-10 flex items-center justify-center gap-2">
+            CREATE ACCOUNT <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+          </span>
         </button>
 
       </form>
 
-      <div class="mt-8 text-center">
+      <div class="mt-8 text-center pt-6 border-t border-slate-100">
         <p class="text-slate-500 text-sm">
           Already have an account? 
           <a href="/login" class="font-bold text-brand-600 hover:text-brand-800 transition-colors underline decoration-2 decoration-brand-200 hover:decoration-brand-600">
@@ -197,14 +211,9 @@
     roleSelect.addEventListener('change', function () {
       if (this.value === 'organizer') {
         upiField.classList.remove('hidden');
-        // Add a small delay to allow display:block to apply before animating opacity/height if we were doing css animations
-        // but tailwind 'hidden' simply toggles display:none. 
-        // For a smoother slide effect, we can use a class toggle approach, but simple hidden works for functionality.
-        upiField.classList.add('animate-slide-down'); 
         upiInput.setAttribute('required', 'required');
       } else {
         upiField.classList.add('hidden');
-        upiField.classList.remove('animate-slide-down');
         upiInput.removeAttribute('required');
         upiInput.value = '';
       }
@@ -246,12 +255,15 @@
       if (strength <= 40) {
         strengthMeter.className = 'h-full transition-all duration-300 bg-red-500';
         strengthText.innerText = 'Weak';
+        strengthText.className = 'text-[10px] text-red-500 text-right mt-1 font-bold';
       } else if (strength <= 80) {
         strengthMeter.className = 'h-full transition-all duration-300 bg-yellow-400';
         strengthText.innerText = 'Medium';
+        strengthText.className = 'text-[10px] text-yellow-500 text-right mt-1 font-bold';
       } else {
         strengthMeter.className = 'h-full transition-all duration-300 bg-green-500';
         strengthText.innerText = 'Strong';
+        strengthText.className = 'text-[10px] text-green-500 text-right mt-1 font-bold';
       }
     });
 
@@ -266,7 +278,7 @@
         if (invalidInput) {
           invalidInput.focus();
           // Find the parent container to shake
-          const container = invalidInput.closest('.relative') || invalidInput.parentElement;
+          const container = invalidInput.closest('.input-lift');
           container.classList.add('shake');
           setTimeout(() => container.classList.remove('shake'), 500);
         }

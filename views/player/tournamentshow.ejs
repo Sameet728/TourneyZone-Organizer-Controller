@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><%= tournament.name %> | Details</title>
-  
+
   <script src="https://cdn.tailwindcss.com"></script>
   
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -19,9 +19,26 @@
           },
           colors: {
             brand: {
-              500: '#3b82f6',
-              600: '#2563eb',
-              900: '#1e3a8a',
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              900: '#4c1d95',
+            }
+          },
+          animation: {
+            'float': 'float 3s ease-in-out infinite',
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'pop': 'pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-5px)' },
+            },
+            pop: {
+              '0%': { transform: 'scale(0.9)', opacity: '0' },
+              '100%': { transform: 'scale(1)', opacity: '1' },
             }
           }
         }
@@ -30,6 +47,11 @@
   </script>
 
   <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f5f3ff; }
+    ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 10px; }
+
     @keyframes blob {
       0% { transform: translate(0px, 0px) scale(1); }
       33% { transform: translate(30px, -50px) scale(1.1); }
@@ -41,11 +63,11 @@
   </style>
 </head>
 
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative overflow-x-hidden">
 
   <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-    <div class="absolute top-0 right-1/4 w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob"></div>
-    <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
+    <div class="absolute top-0 right-1/4 w-96 h-96 bg-brand-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+    <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
   </div>
 
   <div class="relative z-50">
@@ -54,261 +76,297 @@
 
   <div class="container mx-auto px-4 py-8 lg:py-12 flex-grow">
 
+    <%
+      const parseTime = (timeStr) => {
+        if (!timeStr) return null;
+        const cleanStr = timeStr.replace(/\./g, '').trim().toUpperCase();
+        const [time, modifier] = cleanStr.split(' ');
+        let [hours, minutes] = time.split(':');
+        hours = parseInt(hours, 10);
+        minutes = parseInt(minutes, 10);
+        if (hours === 12 && modifier === 'AM') hours = 0;
+        if (hours < 12 && modifier === 'PM') hours += 12;
+        return { h: hours, m: minutes };
+      };
+
+      let isRegistrationOpen = false;
+      let timeStatusMessage = "Registration Closed 🔒";
+
+      const deadline = new Date(tournament.tournamentDate);
+      if (tournament.registrationCloseTime) {
+         const t = parseTime(tournament.registrationCloseTime);
+         if(t) deadline.setHours(t.h, t.m, 0, 0);
+      } else {
+         deadline.setHours(23, 59, 59, 999);
+      }
+
+      const now = new Date();
+      if (now <= deadline) {
+         if (tournament.availableSlots > 0) {
+            isRegistrationOpen = true;
+         } else {
+            timeStatusMessage = "Tournament Full 🚫";
+         }
+      } else {
+         timeStatusMessage = "Time's Up! ⏳";
+      }
+
+      if (tournament.status === 'completed') {
+         isRegistrationOpen = false;
+         timeStatusMessage = "Tournament Ended 🏁";
+      }
+    %>
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
 
-      <div class="lg:col-span-2 space-y-8">
+      <div class="lg:col-span-2 space-y-8 animate-pop">
         
         <div>
           <div class="flex flex-wrap items-center gap-3 mb-4">
-            <span class="px-3 py-1 rounded-lg bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider">
-              <i class="fas fa-gamepad mr-1"></i> <%= tournament.game %>
+            <span class="px-3 py-1 rounded-lg bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fas fa-gamepad"></i> <%= tournament.game %>
             </span>
-            <span class="px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border
+            
+            <span class="px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border flex items-center gap-1.5
               <%= tournament.status === 'upcoming' ? 'bg-amber-50 text-amber-600 border-amber-200' : '' %>
               <%= tournament.status === 'ongoing' ? 'bg-green-50 text-green-600 border-green-200' : '' %>
               <%= tournament.status === 'completed' ? 'bg-slate-100 text-slate-500 border-slate-200' : '' %>
             ">
+              <span class="w-1.5 h-1.5 rounded-full <%= tournament.status === 'ongoing' ? 'bg-green-500 animate-pulse' : 'bg-current' %>"></span>
               <%= tournament.status %>
             </span>
           </div>
           
-          <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4">
+          <h1 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4 drop-shadow-sm">
             <%= tournament.name %>
           </h1>
 
           <div class="flex items-center gap-2 text-slate-500 font-medium">
-             <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xs">
-               <i class="fas fa-user"></i>
+             <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-brand-100 to-purple-100 flex items-center justify-center text-brand-600 text-xs shadow-sm">
+               <i class="fas fa-user-shield"></i>
              </div>
-             <span>Hosted by <strong class="text-slate-700"><%= tournament.organizer?.username || "Unknown" %></strong></span>
+             <span>Hosted by <strong class="text-slate-700 hover:text-brand-600 transition-colors cursor-pointer"><%= tournament.organizer?.username || "Organizer" %></strong></span>
           </div>
         </div>
 
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm">
-          <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center">
-            <i class="fas fa-align-left text-brand-500 mr-2"></i> About Tournament
+        <div class="bg-white/80 backdrop-blur-xl border border-white/60 rounded-[2rem] p-8 shadow-xl">
+          <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+            <span class="text-2xl">📜</span> About Tournament
           </h3>
-          <p class="text-slate-600 leading-relaxed whitespace-pre-line">
-            <%= tournament.description || "No description provided by the organizer." %>
+          <p class="text-slate-600 leading-relaxed whitespace-pre-line text-sm">
+            <%= tournament.description || "No specific details provided. Get ready to play!" %>
           </p>
 
-          <hr class="my-6 border-slate-100">
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-2 gap-4 mt-8 pt-8 border-t border-slate-100">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+              <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg shadow-sm">
                 <i class="far fa-calendar-alt"></i>
               </div>
               <div>
-                <p class="text-xs font-bold text-slate-400 uppercase">Start Date</p>
-                <p class="font-bold text-slate-800"><%= tournament.startDate.toDateString() %></p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Date</p>
+                <p class="font-bold text-slate-800"><%= new Date(tournament.tournamentDate).toLocaleDateString() %></p>
               </div>
             </div>
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
-                <i class="far fa-calendar-check"></i>
+              <div class="w-10 h-10 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center text-lg shadow-sm">
+                <i class="far fa-clock"></i>
               </div>
               <div>
-                <p class="text-xs font-bold text-slate-400 uppercase">End Date</p>
-                <p class="font-bold text-slate-800"><%= tournament.endDate.toDateString() %></p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Start Time</p>
+                <p class="font-bold text-slate-800"><%= tournament.matchTime || "TBA" %></p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-yellow-50 text-yellow-600 flex items-center justify-center text-lg shadow-sm">
+                <i class="fas fa-trophy"></i>
+              </div>
+              <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Prize Pool</p>
+                <p class="font-bold text-slate-800">₹<%= (tournament.prizePool || 0).toLocaleString('en-IN') %></p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-lg shadow-sm">
+                <i class="fas fa-stopwatch"></i>
+              </div>
+              <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Reg Closes</p>
+                <p class="font-bold text-slate-800"><%= tournament.registrationCloseTime || "—" %></p>
               </div>
             </div>
           </div>
         </div>
 
-        <% if (
-          tournament.result &&
-          tournament.result.firstPlace &&
-          tournament.result.firstPlace.teamName
-        ) { %>
-          <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-8 shadow-xl relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-64 h-64 bg-yellow-500 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
-
-            <h3 class="text-xl font-bold mb-6 flex items-center relative z-10">
-              <i class="fas fa-trophy text-yellow-400 mr-2"></i> Tournament Results
+        <% if (tournament.status === 'completed' && tournament.result?.firstPlace) { %>
+          <div class="relative bg-slate-900 rounded-[2rem] p-8 shadow-2xl overflow-hidden group">
+            <div class="absolute -top-20 -right-20 w-64 h-64 bg-yellow-500/20 rounded-full blur-3xl group-hover:bg-yellow-500/30 transition-colors duration-500"></div>
+            
+            <h3 class="font-bold text-xl text-white mb-6 flex items-center gap-2 relative z-10">
+              <i class="fas fa-crown text-yellow-400 animate-bounce"></i> Tournament Results
             </h3>
 
             <div class="space-y-4 relative z-10">
-              <div class="flex items-center justify-between bg-white/10 backdrop-blur-sm border border-yellow-500/50 p-4 rounded-xl">
+              <div class="flex items-center justify-between bg-white/10 backdrop-blur-md border border-yellow-500/40 p-4 rounded-2xl transform hover:scale-[1.02] transition-transform">
                 <div class="flex items-center gap-4">
-                  <div class="text-2xl">🥇</div>
+                  <div class="text-3xl filter drop-shadow-lg">🥇</div>
                   <div>
-                    <p class="text-yellow-400 text-xs font-bold uppercase tracking-wider">Champion</p>
-                    <p class="text-lg font-bold"><%= tournament.result.firstPlace.teamName %></p>
+                    <p class="text-yellow-400 text-[10px] font-bold uppercase tracking-widest">Champion</p>
+                    <p class="text-lg font-bold text-white"><%= tournament.result.firstPlace.teamName %></p>
                   </div>
                 </div>
                 <div class="text-right hidden sm:block">
-                  <p class="text-xs text-slate-400">Leader</p>
-                  <p class="text-sm font-medium"><%= tournament.result.firstPlace.leader %></p>
+                  <p class="text-[10px] text-slate-400 uppercase">Leader</p>
+                  <p class="text-sm font-medium text-slate-200"><%= tournament.result.firstPlace.leader %></p>
                 </div>
               </div>
 
-              <div class="flex items-center justify-between bg-white/5 backdrop-blur-sm border border-slate-500/30 p-4 rounded-xl">
+              <div class="flex items-center justify-between bg-white/5 backdrop-blur-md border border-slate-500/30 p-4 rounded-2xl hover:bg-white/10 transition-colors">
                 <div class="flex items-center gap-4">
-                  <div class="text-2xl">🥈</div>
+                  <div class="text-3xl opacity-80">🥈</div>
                   <div>
-                    <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">Runner Up</p>
-                    <p class="text-lg font-bold"><%= tournament.result.secondPlace.teamName %></p>
+                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Runner Up</p>
+                    <p class="text-lg font-bold text-white"><%= tournament.result.secondPlace?.teamName || "-" %></p>
                   </div>
-                </div>
-                 <div class="text-right hidden sm:block">
-                  <p class="text-xs text-slate-400">Leader</p>
-                  <p class="text-sm font-medium"><%= tournament.result.secondPlace.leader %></p>
                 </div>
               </div>
 
-              <div class="flex items-center justify-between bg-white/5 backdrop-blur-sm border border-orange-500/30 p-4 rounded-xl">
+              <div class="flex items-center justify-between bg-white/5 backdrop-blur-md border border-orange-500/30 p-4 rounded-2xl hover:bg-white/10 transition-colors">
                 <div class="flex items-center gap-4">
-                  <div class="text-2xl">🥉</div>
+                  <div class="text-3xl opacity-80">🥉</div>
                   <div>
-                    <p class="text-orange-400 text-xs font-bold uppercase tracking-wider">Third Place</p>
-                    <p class="text-lg font-bold"><%= tournament.result.thirdPlace.teamName %></p>
+                    <p class="text-orange-400 text-[10px] font-bold uppercase tracking-widest">3rd Place</p>
+                    <p class="text-lg font-bold text-white"><%= tournament.result.thirdPlace?.teamName || "-" %></p>
                   </div>
-                </div>
-                 <div class="text-right hidden sm:block">
-                  <p class="text-xs text-slate-400">Leader</p>
-                  <p class="text-sm font-medium"><%= tournament.result.thirdPlace.leader %></p>
                 </div>
               </div>
             </div>
-
-            <% if (tournament.result.notes) { %>
-              <div class="mt-6 pt-4 border-t border-white/10 text-slate-300 text-sm italic">
-                <strong><i class="fas fa-quote-left mr-2"></i>Notes:</strong> <%= tournament.result.notes %>
-              </div>
-            <% } %>
           </div>
         <% } %>
 
       </div>
 
       <div class="lg:col-span-1">
-        <div class="bg-white border border-slate-200 rounded-2xl shadow-lg p-6 sticky top-24">
+        <div class="bg-white border border-slate-100 rounded-[2rem] shadow-xl p-6 sticky top-24 transform transition-all hover:shadow-2xl">
           
-          <h4 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Registration Details</h4>
+          <div class="flex justify-between items-center mb-6">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Registration</h4>
+            <% const percent = Math.round((tournament.acceptedCount / tournament.teamLimit) * 100); %>
+            <span class="text-xs font-bold px-2 py-1 rounded bg-slate-100 text-slate-600">
+              <%= percent %>% Full
+            </span>
+          </div>
           
-          <div class="flex items-end justify-between mb-6">
+          <div class="flex items-end justify-between mb-2">
             <div>
-              <p class="text-slate-500 text-sm font-medium mb-1">Entry Fee</p>
-              <p class="text-3xl font-extrabold text-slate-900">₹<%= tournament.entryFee %></p>
+              <p class="text-sm text-slate-500 font-medium mb-1">Entry Fee</p>
+              <p class="text-4xl font-black text-slate-900 tracking-tight">₹<%= tournament.entryFee %></p>
             </div>
             <div class="text-right">
-               <% const percent = Math.round((tournament.acceptedCount / tournament.teamLimit) * 100); %>
-               <div class="inline-flex items-center justify-center w-12 h-12 rounded-full border-4 border-brand-100 text-brand-600 font-bold text-xs">
-                 <%= percent %>%
-               </div>
+               <i class="fas fa-ticket-alt text-brand-200 text-4xl transform -rotate-12"></i>
             </div>
           </div>
 
-          <div class="mb-2">
-            <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-              <div class="bg-brand-500 h-2.5 rounded-full" style="width: <%= percent %>%"></div>
-            </div>
+          <div class="w-full bg-slate-100 rounded-full h-3 mb-2 overflow-hidden border border-slate-100">
+            <div class="bg-gradient-to-r from-brand-400 to-brand-600 h-full rounded-full transition-all duration-1000 ease-out" style="width: <%= percent %>%"></div>
           </div>
-          <div class="flex justify-between text-xs font-bold text-slate-500 mb-6">
-            <span><%= tournament.acceptedCount %> Teams Joined</span>
+          <div class="flex justify-between text-xs font-bold text-slate-400 mb-8">
+            <span><%= tournament.acceptedCount %> Teams</span>
             <span><%= tournament.teamLimit %> Limit</span>
           </div>
 
-          <hr class="border-slate-100 mb-6">
+          <hr class="border-slate-100 mb-8">
 
           <% if (user && user.role === "player") { %>
 
-            <% if (!registration) { %>
+            <% if (!registration && isRegistrationOpen) { %>
+              <a href="/player/tournaments/<%= tournament._id %>/join"
+                 class="block w-full text-center py-4 rounded-2xl bg-brand-600 text-white font-bold text-lg hover:bg-brand-700 shadow-lg shadow-brand-500/30 transition-all hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2 group">
+                <span>Join Now</span> <i class="fas fa-rocket group-hover:animate-bounce"></i>
+              </a>
 
-              <% if (tournament.status !== "upcoming") { %>
-                <button disabled class="w-full py-3.5 rounded-xl bg-slate-100 text-slate-400 font-bold cursor-not-allowed">
-                  Registration Closed
-                </button>
-              <% } else if (tournament.availableSlots <= 0) { %>
-                <button disabled class="w-full py-3.5 rounded-xl bg-red-50 text-red-500 font-bold cursor-not-allowed border border-red-100">
-                  <i class="fas fa-ban mr-2"></i> Tournament Full
-                </button>
-              <% } else { %>
-                <a href="/player/tournaments/<%= tournament._id %>/join"
-                   class="block w-full text-center py-3.5 rounded-xl bg-brand-600 text-white font-bold hover:bg-brand-700 transition-all shadow-lg hover:shadow-brand-500/30 transform hover:-translate-y-1">
-                  Join Tournament 🚀
-                </a>
-              <% } %>
-
-            <% } else if (registration.status === "pending") { %>
-
-              <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-                <div class="w-12 h-12 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-2 text-xl animate-pulse">
-                  <i class="fas fa-hourglass-half"></i>
-                </div>
-                <h5 class="text-amber-800 font-bold">Approval Pending</h5>
-                <p class="text-amber-600 text-xs mt-1">Organizer is reviewing your payment.</p>
+            <% } else if (registration?.status === "pending") { %>
+              <div class="bg-amber-50 text-amber-800 border border-amber-200 rounded-2xl p-6 text-center animate-pulse-slow">
+                <div class="text-4xl mb-2">⏳</div>
+                <h5 class="font-bold text-lg">Approval Pending</h5>
+                <p class="text-xs opacity-70 mt-1">Organizer is verifying details.</p>
               </div>
 
-            <% } else if (registration.status === "accepted") { %>
-
-              <div class="bg-green-50 border border-green-200 rounded-xl p-4 text-center mb-4">
-                <div class="flex items-center justify-center gap-2 mb-2">
-                  <i class="fas fa-check-circle text-green-500 text-xl"></i>
-                  <h5 class="text-green-800 font-bold">Registration Accepted</h5>
+            <% } else if (registration?.status === "accepted") { %>
+              
+              <div class="bg-green-50 text-green-800 border border-green-200 rounded-2xl p-4 text-center mb-6">
+                <div class="font-bold flex items-center justify-center gap-2">
+                  <i class="fas fa-check-circle text-xl"></i> Registration Accepted
                 </div>
-                <p class="text-green-600 text-xs">You are officially in the lineup!</p>
               </div>
 
-              <% if (tournament.roomDetails && tournament.roomDetails.roomId) { %>
-                <div class="bg-slate-900 rounded-xl p-4 text-left border border-slate-700 relative overflow-hidden group">
-                  <div class="absolute top-0 right-0 p-2 opacity-10">
-                    <i class="fas fa-key text-4xl text-white"></i>
+              <% if (tournament.roomDetails?.roomId) { %>
+                <div class="bg-slate-900 text-white rounded-2xl p-5 shadow-inner relative overflow-hidden group">
+                  <div class="absolute -right-4 -bottom-4 text-6xl text-white/5 rotate-12">
+                    <i class="fas fa-key"></i>
                   </div>
                   
-                  <h6 class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3">
-                    <i class="fas fa-lock-open mr-1 text-green-400"></i> Room Credentials
+                  <h6 class="text-[10px] font-bold text-slate-400 uppercase mb-4 tracking-widest flex items-center gap-2">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Room Credentials
                   </h6>
                   
-                  <div class="space-y-3">
+                  <div class="space-y-4 relative z-10">
                     <div>
-                      <p class="text-slate-500 text-[10px] uppercase font-bold">Room ID</p>
-                      <div class="flex items-center justify-between">
-                        <p class="text-white font-mono text-lg font-bold tracking-wider select-all"><%= tournament.roomDetails.roomId %></p>
-                        <i class="far fa-copy text-slate-600 hover:text-white cursor-pointer transition-colors" onclick="copyToClipboard('<%= tournament.roomDetails.roomId %>')"></i>
+                      <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Room ID</p>
+                      <div class="flex items-center justify-between bg-white/10 p-2 rounded-lg border border-white/10 hover:border-white/30 transition-colors cursor-pointer" onclick="copyToClipboard('roomId')">
+                        <span class="font-mono font-bold text-lg tracking-wider" id="roomId"><%= tournament.roomDetails.roomId %></span>
+                        <i class="far fa-copy text-slate-400 hover:text-white"></i>
                       </div>
                     </div>
                     <div>
-                      <p class="text-slate-500 text-[10px] uppercase font-bold">Password</p>
-                      <p class="text-white font-mono text-lg font-bold tracking-wider select-all"><%= tournament.roomDetails.roomPassword %></p>
+                      <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Password</p>
+                      <div class="flex items-center justify-between bg-white/10 p-2 rounded-lg border border-white/10 hover:border-white/30 transition-colors cursor-pointer" onclick="copyToClipboard('roomPass')">
+                        <span class="font-mono font-bold text-lg tracking-wider" id="roomPass"><%= tournament.roomDetails.roomPassword %></span>
+                        <i class="far fa-copy text-slate-400 hover:text-white"></i>
+                      </div>
                     </div>
+                    <% if (tournament.roomDetails.slotNumber) { %>
+                      <div class="text-center pt-2 border-t border-white/10">
+                        <span class="text-xs text-slate-400">Your Slot:</span>
+                        <span class="font-bold text-brand-400 text-xl ml-2"><%= tournament.roomDetails.slotNumber %></span>
+                      </div>
+                    <% } %>
                   </div>
                 </div>
                 <p class="text-center text-[10px] text-slate-400 mt-2">
-                  Updated: <%= new Date(tournament.roomDetails.sharedAt).toLocaleTimeString() %>
+                  <i class="fas fa-history mr-1"></i> Updated: <%= new Date(tournament.roomDetails.sharedAt).toLocaleTimeString() %>
                 </p>
               <% } else { %>
-                <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 flex items-start gap-3">
-                  <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
-                  <p class="text-blue-700 text-xs">Room ID & Password will be displayed here when shared by the organizer.</p>
+                <div class="bg-blue-50 text-blue-700 border border-blue-200 rounded-2xl p-5 text-center">
+                  <div class="text-3xl mb-2">🔒</div>
+                  <p class="font-bold text-sm">Credentials Locked</p>
+                  <p class="text-[10px] opacity-75 mt-1 font-bold uppercase tracking-wide">Check back 15 mins before match</p>
                 </div>
               <% } %>
 
-            <% } else { %>
-
-              <div class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
-                <div class="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-2 text-xl">
-                  <i class="fas fa-times"></i>
-                </div>
-                <h5 class="text-red-800 font-bold">Registration Rejected</h5>
-                <p class="text-red-600 text-xs mt-1"><%= registration.rejectionReason || "Invalid UTR" %></p>
+            <% } else if (registration?.status === "rejected") { %>
+              <div class="bg-red-50 text-red-700 border border-red-200 rounded-2xl p-6 text-center">
+                <div class="text-4xl mb-2">🛑</div>
+                <div class="font-bold">Registration Rejected</div>
+                <p class="text-xs bg-white/60 p-2 rounded-lg mt-3 border border-red-100">
+                  "<%= registration.rejectionReason || 'Requirements not met' %>"
+                </p>
               </div>
 
+            <% } else { %>
+              <button disabled class="w-full py-4 rounded-2xl bg-slate-100 text-slate-400 font-bold cursor-not-allowed border border-slate-200 flex items-center justify-center gap-2">
+                <i class="fas fa-ban"></i> <%= timeStatusMessage %>
+              </button>
             <% } %>
 
           <% } else { %>
-
-            <div class="bg-slate-50 rounded-xl p-4 text-center border border-slate-100">
-              <p class="text-slate-500 text-sm mb-3">Login as a player to join.</p>
-              <a href="/login" class="text-brand-600 font-bold text-sm hover:underline">Go to Login</a>
-            </div>
-
+            <a href="/login" class="block w-full text-center py-4 rounded-2xl border-2 border-dashed border-brand-300 text-brand-600 font-bold hover:bg-brand-50 hover:border-brand-400 transition-all">
+              Login to Join 🔐
+            </a>
           <% } %>
 
           <button onclick="shareTournament('<%= tournament._id %>', '<%= tournament.name %>')" 
-             class="w-full mt-4 flex items-center justify-center gap-2 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors">
-            <i class="fas fa-share-nodes"></i> Share Link
+             class="w-full mt-4 flex items-center justify-center gap-2 py-3 rounded-xl text-slate-400 font-bold hover:text-brand-600 hover:bg-slate-50 transition-all text-sm group">
+            <i class="fas fa-share-nodes group-hover:scale-110 transition-transform"></i> Share with Squad
           </button>
 
         </div>
@@ -329,19 +387,27 @@
         navigator.share({ title: name, url });
       } else {
         navigator.clipboard.writeText(url);
-        // Simple visual feedback instead of alert
-        const btn = document.querySelector('button[onclick^="share"]');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check text-green-500"></i> Copied!';
+        
+        // Custom Toast Notification
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-6 right-6 bg-slate-900 text-white px-6 py-3 rounded-xl shadow-2xl z-50 flex items-center gap-3 animate-pop';
+        toast.innerHTML = '<i class="fas fa-check-circle text-green-400"></i> <span class="font-bold text-sm">Link Copied!</span>';
+        document.body.appendChild(toast);
+        
         setTimeout(() => {
-          btn.innerHTML = originalText;
-        }, 2000);
+          toast.remove();
+        }, 2500);
       }
     }
 
-    function copyToClipboard(text) {
-      navigator.clipboard.writeText(text);
-      // Optional: Add toast notification here
+    function copyToClipboard(elementId) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        // Feedback animation on the specific element
+        const el = document.getElementById(elementId).parentElement;
+        el.classList.add('bg-green-100', 'border-green-200');
+        setTimeout(() => el.classList.remove('bg-green-100', 'border-green-200'), 500);
+      });
     }
   </script>
 

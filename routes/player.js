@@ -3,7 +3,6 @@ const router = express.Router();
 const Tournament = require("../models/tournament");
 
 /* ================= MIDDLEWARE ================= */
-
 function isPlayer(req, res, next) {
   if (!req.isAuthenticated() || req.user.role !== "player") {
     return res.redirect("/login");
@@ -11,22 +10,53 @@ function isPlayer(req, res, next) {
   next();
 }
 
-/* ================= DASHBOARD ================= */
+/* ================= HELPER FUNCTION ================= */
+// Logic: Current Time MUST be less than TournamentDate + RegistrationCloseTime
+function isRegistrationOpen(tournament) {
+  if (!tournament.registrationCloseTime || !tournament.tournamentDate) {
+    return true;
+  }
+
+  const now = new Date();
+  const deadline = new Date(tournament.tournamentDate); // Get the day (Dec 25)
+
+  // Parse "4:20 PM"
+  let [timePart, modifier] = tournament.registrationCloseTime.split(" ");
+  let [hours, minutes] = timePart.split(":");
+
+  hours = parseInt(hours, 10);
+  minutes = parseInt(minutes, 10);
+
+  if (modifier) {
+    modifier = modifier.toUpperCase();
+    if (modifier === "PM" && hours < 12) hours += 12;
+    if (modifier === "AM" && hours === 12) hours = 0;
+  }
+
+  // Set the precise deadline time
+  deadline.setHours(hours, minutes, 0, 0);
+
+  // Return TRUE only if NOW is BEFORE Deadline
+  return now <= deadline;
+}
+
+/* ================= ROUTES ================= */
 
 router.get("/", isPlayer, async (req, res) => {
-  const tournaments = await Tournament.find();
-  res.render("dashboards/player", { tournaments });
+  try {
+    const tournaments = await Tournament.find().sort({ createdAt: -1 });
+    res.render("dashboards/player", { tournaments });
+  } catch (err) {
+    console.error(err);
+    res.send("Unable to load dashboard");
+  }
 });
-
-
-/* ================= BROWSE TOURNAMENTS ================= */
 
 router.get("/tournaments", isPlayer, async (req, res) => {
   try {
     const tournaments = await Tournament.find()
       .populate("organizer", "username")
-      .sort({ createdAt: -1 });
-
+      .sort({ tournamentDate: 1 });
     res.render("player/viewTournaments", { tournaments });
   } catch (err) {
     console.error(err);
@@ -34,75 +64,76 @@ router.get("/tournaments", isPlayer, async (req, res) => {
   }
 });
 
-/* ================= JOINED TOURNAMENTS ================= */
-
 router.get("/my-tournaments", isPlayer, async (req, res) => {
   try {
-    const tournaments = await Tournament.find({
-      "registrations.user": req.user._id,
-    })
+    const tournaments = await Tournament.find({ "registrations.user": req.user._id })
       .populate("organizer", "username")
-      .sort({ startDate: 1 });
-
-    res.render("player/myTournaments", { tournaments });
+      .sort({ tournamentDate: 1 });
+    res.render("player/mytournaments", { tournaments });
   } catch (err) {
     console.error(err);
     res.send("Unable to load joined tournaments");
   }
 });
 
-
-
-/* ================= VIEW TOURNAMENT ================= */
-
 router.get("/tournaments/:id", isPlayer, async (req, res) => {
-  const tournament = await Tournament.findById(req.params.id)
-    .populate("organizer", "username email")
-    .populate("registrations.user", "username");
+  try {
+    const tournament = await Tournament.findById(req.params.id)
+      .populate("organizer", "username email")
+      .populate("registrations.user", "username");
 
-  if (!tournament) return res.send("Tournament not found");
+    if (!tournament) return res.send("Tournament not found");
 
-  // 🔑 find current player's registration
-  const registration = tournament.registrations.find(
-    (r) => r.user && r.user._id.equals(req.user._id)
-  );
+    const registration = tournament.registrations.find(
+      (r) => r.user && r.user._id.equals(req.user._id)
+    );
 
-  res.render("player/tournamentshow", {
-    tournament,
-    registration,
-    user: req.user,
-  });
+    res.render("player/tournamentShow", {
+      tournament,
+      registration,
+      user: req.user,
+      registrationOpen: isRegistrationOpen(tournament),
+    });
+  } catch (err) {
+    console.error(err);
+    res.send("Unable to load tournament");
+  }
 });
-
-/* ================= JOIN FORM ================= */
 
 router.get("/tournaments/:id/join", isPlayer, async (req, res) => {
-  const tournament = await Tournament.findById(req.params.id).populate(
-    "organizer",
-    "upiId"
-  );
+  try {
+    const tournament = await Tournament.findById(req.params.id).populate("organizer", "upiId");
 
-  if (!tournament) return res.send("Tournament not found");
+    if (!tournament) return res.send("Tournament not found");
 
-  const registration = tournament.registrations.find(
-    (r) => r.user && r.user.equals(req.user._id)
-  );
+    if (!isRegistrationOpen(tournament)) {
+      return res.send("Registration closed for this tournament");
+    }
 
-  res.render("player/joinTournamentForm", {
-    tournament,
-    registration,
-    user: req.user,
-  });
+    const registration = tournament.registrations.find(
+      (r) => r.user && r.user.equals(req.user._id)
+    );
+
+    res.render("player/joinTournamentForm", {
+      tournament,
+      registration,
+      user: req.user,
+    });
+  } catch (err) {
+    console.error(err);
+    res.send("Unable to open join form");
+  }
 });
-
-/* ================= SUBMIT REGISTRATION ================= */
 
 router.post("/tournaments/:id/register", isPlayer, async (req, res) => {
   try {
     const tournament = await Tournament.findById(req.params.id);
     if (!tournament) return res.send("Tournament not found");
 
-    // Prevent duplicate registration
+    if (!isRegistrationOpen(tournament)) {
+      return res.send("Registration closed");
+    }
+
     const already = tournament.registrations.find(
       (r) => r.user && r.user.equals(req.user._id)
     );
@@ -127,16 +158,11 @@ router.post("/tournaments/:id/register", isPlayer, async (req, res) => {
   }
 });
 
-/* ================= VIEW RESULTS ================= */
-
-/* ================= RESULTS : LIST ALL TOURNAMENTS ================= */
-
 router.get("/results", isPlayer, async (req, res) => {
   try {
     const tournaments = await Tournament.find({
-      result: { $exists: true, $ne: null }
-    }).sort({ endDate: -1 });
-
+      result: { $exists: true, $ne: null },
+    }).sort({ tournamentDate: -1 });
     res.render("player/results", { tournaments });
   } catch (err) {
     console.error(err);
@@ -145,18 +171,17 @@ router.get("/results", isPlayer, async (req, res) => {
 });
 
 router.get("/results/:id", isPlayer, async (req, res) => {
-  const tournament = await Tournament.findById(req.params.id)
-    .populate("organizer", "username email");
+  try {
+    const tournament = await Tournament.findById(req.params.id).populate("organizer", "username email");
 
-  if (!tournament || !tournament.result) {
-    return res.send("Results not available");
+    if (!tournament || !tournament.result) {
+      return res.send("Results not available");
+    }
+    res.render("player/showResult", { tournament });
+  } catch (err) {
+    console.error(err);
+    res.send("Unable to load result");
   }
-
-  res.render("player/showResult", { tournament });
 });
 
-
-
 module.exports = router;
-
-

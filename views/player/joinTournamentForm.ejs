@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Join <%= tournament.name %></title>
+  <title>Join <%= tournament.name %> | SVx Arena</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   
@@ -19,9 +19,32 @@
           },
           colors: {
             brand: {
-              500: '#3b82f6',
-              600: '#2563eb',
-              900: '#1e3a8a',
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              900: '#4c1d95',
+            }
+          },
+          animation: {
+            'float': 'float 3s ease-in-out infinite',
+            'scan': 'scan 2s linear infinite',
+            'shine': 'shine 3s infinite',
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-6px)' },
+            },
+            scan: {
+              '0%, 100%': { top: '0%' },
+              '50%': { top: '100%' },
+            },
+            shine: {
+              '0%': { left: '-100%' },
+              '20%': { left: '100%' },
+              '100%': { left: '100%' },
             }
           }
         }
@@ -30,6 +53,11 @@
   </script>
 
   <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f5f3ff; }
+    ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 10px; }
+
     @keyframes blob {
       0% { transform: translate(0px, 0px) scale(1); }
       33% { transform: translate(30px, -50px) scale(1.1); }
@@ -38,14 +66,20 @@
     }
     .animate-blob { animation: blob 7s infinite; }
     .animation-delay-2000 { animation-delay: 2s; }
+    
+    /* Input Focus Lift */
+    .input-lift:focus-within {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.1), 0 8px 10px -6px rgba(124, 58, 237, 0.1);
+    }
   </style>
 </head>
 
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative overflow-x-hidden">
 
   <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-    <div class="absolute top-0 right-1/4 w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob"></div>
-    <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
+    <div class="absolute top-0 right-1/4 w-96 h-96 bg-brand-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+    <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
   </div>
 
   <div class="relative z-50">
@@ -56,13 +90,20 @@
     
     <div class="w-full max-w-lg relative">
       
-      <div class="bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl rounded-3xl overflow-hidden">
+      <div class="bg-white/90 backdrop-blur-2xl border border-white/60 shadow-2xl rounded-[2rem] overflow-hidden transform transition-all hover:shadow-brand-500/20">
         
-        <div class="bg-gradient-to-r from-brand-600 to-indigo-600 p-6 text-center text-white">
-          <h3 class="text-xl font-bold uppercase tracking-wider opacity-80 mb-1">Registration</h3>
-          <h1 class="text-3xl font-extrabold"><%= tournament.name %></h1>
-          <div class="mt-4 inline-flex items-center bg-white/20 backdrop-blur-md rounded-full px-4 py-1 border border-white/30">
-            <span class="text-sm font-bold">Entry Fee: ₹<%= tournament.entryFee %></span>
+        <div class="bg-gradient-to-br from-brand-600 to-purple-700 p-8 text-center text-white relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full -translate-x-10 -translate-y-10 blur-xl"></div>
+          <div class="absolute bottom-0 right-0 w-32 h-32 bg-purple-400/20 rounded-full translate-x-10 translate-y-10 blur-xl"></div>
+          
+          <h3 class="text-xs font-bold uppercase tracking-widest opacity-80 mb-2 flex items-center justify-center gap-2">
+            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span> Registration Open
+          </h3>
+          <h1 class="text-3xl font-extrabold mb-4 tracking-tight relative z-10 drop-shadow-sm"><%= tournament.name %></h1>
+          
+          <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md rounded-full px-5 py-2 border border-white/20 shadow-lg hover:scale-105 transition-transform duration-300">
+            <span class="text-sm font-bold">🎟 Entry Fee:</span>
+            <span class="text-lg font-extrabold text-yellow-300">₹<%= tournament.entryFee %></span>
           </div>
         </div>
 
@@ -70,56 +111,68 @@
           
           <% if (tournament.teamLimit && tournament.teams.length >= tournament.teamLimit) { %>
             
-            <div class="text-center py-8">
-              <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-                <i class="fas fa-ban"></i>
+            <div class="text-center py-12">
+              <div class="w-24 h-24 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner border border-red-100 animate-float">
+                <i class="fas fa-lock"></i>
               </div>
-              <h3 class="text-2xl font-bold text-slate-900 mb-2">Registration Closed</h3>
-              <p class="text-slate-500">All slots for this tournament have been filled. Better luck next time!</p>
+              <h3 class="text-2xl font-bold text-slate-900 mb-2">Registration Closed 🔒</h3>
+              <p class="text-slate-500 max-w-xs mx-auto">
+                All slots are filled! Keep an eye out for the next tournament.
+              </p>
             </div>
 
           <% } else if (!registration) { %>
 
-            <form method="POST" action="/player/tournaments/<%= tournament._id %>/register" class="space-y-6">
+            <form method="POST" action="/player/tournaments/<%= tournament._id %>/register" class="space-y-8">
 
-              <div class="space-y-4">
-                <h4 class="text-sm font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2">
-                  <i class="fas fa-users text-brand-500 mr-2"></i> Team Details
+              <div class="space-y-5">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2 flex items-center gap-2">
+                  <i class="fas fa-users text-brand-500"></i> Squad Details
                 </h4>
 
-                <div>
-                  <label class="block text-sm font-bold text-slate-700 ml-1 mb-1">Team Name <span class="text-red-500">*</span></label>
-                  <input name="teamName" required placeholder="e.g. Delta Force"
-                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none transition-all font-bold text-slate-800">
-                </div>
-
-                <div>
-                  <label class="block text-sm font-bold text-slate-700 ml-1 mb-1">Team Leader</label>
-                  <div class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-medium flex items-center justify-between">
-                    <span><%= user.username %></span>
-                    <i class="fas fa-crown text-yellow-500"></i>
+                <div class="space-y-1 input-lift transition-transform duration-200 rounded-xl">
+                  <label class="block text-xs font-bold text-slate-500 uppercase ml-1">Team Name <span class="text-red-500">*</span></label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-400">
+                      <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <input name="teamName" required placeholder="e.g. Delta Force"
+                      class="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-bold text-slate-800 placeholder-slate-400">
                   </div>
                 </div>
 
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                  <label class="block text-sm font-bold text-slate-700 mb-3">Teammates (Optional)</label>
+                <div class="space-y-1">
+                  <label class="block text-xs font-bold text-slate-500 uppercase ml-1">Team Leader</label>
+                  <div class="w-full px-4 py-3.5 bg-gradient-to-r from-slate-50 to-white border border-slate-200 rounded-xl text-slate-600 font-bold flex items-center justify-between shadow-sm">
+                    <span class="flex items-center gap-2">
+                      <img src="https://ui-avatars.com/api/?name=<%= user.username %>&background=random" class="w-6 h-6 rounded-full">
+                      <%= user.username %>
+                    </span>
+                    <i class="fas fa-crown text-yellow-500 animate-bounce"></i>
+                  </div>
+                </div>
+
+                <div class="bg-brand-50/50 p-5 rounded-2xl border border-brand-100/50 transition-all hover:border-brand-200">
+                  <label class="block text-xs font-bold text-brand-700 mb-3 uppercase tracking-wider">
+                    <i class="fas fa-user-friends mr-1"></i> Teammates (Optional)
+                  </label>
                   <div class="space-y-3">
                     <% for (let i = 2; i <= 4; i++) { %>
-                      <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                          <span class="text-xs font-bold">#<%= i %></span>
+                      <div class="relative group input-lift rounded-lg">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-brand-300 font-mono text-xs font-bold group-focus-within:text-brand-500">
+                          0<%= i %>
                         </div>
-                        <input name="member<%= i %>" placeholder="Player ID / Name"
-                          class="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-sm">
+                        <input name="member<%= i %>" placeholder="Player ID / IGN"
+                          class="w-full pl-10 pr-4 py-2.5 bg-white border border-brand-100 rounded-lg focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 outline-none text-sm text-slate-700 placeholder-slate-400 transition-all">
                       </div>
                     <% } %>
                   </div>
                 </div>
               </div>
 
-              <div class="pt-2 space-y-4">
-                <h4 class="text-sm font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2">
-                  <i class="fas fa-wallet text-brand-500 mr-2"></i> Payment (UPI)
+              <div class="pt-4 space-y-6">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2 flex items-center gap-2">
+                  <i class="fas fa-wallet text-brand-500"></i> Secure Payment
                 </h4>
 
                 <% if (tournament.organizer?.upiId) { 
@@ -129,57 +182,66 @@
                     const upiLink = `upi://pay?pa=${upiId}&pn=Organizer&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
                 %>
 
-                  <div class="bg-blue-50 border border-blue-100 rounded-2xl p-6 text-center">
-                    <p class="text-blue-800 font-bold mb-4 flex items-center justify-center gap-2">
-                      <span>Scan to Pay</span> 
-                      <span class="text-2xl text-slate-900 font-extrabold">₹<%= amount %></span>
+                  <div class="bg-gradient-to-b from-brand-50 to-white border border-brand-100 rounded-2xl p-6 text-center shadow-sm relative overflow-hidden group">
+                    <div class="absolute inset-0 pointer-events-none">
+                       <div class="w-full h-[2px] bg-brand-400/50 shadow-[0_0_15px_rgba(139,92,246,0.5)] absolute top-0 animate-scan"></div>
+                    </div>
+
+                    <p class="text-brand-800 font-bold mb-4 flex items-center justify-center gap-2 text-sm uppercase tracking-wide">
+                      Scan QR Code <span class="bg-brand-100 text-brand-700 px-2 py-0.5 rounded text-xs">UPI</span>
                     </p>
                     
-                    <div class="bg-white p-3 rounded-xl shadow-sm inline-block border border-slate-200 mb-4">
+                    <div class="bg-white p-3 rounded-2xl shadow-lg inline-block border border-slate-100 mb-4 transform group-hover:scale-105 transition-transform duration-500 relative z-10">
                       <img
                         src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=<%= encodeURIComponent(upiLink) %>"
                         alt="UPI QR Code"
-                        class="rounded-lg mix-blend-multiply"
-                        width="180" height="180"
+                        class="rounded-xl mix-blend-multiply"
+                        width="160" height="160"
                       />
                     </div>
                     
-                    <div class="text-xs text-blue-600 bg-blue-100/50 py-2 px-3 rounded-lg mx-auto max-w-xs">
-                      <i class="fas fa-exclamation-circle mr-1"></i> 
-                      IMPORTANT: Copy the <strong>UTR / Transaction ID</strong> after paying. Incorrect UTR results in rejection.
+                    <div class="text-[11px] font-bold text-slate-500 bg-slate-50 py-2 px-3 rounded-lg mx-auto max-w-xs border border-slate-100 flex items-center justify-center gap-2">
+                      <i class="fas fa-info-circle text-brand-500"></i> 
+                      Copy the <strong>UTR / Transaction ID</strong>
                     </div>
                   </div>
 
                 <% } else { %>
-                  <div class="bg-red-50 border border-red-200 rounded-xl p-4 text-center text-red-600">
-                    <i class="fas fa-times-circle text-2xl mb-2"></i>
-                    <p class="font-bold">Payment Setup Incomplete</p>
-                    <p class="text-sm">The organizer has not added UPI details yet.</p>
+                  <div class="bg-red-50 border border-red-200 rounded-2xl p-6 text-center text-red-600 animate-pulse">
+                    <i class="fas fa-exclamation-triangle text-3xl mb-2"></i>
+                    <p class="font-bold text-sm">Payment Setup Pending</p>
+                    <p class="text-xs mt-1">The organizer has not added UPI details yet.</p>
                   </div>
                 <% } %>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-sm font-bold text-slate-700 ml-1 mb-1">Payer Name <span class="text-red-500">*</span></label>
-                    <input name="payerName" required placeholder="Name on UPI App"
-                      class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none transition-all font-medium text-slate-800">
+                  <div class="space-y-1 input-lift rounded-xl">
+                    <label class="block text-xs font-bold text-slate-500 uppercase ml-1">Payer Name <span class="text-red-500">*</span></label>
+                    <input name="payerName" required placeholder="Name on App"
+                      class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium text-slate-800 placeholder-slate-400">
                   </div>
-                  <div>
-                    <label class="block text-sm font-bold text-slate-700 ml-1 mb-1">UTR / Ref No. <span class="text-red-500">*</span></label>
+                  <div class="space-y-1 input-lift rounded-xl">
+                    <label class="block text-xs font-bold text-slate-500 uppercase ml-1">UTR / Ref No. <span class="text-red-500">*</span></label>
                     <input name="transactionId" required placeholder="e.g. 3245xxxx"
-                      class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none transition-all font-medium text-slate-800">
+                      class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium text-slate-800 placeholder-slate-400">
                   </div>
                 </div>
                 
                 <input name="amount" type="hidden" value="<%= tournament.entryFee %>">
 
                 <button type="submit" <%= !tournament.organizer?.upiId ? "disabled" : "" %>
-                  class="w-full group relative flex justify-center py-4 px-4 border border-transparent text-lg font-bold rounded-xl text-white bg-slate-900 hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 transition-all duration-200 shadow-lg hover:shadow-brand-500/30 hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed">
-                  <span class="mr-2">🚀</span> Submit & Request Slot
+                  class="w-full group relative overflow-hidden py-4 px-6 bg-brand-600 text-white font-bold rounded-2xl shadow-xl shadow-brand-500/40 hover:bg-brand-700 hover:shadow-brand-500/60 hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 mt-8">
+                  
+                  <div class="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-shine"></div>
+                  
+                  <span class="relative z-10 flex items-center justify-center gap-2 text-lg">
+                    <span>Submit Request</span> 
+                    <i class="fas fa-rocket group-hover:animate-bounce"></i>
+                  </span>
                 </button>
 
-                <p class="text-center text-xs text-slate-400 mt-2">
-                  Your slot is confirmed only after the organizer approves your payment.
+                <p class="text-center text-[10px] uppercase font-bold text-slate-400 mt-4 tracking-wide">
+                  <i class="fas fa-shield-alt mr-1"></i> Secure Slot Reservation
                 </p>
 
               </div>
@@ -187,41 +249,52 @@
 
           <% } else if (registration.status === "pending") { %>
 
-            <div class="text-center py-10">
+            <div class="text-center py-12">
               <div class="relative w-24 h-24 mx-auto mb-6">
                  <div class="absolute inset-0 bg-amber-100 rounded-full animate-ping opacity-75"></div>
-                 <div class="relative w-24 h-24 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center text-4xl shadow-sm">
-                   <i class="fas fa-hourglass-half"></i>
+                 <div class="relative w-24 h-24 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center text-4xl shadow-sm border border-amber-100">
+                   <i class="fas fa-hourglass-half animate-pulse-slow"></i>
                  </div>
               </div>
-              <h3 class="text-2xl font-bold text-slate-900 mb-2">Approval Pending</h3>
-              <p class="text-slate-500 max-w-xs mx-auto mb-6">Your registration has been sent. The organizer is reviewing your payment details.</p>
-              <div class="inline-block bg-slate-50 px-4 py-2 rounded-lg border border-slate-200 text-sm font-mono text-slate-600">
-                Team: <%= registration.teamName %>
+              <h3 class="text-2xl font-bold text-slate-900 mb-2">Approval Pending ⏳</h3>
+              <p class="text-slate-500 max-w-xs mx-auto mb-6 text-sm">
+                Your payment is being verified by the organizer. Sit tight!
+              </p>
+              <div class="inline-flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-lg border border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-600">
+                <i class="fas fa-users text-brand-500"></i> Team: <%= registration.teamName %>
               </div>
             </div>
 
           <% } else if (registration.status === "accepted") { %>
 
-            <div class="text-center py-10">
-              <div class="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-sm">
-                <i class="fas fa-check-circle"></i>
+            <div class="text-center py-12">
+              <div class="relative w-24 h-24 mx-auto mb-6">
+                <div class="absolute -top-4 -left-4 text-yellow-400 text-xl animate-bounce">✨</div>
+                <div class="absolute -bottom-2 -right-4 text-brand-400 text-xl animate-pulse">🎉</div>
+                
+                <div class="w-24 h-24 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-5xl shadow-sm border border-green-100 animate-float">
+                  <i class="fas fa-check-circle"></i>
+                </div>
               </div>
-              <h3 class="text-2xl font-bold text-slate-900 mb-2">Registration Accepted!</h3>
-              <p class="text-slate-500 max-w-xs mx-auto">You are in! The Room ID and Password will be shared here or via email soon.</p>
+              <h3 class="text-2xl font-bold text-slate-900 mb-2">You're In! 🚀</h3>
+              <p class="text-slate-500 max-w-xs mx-auto text-sm">
+                Registration accepted. The Room ID and Password will be shared here shortly.
+              </p>
             </div>
 
           <% } else { %>
 
-            <div class="text-center py-10">
-              <div class="w-24 h-24 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-sm">
+            <div class="text-center py-12">
+              <div class="w-24 h-24 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-sm border border-red-100 hover:animate-shake">
                 <i class="fas fa-times-circle"></i>
               </div>
-              <h3 class="text-2xl font-bold text-slate-900 mb-2">Registration Rejected</h3>
-              <p class="text-slate-500 max-w-xs mx-auto mb-6">Unfortunately, your request was not approved.</p>
+              <h3 class="text-2xl font-bold text-slate-900 mb-2">Registration Rejected 🛑</h3>
+              <p class="text-slate-500 max-w-xs mx-auto mb-6 text-sm">
+                Unfortunately, your request was not approved.
+              </p>
               
-              <div class="bg-red-50 border border-red-100 rounded-xl p-4 text-sm text-red-700 mb-6">
-                <strong>Reason:</strong> <%= registration.rejectionReason || "Invalid UTR or Payment Mismatch" %>
+              <div class="bg-red-50 border border-red-100 rounded-xl p-4 text-xs font-bold text-red-600 mb-6 inline-block">
+                Reason: <%= registration.rejectionReason || "Invalid UTR or Payment Mismatch" %>
               </div>
             </div>
 
@@ -229,9 +302,9 @@
 
         </div>
         
-        <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 text-center">
-          <a href="/player/tournaments" class="text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors">
-            <i class="fas fa-arrow-left mr-1"></i> Back to Tournaments
+        <div class="bg-slate-50/80 backdrop-blur-md px-6 py-4 border-t border-slate-100 text-center">
+          <a href="/player/tournaments" class="text-sm font-bold text-slate-500 hover:text-brand-600 transition-colors flex items-center justify-center gap-2 group">
+            <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Back to Tournaments
           </a>
         </div>
 

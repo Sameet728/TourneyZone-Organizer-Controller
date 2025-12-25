@@ -1,66 +1,70 @@
-<nav class="fixed w-full z-50 top-0 start-0 border-b border-white/20 bg-white/80 backdrop-blur-xl transition-all duration-300" id="mainNavbar">
+<nav class="fixed w-full z-50 top-0 start-0 border-b border-white/40 bg-white/90 backdrop-blur-xl transition-all duration-300 shadow-sm" id="mainNavbar">
   <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
     
-    <a href="/" class="flex items-center space-x-2 rtl:space-x-reverse group">
-      <div class="w-10 h-10 bg-brand-600 text-white rounded-xl flex items-center justify-center text-xl shadow-lg shadow-brand-500/30 group-hover:scale-110 transition-transform">
-        <i class="fas fa-bolt"></i>
-      </div>
+    <a href="/" class="flex items-center gap-3 group">
+      <img src="/images/logo.jpeg" alt="SVx Arena Logo" class="w-12 h-12 object-contain transition-transform duration-300 group-hover:scale-110 rounded-xl
+ filter drop-shadow-sm font-bold">
+      
       <span class="self-center text-2xl font-extrabold whitespace-nowrap text-slate-900 tracking-tight">
-        Tourney<span class="text-brand-600">Zone</span>
+        SVx<span class="text-brand-600">Arena</span>
       </span>
     </a>
 
-    <button data-collapse-toggle="navbar-sticky" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-slate-500 rounded-lg md:hidden hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-200" aria-controls="navbar-sticky" aria-expanded="false" onclick="toggleMobileMenu()">
+    <button data-collapse-toggle="navbar-sticky" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-slate-500 rounded-xl md:hidden hover:bg-brand-50 hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-200 transition-colors" aria-controls="navbar-sticky" aria-expanded="false" onclick="toggleMobileMenu()">
       <span class="sr-only">Open main menu</span>
       <i class="fas fa-bars text-xl"></i>
     </button>
 
-    <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
-      <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-slate-100 rounded-2xl bg-slate-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-transparent">
+    <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1 transition-all duration-300 ease-in-out" id="navbar-sticky">
+      <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-slate-100 rounded-[14px]
+ bg-white md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-transparent shadow-lg md:shadow-none">
         
         <li>
-          <a href="/player/tournaments" class="block py-2 px-3 text-slate-700 rounded hover:bg-slate-100 md:hover:bg-transparent md:hover:text-brand-600 md:p-0 transition-colors">
-            Tournaments
+          <a href="/tournaments" class="block py-2 px-4 rounded-lg text-slate-600 hover:text-brand-600 hover:bg-brand-50 md:hover:bg-transparent transition-all relative group">
+            <span>🏆 Tournaments</span>
+            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-500 transition-all duration-300 group-hover:w-full hidden md:block"></span>
           </a>
         </li>
 
         <% if (!currentUser) { %>
-          <li class="md:hidden border-t border-slate-200 my-2 pt-2"></li>
-          <li class="flex flex-col md:flex-row gap-2">
-            <a href="/login" class="px-5 py-2 text-sm font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 hover:text-brand-600 transition-all text-center">
+          <li class="md:hidden border-t border-slate-100 my-2 pt-2"></li>
+          <li class="flex flex-col md:flex-row gap-3 md:items-center">
+            <a href="/login" class="px-5 py-2 text-sm font-bold text-slate-600 hover:text-brand-600 bg-transparent border-2 border-transparent hover:border-brand-100 rounded-xl transition-all text-center">
               Log In
             </a>
-            <a href="/signup" class="px-5 py-2 text-sm font-bold text-white bg-slate-900 rounded-xl hover:bg-brand-600 shadow-lg hover:shadow-brand-500/30 transition-all text-center">
-              Sign Up
+            <a href="/signup" class="group relative px-6 py-2.5 text-sm font-bold text-white bg-brand-600 rounded-xl shadow-lg shadow-brand-500/30 hover:bg-brand-700 hover:-translate-y-0.5 transition-all text-center overflow-hidden">
+              <span class="relative z-10 flex items-center justify-center gap-2">Sign Up <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i></span>
             </a>
           </li>
         <% } else { %>
           
           <% if (currentUser.role === 'player') { %>
             <li>
-              <a href="/player/my-tournaments" class="block py-2 px-3 text-slate-700 rounded hover:bg-slate-100 md:hover:bg-transparent md:hover:text-brand-600 md:p-0 transition-colors">
-                My Matches
+              <a href="/player/my-tournaments" class="block py-2 px-4 rounded-lg text-slate-600 hover:text-brand-600 hover:bg-brand-50 md:hover:bg-transparent transition-all relative group">
+                <span>🎮 My Matches</span>
                 <% if (currentUser.tournamentsJoined?.length > 0) { %>
-                  <span class="inline-flex items-center justify-center w-5 h-5 ms-2 text-xs font-semibold text-white bg-red-500 rounded-full">
+                  <span class="inline-flex items-center justify-center w-5 h-5 ms-2 text-[10px] font-bold text-white bg-red-500 rounded-full animate-bounce">
                     <%= currentUser.tournamentsJoined.length %>
                   </span>
                 <% } %>
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-500 transition-all duration-300 group-hover:w-full hidden md:block"></span>
               </a>
             </li>
           <% } %>
 
           <% if (currentUser.role === 'organizer') { %>
             <li>
-              <a href="/organizer/tournaments/new" class="block py-2 px-3 text-slate-700 rounded hover:bg-slate-100 md:hover:bg-transparent md:hover:text-brand-600 md:p-0 transition-colors">
-                <i class="fas fa-plus-circle mr-1"></i> Host Event
+              <a href="/organizer/tournaments/new" class="block py-2 px-4 rounded-lg text-slate-600 hover:text-brand-600 hover:bg-brand-50 md:hover:bg-transparent transition-all relative group">
+                <span><i class="fas fa-plus-circle text-brand-400 mr-1"></i> Host Event</span>
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-500 transition-all duration-300 group-hover:w-full hidden md:block"></span>
               </a>
             </li>
           <% } %>
 
           <li class="md:ml-4 mt-4 md:mt-0">
             <div class="relative group">
-              <a href="/<%= currentUser.role %>" class="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-900 rounded-xl hover:bg-slate-200 transition-colors font-bold text-sm w-full justify-center md:w-auto">
-                <div class="w-6 h-6 bg-brand-500 text-white rounded-full flex items-center justify-center text-xs">
+              <a href="/<%= currentUser.role %>" class="flex items-center gap-2 px-5 py-2.5 bg-slate-50 border border-slate-200 text-slate-800 rounded-xl hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700 transition-all font-bold text-sm w-full justify-center md:w-auto shadow-sm group-hover:shadow-md">
+                <div class="w-6 h-6 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center text-xs">
                   <i class="fas fa-user"></i>
                 </div>
                 <span>Dashboard</span>
@@ -69,14 +73,14 @@
           </li>
 
           <li class="md:hidden">
-            <a href="/logout" class="block py-2 px-3 text-red-600 rounded hover:bg-red-50 font-bold text-center mt-2">
-              Log Out
+            <a href="/logout" class="block py-2 px-4 text-red-500 rounded-lg hover:bg-red-50 font-bold text-center mt-2 border border-red-100">
+              <i class="fas fa-sign-out-alt mr-2"></i> Log Out
             </a>
           </li>
           
           <li class="hidden md:block">
-            <a href="/logout" class="text-slate-400 hover:text-red-500 transition-colors" title="Logout">
-              <i class="fas fa-sign-out-alt"></i>
+            <a href="/logout" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all" title="Logout">
+              <i class="fas fa-power-off"></i>
             </a>
           </li>
 
@@ -92,5 +96,19 @@
   function toggleMobileMenu() {
     const menu = document.getElementById('navbar-sticky');
     menu.classList.toggle('hidden');
+    // Simple animation for mobile menu
+    if (!menu.classList.contains('hidden')) {
+      menu.classList.add('animate-fade-in-down');
+    }
   }
 </script>
+
+<style>
+  .animate-fade-in-down {
+    animation: fadeInDown 0.3s ease-out;
+  }
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

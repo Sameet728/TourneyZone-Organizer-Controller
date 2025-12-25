@@ -3,28 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Tournaments | BattleZone</title>
-  
+  <title>My Tournaments | SVx Arena</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
-  
+
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: {
+         fontFamily: {
             sans: ['"Plus Jakarta Sans"', 'sans-serif'],
           },
           colors: {
             brand: {
-              50: '#eff6ff',
-              100: '#dbeafe',
-              500: '#3b82f6',
-              600: '#2563eb', // Electric Blue
-              900: '#1e3a8a',
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              900: '#4c1d95',
             }
           }
         }
@@ -33,12 +32,10 @@
   </script>
 
   <style>
-    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    
-    /* Soft Background Gradient Animation */
+    ::-webkit-scrollbar-track { background: #f5f3ff; }
+    ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 10px; }
+
     @keyframes blob {
       0% { transform: translate(0px, 0px) scale(1); }
       33% { transform: translate(30px, -50px) scale(1.1); }
@@ -54,9 +51,9 @@
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative overflow-x-hidden">
 
   <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-    <div class="absolute top-0 left-1/4 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-    <div class="absolute top-0 right-1/4 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-    <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-brand-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+    <div class="absolute top-0 right-1/4 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
   </div>
 
   <div class="relative z-50">
@@ -64,92 +61,131 @@
   </div>
 
   <div class="container mx-auto px-4 py-8 lg:py-12 flex-grow">
-    
+
     <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
       <div class="text-center md:text-left">
         <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
-          My Tournaments <span class="text-2xl">⚡️</span>
+          My Tournaments <span class="text-brand-500">⚡️</span>
         </h2>
         <p class="text-slate-500 mt-2 font-medium">Manage and track your gaming events</p>
       </div>
 
-      <a href="/organizer/tournaments/new" 
-         class="group relative inline-flex items-center justify-center px-8 py-3 text-base font-bold text-white transition-all duration-200 bg-brand-600 font-pj rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-600 hover:bg-brand-900 shadow-lg hover:shadow-xl hover:-translate-y-1 w-full md:w-auto">
-         <span class="mr-2 text-xl">🚀</span> Create New
-         <div class="absolute inset-0 rounded-xl ring-2 ring-white/20 group-hover:ring-white/40 transition-all"></div>
+      <a href="/organizer/tournaments/new"
+         class="group inline-flex items-center justify-center px-8 py-3 font-bold text-white bg-brand-600 rounded-xl hover:bg-brand-900 shadow-lg shadow-brand-500/30 hover:-translate-y-1 transition-all w-full md:w-auto">
+        <span class="mr-2 text-lg">🚀</span> Create New
       </a>
     </div>
 
     <% if (tournaments.length === 0) { %>
-      
-      <div class="bg-white/60 backdrop-blur-xl border border-white/20 rounded-3xl p-10 md:p-16 text-center shadow-xl max-w-2xl mx-auto">
-        <div class="bg-indigo-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-          <i class="fas fa-gamepad text-4xl text-brand-600"></i>
+      <div class="bg-white/60 backdrop-blur-xl border border-white/50 rounded-3xl p-12 text-center shadow-xl max-w-2xl mx-auto">
+        <div class="w-20 h-20 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-600 text-4xl shadow-inner">
+          <i class="fas fa-gamepad"></i>
         </div>
-        <h3 class="text-2xl font-bold text-slate-900 mb-3">No Tournaments Found</h3>
-        <p class="text-slate-500 mb-8 leading-relaxed">
-          It looks quiet here! You haven't organized any battle arenas yet. <br class="hidden md:block">
-          Start your journey by creating your first tournament.
+        <h3 class="text-2xl font-bold text-slate-900 mb-2">No Tournaments Found</h3>
+        <p class="text-slate-500 mb-8">
+          The arena is empty. It's time to organize your first battle!
         </p>
-        <a href="/organizer/tournaments/new" class="inline-flex items-center justify-center px-6 py-3 text-sm font-bold text-brand-600 transition-all duration-200 bg-indigo-50 border border-transparent rounded-lg hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-600">
+        <a href="/organizer/tournaments/new"
+           class="inline-flex items-center px-6 py-3 font-bold text-brand-600 bg-brand-50 border border-brand-100 rounded-xl hover:bg-brand-100 transition-colors">
           <i class="fas fa-plus mr-2"></i> Create First Tournament
         </a>
       </div>
-
     <% } else { %>
-      
+
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-        
-        <% tournaments.forEach(t => { %>
-          <div class="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
+        <% tournaments.forEach(t => { 
+            /* --- SAFE CALCULATION LOGIC --- */
+            let teamCount = 0;
+            if (t.teams && Array.isArray(t.teams)) {
+              teamCount = t.teams.length;
+            }
             
+            let limit = 0;
+            if (t.teamLimit) {
+              limit = parseInt(t.teamLimit);
+            }
+            
+            let percentage = 0;
+            if (limit > 0) {
+              percentage = Math.round((teamCount / limit) * 100);
+            }
+            // Clamp percentage to max 100
+            percentage = Math.min(percentage, 100);
+            
+            let spotsLeft = Math.max(0, limit - teamCount);
+        %>
+          <div class="group relative bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-brand-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+
             <div class="flex justify-between items-start mb-4">
-              <div class="flex items-center space-x-2">
-                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors">
-                  <i class="fas fa-gamepad"></i>
-                </span>
-                <span class="font-bold text-sm text-slate-600 uppercase tracking-wide"><%= t.game %></span>
-              </div>
-              
-              <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border
-                <%= t.status === 'upcoming' ? 'bg-amber-50 text-amber-600 border-amber-200' : '' %>
-                <%= t.status === 'ongoing' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : '' %>
-                <%= t.status === 'completed' ? 'bg-slate-100 text-slate-500 border-slate-200' : '' %>
+              <span class="inline-flex items-center gap-2 px-3 py-1 bg-slate-50 text-slate-600 rounded-lg text-xs font-bold uppercase tracking-wider">
+                <i class="fas fa-gamepad"></i> <%= t.game %>
+              </span>
+
+              <span class="px-3 py-1 rounded-full text font-bold uppercase tracking-wider
+                <%= t.status === 'upcoming' ? 'bg-amber-50 text-amber-600 border border-amber-100' : '' %>
+                <%= t.status === 'ongoing' ? 'bg-green-50 text-green-600 border border-green-100' : '' %>
+                <%= t.status === 'completed' ? 'bg-slate-100 text-slate-500 border border-slate-200' : '' %>
               ">
-                <%= t.status === 'upcoming' ? '⏳ ' : (t.status === 'ongoing' ? '🔥 ' : '🏁 ') %>
-                <%= t.status %>
+                🔥 <%= t.status %>
               </span>
             </div>
 
-            <h5 class="text-xl font-bold text-slate-900 mb-2 leading-tight group-hover:text-brand-600 transition-colors">
-              <%= t.name %>
-            </h5>
-            
-            <p class="text-slate-500 text-sm mb-6 line-clamp-2 flex-grow">
-              <%= t.description || "No description provided for this epic battle." %>
+            <h5 class="text-xl font-bold text-slate-900 mb-2 group-hover:text-brand-600 transition-colors"><%= t.name %></h5>
+            <p class="text-sm text-slate-500 mb-5 line-clamp-2 flex-grow">
+              <%= t.description || "No description provided." %>
             </p>
 
-            <div class="space-y-2 mb-6 text-sm font-medium text-slate-500 bg-slate-50/50 p-3 rounded-xl border border-slate-100">
-              <div class="flex items-center">
-                <i class="far fa-calendar-alt w-5 text-brand-500"></i>
-                <span class="ml-2"><%= t.startDate.toDateString() %></span>
+            <div class="mb-5">
+              <div class="flex justify-between items-end text-xs font-bold mb-1.5">
+                <span class="text-slate-500 flex items-center">
+                  <i class="fas fa-users mr-1.5 text-brand-400"></i>
+                  <%= teamCount %> / <%= limit %> Teams
+                </span>
+                <span class="<%= spotsLeft === 0 ? 'text-red-500' : 'text-brand-600' %>">
+                  <%= spotsLeft === 0 ? 'Full' : `${spotsLeft} Spots Left` %>
+                </span>
               </div>
-              <div class="flex items-center">
-                <i class="far fa-calendar-check w-5 text-brand-500"></i>
-                <span class="ml-2"><%= t.endDate.toDateString() %></span>
+              
+              <!-- FIXED PROGRESS BAR WITH SMOOTH ANIMATION -->
+              <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
+                <div class="h-full rounded-full transition-all duration-500 ease-out bg-gradient-to-r from-brand-400 to-brand-600 absolute inset-0 opacity-0"
+                     data-width="<%= percentage %>"
+                     style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="bg-brand-50/50 rounded-xl p-4 text-sm space-y-2.5 mb-6 border border-brand-50">
+              <div class="flex items-center text-slate-600">
+                <i class="far fa-calendar-alt text-brand-500 w-5"></i>
+                <span class="font-medium"><%= new Date(t.tournamentDate).toDateString() %></span>
+              </div>
+              <div class="flex items-center text-slate-600">
+                <i class="far fa-clock text-brand-500 w-5"></i>
+                <span class="font-medium">Match: <%= t.matchTime || "TBA" %></span>
+              </div>
+              <div class="flex items-center text-slate-600">
+                <i class="fas fa-trophy text-brand-500 w-5"></i>
+                <span class="font-bold text-slate-800">Prize: ₹<%= t.prizePool || 0 %></span>
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3 mt-auto">
               <% if (t.status === 'completed') { %>
-                <a href="/organizer/tournaments/<%= t._id %>/results" class="col-span-2 inline-flex justify-center items-center px-4 py-2.5 text-sm font-bold text-white transition-all duration-200 bg-emerald-500 rounded-lg hover:bg-emerald-600 hover:shadow-lg hover:shadow-emerald-500/30">
-                  <i class="fas fa-trophy mr-2"></i> Submit Results
+                <a href="/organizer/tournaments/<%= t._id %>/results"
+                   class="text-center px-4 py-2.5 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-200 flex items-center justify-center gap-2">
+                  <i class="fas fa-trophy"></i> Results
+                </a>
+                <a href="/organizer/tournaments/<%= t._id %>"
+                   class="text-center px-4 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 hover:text-brand-600 transition-colors">
+                  <i class="fas fa-eye mr-2"></i> View
                 </a>
               <% } else { %>
-                <a href="/organizer/tournaments/<%= t._id %>/edit" class="inline-flex justify-center items-center px-4 py-2.5 text-sm font-bold text-white transition-all duration-200 bg-brand-600 rounded-lg hover:bg-brand-700 hover:shadow-lg hover:shadow-brand-500/30">
+                <a href="/organizer/tournaments/<%= t._id %>/edit"
+                   class="text-center px-4 py-2.5 bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-700 transition-colors shadow-lg shadow-brand-200">
                   <i class="fas fa-edit mr-2"></i> Edit
                 </a>
-                <a href="/organizer/tournaments/<%= t._id %>" class="inline-flex justify-center items-center px-4 py-2.5 text-sm font-bold text-slate-700 transition-all duration-200 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-brand-600 hover:border-brand-200">
+                <a href="/organizer/tournaments/<%= t._id %>"
+                   class="text-center px-4 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 hover:text-brand-600 transition-colors">
                   <i class="fas fa-eye mr-2"></i> View
                 </a>
               <% } %>
@@ -158,6 +194,7 @@
           </div>
         <% }) %>
       </div>
+
     <% } %>
 
   </div>
@@ -165,6 +202,17 @@
   <div class="mt-12">
     <%- include("../includes/footer") %>
   </div>
+
+  <!-- PROGRESS BAR ANIMATION SCRIPT -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Animate all progress bars
+      document.querySelectorAll('[data-width]').forEach(bar => {
+        const targetWidth = bar.getAttribute('data-width');
+        bar.style.width = targetWidth + '%';
+      });
+    });
+  </script>
 
 </body>
 </html>

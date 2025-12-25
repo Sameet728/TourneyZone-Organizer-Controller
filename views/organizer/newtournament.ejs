@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create New Tournament | BattleZone</title>
-  
+  <title>Create Tournament | SVx Arena</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
-  
+
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
@@ -19,9 +19,11 @@
           },
           colors: {
             brand: {
-              500: '#3b82f6',
-              600: '#2563eb',
-              900: '#1e3a8a',
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              900: '#4c1d95',
             }
           }
         }
@@ -30,21 +32,26 @@
   </script>
 
   <style>
-    /* Smooth fade in for the Time Slot field */
+    /* Smooth Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f5f3ff; }
+    ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 10px; }
+
+    /* Animations */
     .fade-enter {
       opacity: 0;
       transform: translateY(-10px);
       max-height: 0;
       overflow: hidden;
-      transition: all 0.3s ease-out;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .fade-enter-active {
       opacity: 1;
       transform: translateY(0);
-      max-height: 100px; /* Arbitrary large height */
+      max-height: 200px; /* Enough space for the content */
+      margin-top: 1.5rem;
     }
-    
-    /* Background Animation */
+
     @keyframes blob {
       0% { transform: translate(0px, 0px) scale(1); }
       33% { transform: translate(30px, -50px) scale(1.1); }
@@ -53,16 +60,32 @@
     }
     .animate-blob { animation: blob 7s infinite; }
     .animation-delay-2000 { animation-delay: 2s; }
-    .animation-delay-4000 { animation-delay: 4s; }
+    
+    /* Input Styling Class */
+    .svx-input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.75rem;
+      color: #1e293b;
+      font-weight: 500;
+      transition: all 0.2s;
+      outline: none;
+    }
+    .svx-input:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+    .svx-input::placeholder { color: #94a3b8; }
   </style>
 </head>
 
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative overflow-x-hidden">
 
   <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-    <div class="absolute top-0 left-1/4 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-    <div class="absolute top-0 right-1/4 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-    <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+    <div class="absolute top-0 right-1/4 w-96 h-96 bg-brand-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+    <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
   </div>
 
   <div class="relative z-50">
@@ -73,152 +96,124 @@
     
     <div class="w-full max-w-4xl relative">
       
-      <div class="bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl rounded-3xl p-6 md:p-12">
+      <div class="bg-white/80 backdrop-blur-xl border border-white/60 shadow-2xl rounded-3xl overflow-hidden">
         
-        <div class="text-center mb-10">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-50 text-brand-600 mb-4 shadow-sm">
-            <i class="fas fa-trophy text-2xl"></i>
+        <div class="text-center pt-10 pb-6 px-6">
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-brand-50 text-brand-600 rounded-2xl mb-4 shadow-sm text-3xl">
+            <i class="fas fa-trophy"></i>
           </div>
-          <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Create Tournament 🚀
-          </h2>
-          <p class="text-slate-500 mt-2">Setup the arena for the next big battle</p>
+          <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Create Tournament</h2>
+          <p class="text-slate-500 mt-2">Set the stage for the next big battle.</p>
         </div>
 
-        <div class="mb-8 bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-4 shadow-sm">
-          <div class="flex-shrink-0 text-amber-500 mt-1">
-            <i class="fas fa-exclamation-triangle fa-lg"></i>
-          </div>
-          <div>
-            <h4 class="text-sm font-bold text-amber-800 uppercase tracking-wide">Action Required</h4>
-            <p class="text-sm text-amber-700 mt-1">
-              Ensure your <b>UPI ID</b> is updated in your organizer profile. Players need this to pay entry fees and upload screenshots.
-            </p>
-          </div>
-        </div>
+        <form action="/organizer/tournaments" method="POST" class="px-8 pb-10 md:px-12 md:pb-12 space-y-8">
 
-        <form action="/organizer/tournaments" method="POST" class="space-y-6">
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-            
-            <div class="space-y-2">
-              <label for="name" class="block text-sm font-bold text-slate-700 ml-1">Tournament Name</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                  <i class="fas fa-heading"></i>
-                </div>
-                <input type="text" name="name" id="name" placeholder="e.g. Winter Battle Royale" required 
-                  class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all placeholder-slate-400 font-medium text-slate-700 hover:bg-slate-100/50">
-              </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-1">
+              <label class="text-xs font-bold text-slate-500 uppercase ml-1">Tournament Name</label>
+              <input name="name" placeholder="e.g. Winter Championship" required class="svx-input">
             </div>
-
-            <div class="space-y-2">
-              <label for="game" class="block text-sm font-bold text-slate-700 ml-1">Game Title</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                  <i class="fas fa-gamepad"></i>
-                </div>
-                <input type="text" name="game" id="game" placeholder="e.g. BGMI, Valorant" required 
-                  class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all placeholder-slate-400 font-medium text-slate-700 hover:bg-slate-100/50">
-              </div>
+            <div class="space-y-1">
+              <label class="text-xs font-bold text-slate-500 uppercase ml-1">Game Title</label>
+              <input name="game" placeholder="e.g. Valorant, BGMI" required class="svx-input">
             </div>
-
-            <div class="space-y-2">
-              <label for="entryFee" class="block text-sm font-bold text-slate-700 ml-1">Entry Fee (₹)</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                  <i class="fas fa-rupee-sign"></i>
-                </div>
-                <input type="number" name="entryFee" id="entryFee" min="0" value="0" placeholder="0" required 
-                  class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all placeholder-slate-400 font-medium text-slate-700 hover:bg-slate-100/50">
-              </div>
+            <div class="space-y-1">
+              <label class="text-xs font-bold text-slate-500 uppercase ml-1">Entry Fee (₹)</label>
+              <input name="entryFee" type="number" placeholder="0" required class="svx-input">
             </div>
-
-            <div class="space-y-2">
-              <label for="teamLimit" class="block text-sm font-bold text-slate-700 ml-1">Team Slots</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                  <i class="fas fa-users"></i>
-                </div>
-                <input type="number" name="teamLimit" placeholder="e.g. 100" required
-                  class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all placeholder-slate-400 font-medium text-slate-700 hover:bg-slate-100/50">
-              </div>
+            <div class="space-y-1">
+              <label class="text-xs font-bold text-slate-500 uppercase ml-1">Prize Pool (₹)</label>
+              <input name="prizePool" type="number" placeholder="0" class="svx-input">
             </div>
-
+            <div class="space-y-1 md:col-span-2">
+              <label class="text-xs font-bold text-slate-500 uppercase ml-1">Total Team Slots</label>
+              <input name="teamLimit" type="number" placeholder="e.g. 100" required class="svx-input">
+            </div>
           </div>
 
-          <div class="space-y-2">
-            <label for="description" class="block text-sm font-bold text-slate-700 ml-1">Rules & Description</label>
-            <textarea name="description" id="description" rows="4" placeholder="Describe the format, maps, and rules..."
-              class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all placeholder-slate-400 font-medium text-slate-700 hover:bg-slate-100/50"></textarea>
+          <div class="space-y-1">
+            <label class="text-xs font-bold text-slate-500 uppercase ml-1">Rules & Description</label>
+            <textarea name="description" rows="4" placeholder="Enter tournament rules, map details, and other info..." class="svx-input resize-y"></textarea>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-            <div class="space-y-2">
-              <label for="startDate" class="block text-sm font-bold text-slate-700 ml-1">Start Date</label>
-              <div class="relative">
-                 <input type="date" name="startDate" id="startDate" required 
-                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all text-slate-700 font-medium">
+          <div class="bg-brand-50/50 p-6 rounded-2xl border border-brand-100 space-y-6">
+            <h3 class="text-sm font-bold text-brand-600 uppercase tracking-wider flex items-center gap-2">
+              <i class="far fa-calendar-alt"></i> Schedule Settings
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <div class="space-y-1">
+                <label class="text-xs font-bold text-slate-500 uppercase ml-1">Tournament Date</label>
+                <input type="date" name="tournamentDate" required class="svx-input cursor-pointer">
               </div>
-            </div>
-            <div class="space-y-2">
-              <label for="endDate" class="block text-sm font-bold text-slate-700 ml-1">End Date</label>
-              <div class="relative">
-                <input type="date" name="endDate" id="endDate" required 
-                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all text-slate-700 font-medium">
+
+              <div class="space-y-1">
+                <label class="text-xs font-bold text-slate-500 uppercase ml-1">Registration Closes At</label>
+                <div class="flex gap-2">
+                  <select id="closeHour" class="svx-input text-center cursor-pointer">
+                    <option value="">HH</option>
+                    <% for(let i=1;i<=12;i++){ %>
+                      <option value="<%= i %>"><%= i %></option>
+                    <% } %>
+                  </select>
+                  <span class="self-center font-bold text-slate-400">:</span>
+                  <select id="closeMinute" class="svx-input text-center cursor-pointer">
+                    <option value="">MM</option>
+                    <option>00</option><option>15</option><option>30</option><option>45</option>
+                  </select>
+                  <select id="closeMeridian" class="svx-input text-center bg-slate-100 font-bold cursor-pointer">
+                    <option>AM</option><option>PM</option>
+                  </select>
+                </div>
+                <input type="hidden" name="registrationCloseTime" id="registrationCloseTime">
               </div>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">
-            
-            <div class="space-y-2">
-              <label for="type" class="block text-sm font-bold text-slate-700 ml-1">Format Type</label>
+          <div class="space-y-4">
+            <div class="space-y-1">
+              <label class="text-xs font-bold text-slate-500 uppercase ml-1">Tournament Format</label>
               <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                  <i class="fas fa-chess-board"></i>
-                </div>
-                <select name="type" id="type" required onchange="toggleTimeSlot()"
-                  class="w-full pl-11 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all text-slate-700 font-medium appearance-none cursor-pointer">
-                  <option value="regular" selected>🏆 Regular Tournament</option>
-                  <option value="scrim">⚔️ Daily Scrim</option>
+                <select name="type" id="type" onchange="toggleScrimTime()" class="svx-input appearance-none cursor-pointer">
+                  <option value="regular">🏆 Regular Tournament</option>
+                  <option value="scrim">⚔️ Scrim / Practice Match</option>
                 </select>
-                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
+                <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-500">
                   <i class="fas fa-chevron-down text-xs"></i>
                 </div>
               </div>
             </div>
 
-            <div id="timeSlotWrapper" class="space-y-2 fade-enter">
-              <label for="timeSlot" class="block text-sm font-bold text-slate-700 ml-1">Daily Scrim Time</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                  <i class="far fa-clock"></i>
-                </div>
-                <select name="timeSlot" id="timeSlot"
-                  class="w-full pl-11 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all text-slate-700 font-medium appearance-none cursor-pointer">
-                  <option value="">-- Select Time Slot --</option>
-                  <option value="9 AM - 12 PM">🌅 Morning (9 AM - 12 PM)</option>
-                  <option value="12 PM - 3 PM">☀️ Noon (12 PM - 3 PM)</option>
-                  <option value="3 PM - 6 PM">🌤 Afternoon (3 PM - 6 PM)</option>
-                  <option value="6 PM - 9 PM">🌇 Evening (6 PM - 9 PM)</option>
-                  <option value="9 PM - 12 AM">🌙 Night (9 PM - 12 AM)</option>
+            <div id="scrimTimeWrapper" class="fade-enter bg-purple-50 p-6 rounded-2xl border border-purple-100">
+              <label class="block text-sm font-bold text-purple-700 mb-3">
+                <i class="far fa-clock mr-1"></i> Set Scrim Match Time
+              </label>
+              <div class="flex gap-2">
+                <select id="scrimHour" class="svx-input text-center cursor-pointer border-purple-200 focus:border-purple-500">
+                  <option value="">HH</option>
+                  <% for(let i=1;i<=12;i++){ %>
+                    <option value="<%= i %>"><%= i %></option>
+                  <% } %>
                 </select>
-                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
-                  <i class="fas fa-chevron-down text-xs"></i>
-                </div>
+                <span class="self-center font-bold text-purple-400">:</span>
+                <select id="scrimMinute" class="svx-input text-center cursor-pointer border-purple-200 focus:border-purple-500">
+                  <option value="">MM</option>
+                  <option>00</option><option>15</option><option>30</option><option>45</option>
+                </select>
+                <select id="scrimMeridian" class="svx-input text-center font-bold cursor-pointer border-purple-200 bg-white text-purple-700">
+                  <option>AM</option><option>PM</option>
+                </select>
               </div>
+              <input type="hidden" name="timeSlot" id="scrimTime">
             </div>
-
           </div>
 
-          <div class="pt-6">
-            <button type="submit" 
-              class="group relative w-full flex justify-center py-4 px-4 border border-transparent text-lg font-bold rounded-xl text-white bg-brand-600 hover:bg-brand-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all duration-200 shadow-lg hover:shadow-brand-500/30 hover:-translate-y-1">
-              <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                <i class="fas fa-rocket text-brand-500 group-hover:text-white transition-colors"></i>
-              </span>
-              LAUNCH TOURNAMENT
+          <div class="pt-4">
+            <button type="submit" onclick="prepareTimes()"
+              class="w-full py-4 px-6 bg-brand-600 text-white font-bold text-lg rounded-xl shadow-xl shadow-brand-500/30 hover:bg-brand-700 hover:shadow-brand-500/50 hover:-translate-y-1 transition-all duration-200 flex items-center justify-center gap-3">
+              <span>Launch Tournament</span>
+              <i class="fas fa-rocket"></i>
             </button>
           </div>
 
@@ -232,21 +227,41 @@
   </div>
 
   <script>
-    function toggleTimeSlot() {
+    function toggleScrimTime() {
       const type = document.getElementById("type").value;
-      const wrapper = document.getElementById("timeSlotWrapper");
-      const select = document.getElementById("timeSlot");
-
+      const box = document.getElementById("scrimTimeWrapper");
       if (type === "scrim") {
-        wrapper.classList.add("fade-enter-active");
+        box.classList.add("fade-enter-active");
       } else {
-        wrapper.classList.remove("fade-enter-active");
-        select.value = ""; // Reset value
+        box.classList.remove("fade-enter-active");
       }
     }
 
-    // Trigger on load in case of browser auto-fill or back button navigation
-    window.onload = toggleTimeSlot;
+    function prepareTimes() {
+      // 1. Prepare Registration Close Time
+      const h = document.getElementById('closeHour').value;
+      const m = document.getElementById('closeMinute').value;
+      const ap = document.getElementById('closeMeridian').value;
+      
+      if (h && m) {
+        document.getElementById('registrationCloseTime').value = `${h}:${m} ${ap}`;
+      }
+
+      // 2. Prepare Scrim Time (if selected)
+      const type = document.getElementById("type").value;
+      if (type === "scrim") {
+        const sh = document.getElementById('scrimHour').value;
+        const sm = document.getElementById('scrimMinute').value;
+        const sap = document.getElementById('scrimMeridian').value;
+        
+        if (sh && sm) {
+          document.getElementById('scrimTime').value = `${sh}:${sm} ${sap}`;
+        }
+      }
+    }
+
+    // Run on load to handle back-button navigation state
+    window.onload = toggleScrimTime;
   </script>
 
 </body>

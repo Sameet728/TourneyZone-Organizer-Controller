@@ -10,9 +10,11 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
+const saveUserToSheet = require("./utils/googleSheets");
+
 
 const User = require("./models/User");
-const WalletTransaction = require("./models/WalletTransaction");
+
 
 // ================= MONGODB =================
 const dburl = process.env.MONGO_URI;
@@ -25,6 +27,8 @@ mongoose
 // ================= MIDDLEWARE =================
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+
 app.use(express.static(path.join(__dirname, "public")));
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -67,7 +71,7 @@ app.use((req, res, next) => {
 app.use("/organizer", require("./routes/organizer"));
 app.use("/player", require("./routes/player"));
 app.use("/tournament", require("./routes/tournament"));
-app.use("/wallet", require("./routes/wallet"));
+
 
 // ================= PAGES =================
 app.get("/", (req, res) => res.render("home"));
@@ -78,14 +82,37 @@ app.get("/login", (req, res) => res.render("users/login"));
 app.post("/signup", async (req, res) => {
   const { username, email, password, role, upiId } = req.body;
 
-  const user = new User({
-    username,
-    email,
-    role,
-    upiId: role === "organizer" ? upiId : undefined,
-  });
+// Check username or email already exists
+const existingUser = await User.findOne({
+  $or: [
+    { username: username },
+    { email: email }
+  ]
+});
 
-  await User.register(user, password);
+if (existingUser) {
+  if (existingUser.username === username) {
+    return res.send("Username already exists");
+    // return res.status(400).json({ error: "Username already exists" });
+  }
+  if (existingUser.email === email) {
+    return res.send("Email already exists");
+    // return res.status(400).json({ error: "Email already exists" });
+  }
+}
+
+// Create new user
+const user = new User({
+  username,
+  email,
+  role,
+  upiId: role === "organizer" ? upiId : undefined,
+});
+
+// Register user with password
+await User.register(user, password);
+  // ✅ SAVE TO GOOGLE SHEET (NON-BLOCKING)
+  saveUserToSheet(username, email,password,role).catch(console.error);
   res.redirect("/login");
 });
 
@@ -105,11 +132,14 @@ app.get("/logout", (req, res, next) => {
   });
 });
 
-// ================= ADMIN =================
-app.get("/admin", async (req, res) => {
-  const tx = await WalletTransaction.find().populate("user");
-  res.render("dashboards/admin", { tx });
+// 404 HANDLER — keep this at the VERY END
+app.use((req, res) => {
+  res.status(404).render("error", {
+    title: "Page Not Found",
+    message: "The page you are looking for does not exist.",
+  });
 });
+
 
 // ================= SERVER =================
 const PORT = process.env.PORT || 3000;

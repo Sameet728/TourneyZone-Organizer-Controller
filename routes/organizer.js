@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Tournament = require("../models/tournament");
 const User = require("../models/User");
-const nodemailer = require("nodemailer");
+const Brevo = require("@getbrevo/brevo");
 
 /* ================= MIDDLEWARE ================= */
 
@@ -47,26 +47,32 @@ router.post("/tournaments", isOrganizer, async (req, res) => {
       name,
       game,
       description,
-      startDate,
-      endDate,
       entryFee,
+      prizePool,
       teamLimit,
+      slotNumber,
       type,
       timeSlot,
+      matchTime,
+      registrationCloseTime,
+      tournamentDate,
     } = req.body;
+    console.log(tournamentDate);
 
     const tournament = new Tournament({
       name,
       game,
       description,
-      startDate,
-      endDate,
       entryFee,
+      prizePool,
       teamLimit,
       type,
       timeSlot: type === "scrim" ? timeSlot : undefined,
+      
+      registrationCloseTime,
+      tournamentDate,
+      upiId: req.user.upiId,
       organizer: req.user._id,
-      upiId: req.user.upiId, // ✅ SAME UPI AS ORGANIZER
     });
 
     await tournament.save();
@@ -140,7 +146,6 @@ router.post(
 
     await tournament.save();
 
-    // ✅ add tournament to player
     const player = await User.findById(reg.user._id);
     if (!player.tournamentsJoined.includes(tournament._id)) {
       player.tournamentsJoined.push(tournament._id);
@@ -172,51 +177,42 @@ router.post(
 
 /* ================= SHARE ROOM DETAILS ================= */
 
-/* ================= SEND ROOM DETAILS + MATCH TIME ================= */
-
-const Brevo = require("@getbrevo/brevo");
-
 router.post("/tournaments/:id/room", isOrganizer, async (req, res) => {
   try {
-    const { roomId, roomPassword, matchTime } = req.body;
+    const { roomId, roomPassword, matchTime ,slotNumber } = req.body;
+    console.log(slotNumber);
 
-    // 1️⃣ Fetch tournament with users + organizer
     const tournament = await Tournament.findById(req.params.id)
       .populate("registrations.user", "username email")
       .populate("organizer", "username email");
 
-    if (!tournament) {
-      return res.send("Tournament not found");
-    }
+    if (!tournament) return res.send("Tournament not found");
 
-    // 2️⃣ Save room + match time
     tournament.roomDetails = {
       roomId,
       roomPassword,
+      slotNumber,
       sharedAt: new Date(),
     };
     tournament.matchTime = matchTime;
+
     await tournament.save();
 
-    // 3️⃣ Brevo API init
     const apiInstance = new Brevo.TransactionalEmailsApi();
     apiInstance.setApiKey(
       Brevo.TransactionalEmailsApiApiKeys.apiKey,
       process.env.BREVO_API_KEY
     );
 
-    // 4️⃣ Organizer fallback protection
     const organizerName =
       tournament.organizer?.username || "Tournament Organizer";
     const organizerEmail =
       tournament.organizer?.email || "support@tourneyzone.com";
 
-    // 5️⃣ Accepted players only
     const acceptedPlayers = tournament.registrations.filter(
-      r => r.status === "accepted" && r.user?.email
+      (r) => r.status === "accepted" && r.user?.email
     );
 
-    // 6️⃣ Send email to each accepted player
     for (const r of acceptedPlayers) {
       await apiInstance.sendTransacEmail({
         sender: {
@@ -233,99 +229,39 @@ router.post("/tournaments/:id/room", isOrganizer, async (req, res) => {
         htmlContent: `
 <!DOCTYPE html>
 <html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-</head>
-
-<body style="margin:0;padding:0;background:#f5f7fb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;">
-
-  <table width="100%" cellpadding="0" cellspacing="0" style="padding:20px;">
-    <tr>
-      <td align="center">
-
-        <table width="100%" cellpadding="0" cellspacing="0"
-          style="max-width:560px;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.08);">
-
-          <!-- HEADER -->
-          <tr>
-            <td style="padding:28px;background:linear-gradient(135deg,#6366f1,#22d3ee);color:#ffffff;">
-              <h2 style="margin:0;font-size:22px;">🎮 Match Room Details</h2>
-              <p style="margin:6px 0 0;font-size:14px;opacity:0.95;">
-                ${tournament.name}
-              </p>
-            </td>
-          </tr>
-
-          <!-- CONTENT -->
-          <tr>
-            <td style="padding:28px;color:#1f2937;">
-
-              <p style="margin:0 0 14px;font-size:15px;">
-                Hi <strong>${r.user.username}</strong> 👋
-              </p>
-
-              <p style="margin:0 0 18px;font-size:14px;color:#4b5563;">
-                You are officially <strong>accepted</strong> into the tournament.
-                Below are your match details.
-              </p>
-
-              <!-- DETAILS -->
-              <div style="background:#f8fafc;border-radius:12px;padding:18px;">
-                <p style="margin:6px 0;font-size:15px;">
-                  🔑 <strong>Room ID:</strong>
-                  <span style="color:#2563eb;font-weight:600;">${roomId}</span>
-                </p>
-                <p style="margin:6px 0;font-size:15px;">
-                  🔒 <strong>Password:</strong>
-                  <span style="color:#2563eb;font-weight:600;">${roomPassword}</span>
-                </p>
-                <p style="margin:6px 0;font-size:15px;">
-                  ⏰ <strong>Match Time:</strong>
-                  <span style="color:#dc2626;font-weight:600;">${matchTime}</span>
-                </p>
-              </div>
-
-              <p style="margin:16px 0 0;font-size:13px;color:#6b7280;">
-                Please join the room at least <strong>10 minutes early</strong>.
-              </p>
-
-              <!-- ORGANIZER -->
-              <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e5e7eb;">
-                <p style="margin:0;font-size:13px;color:#374151;">
-                  📞 <strong>Organizer Contact</strong>
-                </p>
-                <p style="margin:6px 0 0;font-size:13px;">
-                  ${organizerName}<br/>
-                  <a href="mailto:${organizerEmail}" style="color:#2563eb;text-decoration:none;">
-                    ${organizerEmail}
-                  </a>
-                </p>
-              </div>
-
-            </td>
-          </tr>
-
-          <!-- FOOTER -->
-          <tr>
-            <td align="center" style="padding:18px;background:#f9fafb;font-size:12px;color:#9ca3af;">
-              🚀 Powered by <strong>TourneyZone</strong><br/>
-              Play fair. Win big.
-            </td>
-          </tr>
-
-        </table>
-
-      </td>
-    </tr>
-  </table>
-
+<head><meta name="viewport" content="width=device-width, initial-scale=1.0"/></head>
+<body style="margin:0;padding:0;background:#f5f7fb;font-family:Arial,sans-serif;">
+  <div style="max-width:560px;margin:20px auto;background:#ffffff;border-radius:14px;overflow:hidden;">
+    <div style="padding:24px;background:linear-gradient(135deg,#6366f1,#22d3ee);color:#fff;">
+      <h2 style="margin:0;">🎮 Match Room Details</h2>
+      <p style="margin:6px 0 0;">${tournament.name}</p>
+    </div>
+    <div style="padding:24px;color:#1f2937;">
+      <p>Hi <strong>${r.user.username}</strong> 👋</p>
+      <p>You have been <strong>accepted</strong>. Here are your match details:</p>
+      <div style="background:#f8fafc;padding:16px;border-radius:10px;">
+        <p><strong>Room ID:</strong> ${roomId}</p>
+        <p><strong>Password:</strong> ${roomPassword}</p>
+        <p><strong>Match Time:</strong> ${matchTime}</p>
+        <p><strong>Slot Number:</strong> ${slotNumber}</p>
+      </div>
+      <p style="margin-top:16px;">Please join 10 minutes early.</p>
+      <hr/>
+      <p><strong>Organizer Contact</strong><br/>
+        ${organizerName}<br/>
+        <a href="mailto:${organizerEmail}">${organizerEmail}</a>
+      </p>
+    </div>
+    <div style="padding:14px;text-align:center;background:#f9fafb;color:#9ca3af;font-size:12px;">
+      🚀 Powered by <strong>TourneyZone</strong>
+    </div>
+  </div>
 </body>
 </html>
         `,
       });
     }
 
-    // 7️⃣ Done
     res.redirect(req.get("Referrer") || "/organizer");
   } catch (err) {
     console.error("Brevo send error:", err);
@@ -333,19 +269,15 @@ router.post("/tournaments/:id/room", isOrganizer, async (req, res) => {
   }
 });
 
-
 /* ================= SUBMIT RESULTS ================= */
 
 router.get("/tournaments/:id/results", isOrganizer, async (req, res) => {
   const tournament = await Tournament.findById(req.params.id).populate(
     "organizer",
-    "username email upiId"
+    "username email"
   );
-  console.log(tournament);
 
-  if (!tournament) {
-    return res.send("Tournament not found");
-  }
+  if (!tournament) return res.send("Tournament not found");
 
   res.render("organizer/submitResults", { tournament });
 });
@@ -362,16 +294,8 @@ router.post("/tournaments/:id/results", isOrganizer, async (req, res) => {
     const tournament = await Tournament.findById(req.params.id);
     if (!tournament) return res.send("Tournament not found");
 
-    if (tournament.status !== "completed") {
-      return res.send("Tournament must be completed before submitting results");
-    }
-
-    // 🔎 helper to find team by leader username
-    const findTeamByLeader = (leaderUsername) => {
-      return tournament.teams.find(
-        (team) => team.leader.username === leaderUsername
-      );
-    };
+    const findTeamByLeader = (username) =>
+      tournament.teams.find((t) => t.leader.username === username);
 
     const firstTeam = findTeamByLeader(firstLeaderUsername);
     const secondTeam = findTeamByLeader(secondLeaderUsername);
@@ -381,25 +305,14 @@ router.post("/tournaments/:id/results", isOrganizer, async (req, res) => {
       return res.send("Invalid team selection");
     }
 
-    // ✅ SAVE RESULT (MATCHING SCHEMA)
     tournament.result = {
-      firstPlace: {
-        teamName: firstTeam.name,
-        leader: firstTeam.leader.username,
-      },
-      secondPlace: {
-        teamName: secondTeam.name,
-        leader: secondTeam.leader.username,
-      },
-      thirdPlace: {
-        teamName: thirdTeam.name,
-        leader: thirdTeam.leader.username,
-      },
+      firstPlace: { teamName: firstTeam.name, leader: firstTeam.leader.username },
+      secondPlace: { teamName: secondTeam.name, leader: secondTeam.leader.username },
+      thirdPlace: { teamName: thirdTeam.name, leader: thirdTeam.leader.username },
       notes,
     };
 
     await tournament.save();
-
     res.redirect(`/organizer/tournaments/${tournament._id}`);
   } catch (err) {
     console.error(err);
@@ -408,6 +321,3 @@ router.post("/tournaments/:id/results", isOrganizer, async (req, res) => {
 });
 
 module.exports = router;
-
-
-

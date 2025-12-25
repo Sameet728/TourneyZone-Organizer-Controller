@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tournaments Arena | TourneyZone</title>
-  
+  <title>Tournaments Arena | SVx Arena</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
   
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -19,11 +19,20 @@
           },
           colors: {
             brand: {
-              50: '#eff6ff',
-              100: '#dbeafe',
-              500: '#3b82f6',
-              600: '#2563eb',
-              900: '#1e3a8a',
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              900: '#4c1d95',
+            }
+          },
+          animation: {
+            'float': 'float 3s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-5px)' },
             }
           }
         }
@@ -34,8 +43,8 @@
   <style>
     /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    ::-webkit-scrollbar-track { background: #f5f3ff; }
+    ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 10px; }
 
     @keyframes blob {
       0% { transform: translate(0px, 0px) scale(1); }
@@ -46,16 +55,15 @@
     .animate-blob { animation: blob 7s infinite; }
     .animation-delay-2000 { animation-delay: 2s; }
 
-    /* Card Hover Lift */
     .t-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
   </style>
 </head>
 
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative overflow-x-hidden">
 
   <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-    <div class="absolute top-0 left-1/4 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-brand-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
   </div>
 
   <div class="relative z-50">
@@ -66,47 +74,47 @@
 
     <% const featured = tournaments.find(t => t.status === 'upcoming'); %>
     <% if (featured) { %>
-      <div class="relative w-full rounded-3xl overflow-hidden shadow-2xl mb-12 group">
-        <div class="absolute inset-0 bg-gradient-to-r from-brand-600 to-indigo-600"></div>
+      <div class="relative w-full rounded-[2rem] overflow-hidden shadow-2xl shadow-brand-500/20 mb-12 group transform hover:scale-[1.01] transition-transform duration-500">
+        <div class="absolute inset-0 bg-gradient-to-r from-brand-600 via-purple-600 to-indigo-700"></div>
         
-        <div class="absolute -right-20 -top-20 w-80 h-80 bg-white opacity-10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
+        <div class="absolute -right-20 -top-20 w-80 h-80 bg-white opacity-10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-700 animate-float"></div>
         
-        <div class="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div class="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
           <div class="text-white max-w-2xl">
-            <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider mb-4 border border-white/20">
-              <i class="fas fa-star text-yellow-300"></i> Featured Event
+            <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider mb-4 border border-white/20 shadow-sm">
+              <i class="fas fa-star text-yellow-300 animate-spin-slow"></i> Featured Event
             </div>
-            <h2 class="text-3xl md:text-5xl font-extrabold mb-2 tracking-tight"><%= featured.name %></h2>
-            <div class="flex items-center gap-4 text-brand-100 font-medium text-lg">
-              <span><i class="fas fa-gamepad mr-2"></i><%= featured.game %></span>
-              <span>•</span>
-              <span><i class="fas fa-ticket-alt mr-2"></i>₹<%= featured.entryFee %> Entry</span>
+            <h2 class="text-4xl md:text-6xl font-black mb-3 tracking-tight drop-shadow-sm"><%= featured.name %></h2>
+            <div class="flex items-center gap-6 text-brand-100 font-medium text-lg">
+              <span class="flex items-center gap-2"><i class="fas fa-gamepad"></i> <%= featured.game %></span>
+              <span class="opacity-50">|</span>
+              <span class="flex items-center gap-2"><i class="fas fa-ticket-alt"></i> ₹<%= featured.entryFee %> Entry</span>
             </div>
           </div>
           
-          <a href="/tournament/<%= featured._id %>" class="bg-white text-brand-600 px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-brand-50 hover:scale-105 transition-all duration-300 whitespace-nowrap">
-            Join Now <i class="fas fa-rocket ml-2"></i>
+          <a href="/player/tournaments/<%= featured._id %>" class="bg-white text-brand-700 px-8 py-4 rounded-2xl font-bold text-lg shadow-lg hover:bg-brand-50 hover:scale-105 hover:shadow-xl transition-all duration-300 whitespace-nowrap flex items-center gap-2 group/btn">
+            Join Now <i class="fas fa-rocket group-hover/btn:translate-x-1 transition-transform"></i>
           </a>
         </div>
       </div>
     <% } %>
 
-    <div class="bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg rounded-2xl p-4 md:p-6 mb-8 sticky top-4 z-40">
+    <div class="bg-white/80 backdrop-blur-xl border border-white/60 shadow-lg rounded-2xl p-4 md:p-6 mb-8 sticky top-4 z-40">
       <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
         
-        <div class="relative w-full md:w-96">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+        <div class="relative w-full md:w-96 group">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-500 transition-colors">
             <i class="fas fa-search"></i>
           </div>
           <input type="text" id="searchInput" placeholder="Search tournaments..." 
-            class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none transition-all text-slate-700 font-medium">
+            class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all text-slate-700 font-medium placeholder-slate-400">
         </div>
 
-        <div class="relative w-full md:w-64">
-           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+        <div class="relative w-full md:w-64 group">
+           <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-500 transition-colors">
             <i class="fas fa-sort-amount-down"></i>
           </div>
-          <select id="sortSelect" class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 outline-none transition-all text-slate-700 font-medium appearance-none cursor-pointer">
+          <select id="sortSelect" class="w-full pl-11 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all text-slate-700 font-medium appearance-none cursor-pointer">
             <option value="date">📅 Date (Earliest)</option>
             <option value="price-low">💰 Fee (Low → High)</option>
             <option value="price-high">💎 Fee (High → Low)</option>
@@ -117,11 +125,11 @@
           </div>
         </div>
 
-        <div class="bg-slate-100 p-1 rounded-xl flex w-full md:w-auto">
-          <button onclick="switchTab('upcoming')" id="btn-upcoming" class="toggle-btn flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all shadow-sm bg-white text-brand-600">
+        <div class="bg-slate-100 p-1.5 rounded-xl flex w-full md:w-auto shadow-inner">
+          <button onclick="switchTab('upcoming')" id="btn-upcoming" class="toggle-btn flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all shadow-sm bg-white text-brand-600 ring-1 ring-black/5">
             Upcoming
           </button>
-          <button onclick="switchTab('completed')" id="btn-completed" class="toggle-btn flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 transition-all">
+          <button onclick="switchTab('completed')" id="btn-completed" class="toggle-btn flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 transition-all hover:bg-slate-200/50">
             Completed
           </button>
         </div>
@@ -129,25 +137,26 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 tournament-container min-h-[400px]">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 tournament-container min-h-[400px]">
       
       <% tournaments.forEach(t => { 
           const teamCount = t.teams?.length || 0;
-          const slotsLeft = t.teamLimit - teamCount;
-          const percentFull = Math.round((teamCount / t.teamLimit) * 100);
+          const limit = t.teamLimit || 1; 
+          const slotsLeft = Math.max(0, limit - teamCount);
+          const percentFull = Math.min(100, Math.round((teamCount / limit) * 100));
       %>
         
-        <div class="t-card bg-white border border-slate-100 rounded-2xl p-5 hover:shadow-xl hover:-translate-y-1 relative group"
+        <div class="t-card bg-white border border-slate-100 rounded-[1.5rem] p-6 hover:shadow-xl hover:shadow-brand-500/10 hover:-translate-y-1 relative group transition-all duration-300"
              data-name="<%= t.name %>"
              data-game="<%= t.game %>"
              data-price="<%= t.entryFee %>"
-             data-date="<%= t.startDate.toISOString() %>"
+             data-date="<%= new Date(t.tournamentDate).toISOString() %>"
              data-slots="<%= slotsLeft %>"
              data-status="<%= t.status %>">
           
           <div class="flex justify-between items-start mb-4">
-            <span class="px-3 py-1 bg-brand-50 text-brand-600 rounded-lg text-xs font-bold uppercase tracking-wider">
-              <%= t.game %>
+            <span class="px-3 py-1 bg-brand-50 text-brand-600 rounded-lg text-xs font-bold uppercase tracking-wider border border-brand-100 flex items-center gap-1.5">
+              <i class="fas fa-gamepad"></i> <%= t.game %>
             </span>
             <span class="text-slate-900 font-extrabold text-lg">₹<%= t.entryFee %></span>
           </div>
@@ -156,35 +165,40 @@
             <%= t.name %>
           </h3>
           
-          <div class="flex items-center text-slate-500 text-xs font-bold uppercase tracking-wider mb-4">
-            <i class="far fa-calendar-alt mr-2"></i> <%= t.startDate.toDateString() %>
+          <div class="flex items-center text-slate-500 text-xs font-bold uppercase tracking-wider mb-6">
+            <i class="far fa-calendar-alt mr-2 text-brand-400"></i> <%= new Date(t.tournamentDate).toDateString() %>
           </div>
 
           <% if (t.status !== 'completed') { %>
-            <div class="mb-5">
-              <div class="flex justify-between text-xs font-bold text-slate-400 mb-1">
+            <div class="mb-6">
+              <div class="flex justify-between text-xs font-bold text-slate-400 mb-1.5">
                 <span>Slots Filled</span>
                 <span class="<%= percentFull > 80 ? 'text-red-500' : 'text-brand-500' %>"><%= percentFull %>%</span>
               </div>
-              <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                <div class="bg-brand-500 h-1.5 rounded-full transition-all" style="width: <%= percentFull %>%"></div>
+              <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
+                <div class="bg-gradient-to-r from-brand-400 to-brand-600 h-full rounded-full transition-all duration-1000 ease-out" style="width: <%= percentFull %>%"></div>
               </div>
-              <div class="text-xs text-slate-400 mt-1"><%= slotsLeft %> spots left</div>
+              <div class="text-xs text-slate-400 mt-1.5 font-medium flex items-center justify-between">
+                <span><%= slotsLeft %> spots left</span>
+                <% if (percentFull > 80) { %>
+                  <span class="text-red-500 flex items-center gap-1"><i class="fas fa-fire"></i> Filling Fast!</span>
+                <% } %>
+              </div>
             </div>
           <% } else { %>
-            <div class="mb-5">
-              <div class="w-full bg-slate-50 rounded-lg py-2 text-center border border-slate-100">
-                <span class="text-xs font-bold text-slate-400 uppercase">Ended</span>
+            <div class="mb-6">
+              <div class="w-full bg-slate-50 rounded-xl py-2.5 text-center border border-slate-200 text-slate-400 text-xs font-bold uppercase tracking-widest">
+                Tournament Ended
               </div>
             </div>
           <% } %>
 
-          <div class="grid grid-cols-4 gap-2">
-            <a href="/tournament/<%= t._id %>" class="col-span-3 bg-slate-900 text-white font-bold py-3 rounded-xl text-center hover:bg-brand-600 transition-colors shadow-lg shadow-slate-200">
+          <div class="grid grid-cols-4 gap-3">
+            <a href="/player/tournaments/<%= t._id %>" class="col-span-3 bg-slate-900 text-white font-bold py-3.5 rounded-xl text-center hover:bg-brand-600 transition-all shadow-lg shadow-slate-200 hover:shadow-brand-500/30">
               <%= t.status === 'completed' ? 'See Results' : 'View Details' %>
             </a>
-            <button onclick="shareTournament('<%= t._id %>')" class="col-span-1 bg-slate-100 text-slate-500 rounded-xl flex items-center justify-center hover:bg-slate-200 transition-colors">
-              <i class="fas fa-share-alt"></i>
+            <button onclick="shareTournament('<%= t._id %>')" class="col-span-1 bg-white border border-slate-200 text-slate-400 rounded-xl flex items-center justify-center hover:text-brand-600 hover:border-brand-200 hover:bg-brand-50 transition-all group/share">
+              <i class="fas fa-share-alt group-hover/share:scale-110 transition-transform"></i>
             </button>
           </div>
 
@@ -192,12 +206,12 @@
 
       <% }) %>
 
-      <div id="no-results" class="hidden col-span-full text-center py-12">
-        <div class="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300 text-3xl">
-          <i class="fas fa-search"></i>
+      <div id="no-results" class="hidden col-span-full text-center py-16">
+        <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300 text-4xl animate-float">
+          <i class="fas fa-ghost"></i>
         </div>
-        <h3 class="text-lg font-bold text-slate-900">No tournaments found</h3>
-        <p class="text-slate-500">Try adjusting your search or filters.</p>
+        <h3 class="text-xl font-bold text-slate-900 mb-2">No tournaments found</h3>
+        <p class="text-slate-500">Try adjusting your search or filters to find a match.</p>
       </div>
 
     </div>
@@ -216,13 +230,13 @@
       
       // Update Button Styles
       document.querySelectorAll('.toggle-btn').forEach(b => {
-        b.classList.remove('bg-white', 'text-brand-600', 'shadow-sm');
-        b.classList.add('text-slate-500');
+        b.classList.remove('bg-white', 'text-brand-600', 'shadow-sm', 'ring-1', 'ring-black/5');
+        b.classList.add('text-slate-500', 'hover:text-slate-700', 'hover:bg-slate-200/50');
       });
       
       const activeBtn = document.getElementById('btn-' + tab);
-      activeBtn.classList.remove('text-slate-500');
-      activeBtn.classList.add('bg-white', 'text-brand-600', 'shadow-sm');
+      activeBtn.classList.remove('text-slate-500', 'hover:text-slate-700', 'hover:bg-slate-200/50');
+      activeBtn.classList.add('bg-white', 'text-brand-600', 'shadow-sm', 'ring-1', 'ring-black/5');
 
       filterAndSort();
     }
@@ -291,16 +305,16 @@
 
     // Share Function
     function shareTournament(id) {
-      const url = `${window.location.origin}/tournament/${id}`;
+      const url = `${window.location.origin}/player/tournaments/${id}`;
       navigator.clipboard.writeText(url);
       
       // Create temporary toast
       const toast = document.createElement('div');
-      toast.className = 'fixed bottom-4 right-4 bg-slate-900 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-bold z-50 animate-bounce';
-      toast.innerHTML = '<i class="fas fa-check mr-2 text-green-400"></i> Link Copied!';
+      toast.className = 'fixed bottom-6 right-6 bg-slate-900 text-white px-6 py-3 rounded-xl shadow-2xl text-sm font-bold z-50 animate-bounce flex items-center gap-2';
+      toast.innerHTML = '<i class="fas fa-check-circle text-green-400"></i> Link Copied!';
       document.body.appendChild(toast);
       
-      setTimeout(() => toast.remove(), 2000);
+      setTimeout(() => toast.remove(), 2500);
     }
   </script>
 
