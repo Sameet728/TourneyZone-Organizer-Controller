@@ -216,7 +216,7 @@ router.post("/tournaments/:id/room", isOrganizer, async (req, res) => {
     for (const r of acceptedPlayers) {
       await apiInstance.sendTransacEmail({
         sender: {
-          name: "TourneyZone",
+          name: "SVxArena",
           email: "sameetpisal@gmail.com",
         },
         to: [
@@ -405,4 +405,5 @@ router.post("/tournaments/:id/results", isOrganizer, async (req, res) => {
 });
 
 module.exports = router;
+
 
