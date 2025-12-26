@@ -47,6 +47,7 @@ const tournamentSchema = new Schema(
     // 🔥 DATE & TIME
     tournamentDate: { type: Date, required: true },
     matchTime: { type: String }, // e.g. "6:30 PM"
+    slotNumber: { type: Number, default: 0 },
     registrationCloseTime: { type: String }, // e.g. "4:20 PM"
 
     type: { type: String, enum: ["regular", "scrim"], default: "regular" },
@@ -57,7 +58,7 @@ const tournamentSchema = new Schema(
     roomDetails: {
       roomId: String,
       roomPassword: String,
-      slotNumber: { type: Number, default: null },
+     
       sharedAt: Date,
     },
     result: {
@@ -98,6 +99,13 @@ tournamentSchema.virtual("acceptedCount").get(function () {
 tournamentSchema.virtual("availableSlots").get(function () {
   return this.teamLimit - this.acceptedCount;
 });
+
+tournamentSchema.virtual("activeRegistrations").get(function () {
+  return this.registrations.filter(
+    r => r.status === "pending" || r.status === "accepted"
+  ).length;
+});
+
 
 tournamentSchema.set("toJSON", { virtuals: true });
 tournamentSchema.set("toObject", { virtuals: true });

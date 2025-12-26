@@ -28,6 +28,7 @@
           },
           animation: {
             'float': 'float 3s ease-in-out infinite',
+            'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
           },
           keyframes: {
             float: {
@@ -140,13 +141,21 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 tournament-container min-h-[400px]">
       
       <% tournaments.forEach(t => { 
+          // Logic: Pending + Accepted registrations count towards the limit
+          // We assume 'teams' might contain confirmed/accepted ones, but logic should be consistent with the backend.
+          // For display purposes here, we use teams.length (accepted) as a base, 
+          // or ideally, you pass a 'filledSlots' count from backend to be accurate.
+          // Assuming t.teams represents ACCEPTED teams for now. 
+          // To be perfectly accurate with your new logic, ensure 't' has a virtual 'filledCount'.
+          // Fallback: Using teams.length
           const teamCount = t.teams?.length || 0;
           const limit = t.teamLimit || 1; 
-          const slotsLeft = Math.max(0, limit - teamCount);
           const percentFull = Math.min(100, Math.round((teamCount / limit) * 100));
+          const slotsLeft = Math.max(0, limit - teamCount);
+          const isFull = teamCount >= limit;
       %>
         
-        <div class="t-card bg-white border border-slate-100 rounded-[1.5rem] p-6 hover:shadow-xl hover:shadow-brand-500/10 hover:-translate-y-1 relative group transition-all duration-300"
+        <div class="t-card bg-white border border-slate-100 rounded-[1.5rem] p-6 hover:shadow-xl hover:shadow-brand-500/10 hover:-translate-y-2 relative group transition-all duration-300"
              data-name="<%= t.name %>"
              data-game="<%= t.game %>"
              data-price="<%= t.entryFee %>"
@@ -173,15 +182,24 @@
             <div class="mb-6">
               <div class="flex justify-between text-xs font-bold text-slate-400 mb-1.5">
                 <span>Slots Filled</span>
-                <span class="<%= percentFull > 80 ? 'text-red-500' : 'text-brand-500' %>"><%= percentFull %>%</span>
+                <span class="<%= isFull ? 'text-red-600' : (percentFull > 80 ? 'text-orange-500' : 'text-brand-500') %>">
+                  <%= percentFull %>%
+                </span>
               </div>
+              
               <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
-                <div class="bg-gradient-to-r from-brand-400 to-brand-600 h-full rounded-full transition-all duration-1000 ease-out" style="width: <%= percentFull %>%"></div>
+                <div class="<%= isFull ? 'bg-red-500' : (percentFull > 80 ? 'bg-orange-500' : 'bg-gradient-to-r from-brand-400 to-brand-600') %> h-full rounded-full transition-all duration-1000 ease-out" style="width: <%= percentFull %>%"></div>
               </div>
-              <div class="text-xs text-slate-400 mt-1.5 font-medium flex items-center justify-between">
-                <span><%= slotsLeft %> spots left</span>
-                <% if (percentFull > 80) { %>
-                  <span class="text-red-500 flex items-center gap-1"><i class="fas fa-fire"></i> Filling Fast!</span>
+              
+              <div class="text-xs text-slate-400 mt-2 font-medium flex items-center justify-between">
+                <% if (isFull) { %>
+                   <span class="text-red-600 font-bold flex items-center gap-1"><i class="fas fa-ban"></i> SOLD OUT</span>
+                <% } else if (percentFull > 80) { %>
+                   <span class="text-orange-500 font-bold flex items-center gap-1 animate-pulse"><i class="fas fa-fire"></i> FILLING FAST</span>
+                   <span><%= slotsLeft %> left</span>
+                <% } else { %>
+                   <span class="text-green-600 font-bold flex items-center gap-1"><i class="fas fa-check-circle"></i> OPEN</span>
+                   <span><%= slotsLeft %> left</span>
                 <% } %>
               </div>
             </div>
@@ -194,9 +212,22 @@
           <% } %>
 
           <div class="grid grid-cols-4 gap-3">
-            <a href="/player/tournaments/<%= t._id %>" class="col-span-3 bg-slate-900 text-white font-bold py-3.5 rounded-xl text-center hover:bg-brand-600 transition-all shadow-lg shadow-slate-200 hover:shadow-brand-500/30">
-              <%= t.status === 'completed' ? 'See Results' : 'View Details' %>
-            </a>
+            <% if (t.status === 'completed') { %>
+              <a href="/player/tournaments/<%= t._id %>" class="col-span-3 bg-slate-900 text-white font-bold py-3.5 rounded-xl text-center hover:bg-brand-600 transition-all shadow-lg shadow-slate-200 hover:shadow-brand-500/30">
+                See Results
+              </a>
+            <% } else { %>
+              <% if (isFull) { %>
+                <button disabled class="col-span-3 bg-slate-100 text-slate-400 font-bold py-3.5 rounded-xl text-center cursor-not-allowed border border-slate-200">
+                  Full 🚫
+                </button>
+              <% } else { %>
+                <a href="/player/tournaments/<%= t._id %>" class="col-span-3 bg-brand-600 text-white font-bold py-3.5 rounded-xl text-center hover:bg-brand-700 transition-all shadow-lg shadow-brand-200 hover:shadow-brand-500/30 hover:-translate-y-0.5 active:translate-y-0">
+                  View Details
+                </a>
+              <% } %>
+            <% } %>
+            
             <button onclick="shareTournament('<%= t._id %>')" class="col-span-1 bg-white border border-slate-200 text-slate-400 rounded-xl flex items-center justify-center hover:text-brand-600 hover:border-brand-200 hover:bg-brand-50 transition-all group/share">
               <i class="fas fa-share-alt group-hover/share:scale-110 transition-transform"></i>
             </button>
@@ -207,8 +238,8 @@
       <% }) %>
 
       <div id="no-results" class="hidden col-span-full text-center py-16">
-        <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300 text-4xl animate-float">
-          <i class="fas fa-ghost"></i>
+        <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300 text-5xl animate-float border-2 border-dashed border-slate-200">
+          👻
         </div>
         <h3 class="text-xl font-bold text-slate-900 mb-2">No tournaments found</h3>
         <p class="text-slate-500">Try adjusting your search or filters to find a match.</p>

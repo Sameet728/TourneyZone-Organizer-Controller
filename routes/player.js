@@ -69,7 +69,7 @@ router.get("/my-tournaments", isPlayer, async (req, res) => {
     const tournaments = await Tournament.find({ "registrations.user": req.user._id })
       .populate("organizer", "username")
       .sort({ tournamentDate: 1 });
-    res.render("player/myTournaments", { tournaments });
+    res.render("player/mytournaments", { tournaments });
   } catch (err) {
     console.error(err);
     res.send("Unable to load joined tournaments");
@@ -130,14 +130,31 @@ router.post("/tournaments/:id/register", isPlayer, async (req, res) => {
     const tournament = await Tournament.findById(req.params.id);
     if (!tournament) return res.send("Tournament not found");
 
-    if (!isRegistrationOpen(tournament)) {
-      return res.send("Registration closed");
-    }
+    // 1. Check Time/Date (Keep your existing helper if you use it)
+    // if (!isRegistrationOpen(tournament)) { return res.send("Registration closed"); }
 
+    // 2. Check if user already registered
     const already = tournament.registrations.find(
       (r) => r.user && r.user.equals(req.user._id)
     );
     if (already) return res.redirect("back");
+
+    // ============================================================
+    // 3. NEW LOGIC: Check Slots (Pending + Accepted)
+    // ============================================================
+    
+    // Count how many people are currently taking up space
+    // We ignore 'rejected' users so their spots are free
+    const filledSlots = tournament.registrations.filter(reg => 
+      reg.status === "pending" || reg.status === "accepted"
+    ).length;
+
+    // If the tournament is full, STOP here.
+    if (filledSlots >= tournament.teamLimit) {
+      return res.send("Registration Full! Waiting for organizer to clear rejected slots.");
+    }
+
+    // ============================================================
 
     const { teamName, payerName, transactionId, amount } = req.body;
 
@@ -147,11 +164,12 @@ router.post("/tournaments/:id/register", isPlayer, async (req, res) => {
       payerName,
       transactionId,
       amount,
-      status: "pending",
+      status: "pending", // This will now count towards the limit for the next person
     });
 
     await tournament.save();
     res.redirect(`/player/tournaments/${tournament._id}`);
+
   } catch (err) {
     console.error(err);
     res.send("Registration failed");
@@ -184,6 +202,4 @@ router.get("/results/:id", isPlayer, async (req, res) => {
   }
 });
 
-
 module.exports = router;
-

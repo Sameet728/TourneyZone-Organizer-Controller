@@ -1,115 +1,164 @@
-<nav class="fixed w-full z-50 top-0 start-0 border-b border-white/40 bg-white/90 backdrop-blur-xl transition-all duration-300 shadow-sm" id="mainNavbar">
-  <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-    
-    <a href="/" class="flex items-center gap-3 group">
-      <img src="/images/logo.jpeg" alt="SVx Arena Logo" class="w-12 h-12 object-contain transition-transform duration-300 group-hover:scale-110 rounded-xl
- filter drop-shadow-sm font-bold">
-      
-      <span class="self-center text-2xl font-extrabold whitespace-nowrap text-slate-900 tracking-tight">
-        SVx<span class="text-brand-600">Arena</span>
-      </span>
-    </a>
+<nav class="fixed w-full z-50 top-0 start-0 border-b border-white/30 bg-white/70 backdrop-blur-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-500" id="mainNavbar">
+  <div class="max-w-7xl mx-auto px-6 py-4"> <div class="flex items-center justify-between">
 
-    <button data-collapse-toggle="navbar-sticky" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-slate-500 rounded-xl md:hidden hover:bg-brand-50 hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-200 transition-colors" aria-controls="navbar-sticky" aria-expanded="false" onclick="toggleMobileMenu()">
-      <span class="sr-only">Open main menu</span>
-      <i class="fas fa-bars text-xl"></i>
-    </button>
-
-    <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1 transition-all duration-300 ease-in-out" id="navbar-sticky">
-      <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-slate-100 rounded-[14px]
- bg-white md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-transparent shadow-lg md:shadow-none">
-        
-        <li>
-          <a href="/player/tournaments" class="block py-2 px-4 rounded-lg text-slate-600 hover:text-brand-600 hover:bg-brand-50 md:hover:bg-transparent transition-all relative group">
-            <span>🏆 Tournaments</span>
-            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-500 transition-all duration-300 group-hover:w-full hidden md:block"></span>
-          </a>
-        </li>
-
-        <% if (!currentUser) { %>
-          <li class="md:hidden border-t border-slate-100 my-2 pt-2"></li>
-          <li class="flex flex-col md:flex-row gap-3 md:items-center">
-            <a href="/login" class="px-5 py-2 text-sm font-bold text-slate-600 hover:text-brand-600 bg-transparent border-2 border-transparent hover:border-brand-100 rounded-xl transition-all text-center">
-              Log In
-            </a>
-            <a href="/signup" class="group relative px-6 py-2.5 text-sm font-bold text-white bg-brand-600 rounded-xl shadow-lg shadow-brand-500/30 hover:bg-brand-700 hover:-translate-y-0.5 transition-all text-center overflow-hidden">
-              <span class="relative z-10 flex items-center justify-center gap-2">Sign Up <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i></span>
-            </a>
-          </li>
-        <% } else { %>
+      <div class="flex-shrink-0 relative group cursor-pointer">
+        <a href="/" class="flex items-center gap-3">
+          <div class="relative">
+            <div class="absolute -inset-2 bg-gradient-to-tr from-blue-400 to-purple-500 rounded-full blur-xl opacity-0 group-hover:opacity-40 transition duration-700 animate-pulse"></div>
+            <img src="/images/logo.jpeg" alt="SVx Arena" 
+                 class="relative h-12 w-12 rounded-2xl object-cover shadow-lg ring-1 ring-white/50 transform transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+          </div>
           
+          <div class="flex flex-col justify-center">
+            <span class="text-2xl font-black tracking-tighter text-slate-900 leading-none group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-brand-600 group-hover:to-purple-600 transition-all duration-300">
+              SVx<span class="text-brand-600">Arena</span>
+            </span>
+          </div>
+        </a>
+      </div>
+
+      <div class="hidden md:flex items-center gap-1 bg-white/40 backdrop-blur-md px-2 py-1.5 rounded-full border border-white/50 shadow-inner">
+        
+        <a href="/player/tournaments" class="relative px-6 py-3 rounded-full text-sm font-bold text-slate-600 hover:text-brand-700 transition-all group overflow-hidden">
+          <span class="relative z-10 flex items-center gap-2">
+            <span class="text-lg group-hover:animate-bounce">🏆</span> Tournaments
+          </span>
+          <div class="absolute inset-0 bg-white/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full shadow-sm"></div>
+        </a>
+
+        <% if (currentUser) { %>
           <% if (currentUser.role === 'player') { %>
-            <li>
-              <a href="/player/my-tournaments" class="block py-2 px-4 rounded-lg text-slate-600 hover:text-brand-600 hover:bg-brand-50 md:hover:bg-transparent transition-all relative group">
-                <span>🎮 My Matches</span>
+            <a href="/player/my-tournaments" class="relative px-6 py-3 rounded-full text-sm font-bold text-slate-600 hover:text-brand-700 transition-all group">
+              <span class="relative z-10 flex items-center gap-2">
+                <span class="text-lg group-hover:animate-spin">🎮</span> My Matches
                 <% if (currentUser.tournamentsJoined?.length > 0) { %>
-                  <span class="inline-flex items-center justify-center w-5 h-5 ms-2 text-[10px] font-bold text-white bg-red-500 rounded-full animate-bounce">
-                    <%= currentUser.tournamentsJoined.length %>
+                  <span class="flex h-2.5 w-2.5 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
                   </span>
                 <% } %>
-                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-500 transition-all duration-300 group-hover:w-full hidden md:block"></span>
-              </a>
-            </li>
+              </span>
+              <div class="absolute inset-0 bg-white/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full shadow-sm"></div>
+            </a>
           <% } %>
 
           <% if (currentUser.role === 'organizer') { %>
-            <li>
-              <a href="/organizer/tournaments/new" class="block py-2 px-4 rounded-lg text-slate-600 hover:text-brand-600 hover:bg-brand-50 md:hover:bg-transparent transition-all relative group">
-                <span><i class="fas fa-plus-circle text-brand-400 mr-1"></i> Host Event</span>
-                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-500 transition-all duration-300 group-hover:w-full hidden md:block"></span>
-              </a>
-            </li>
+            <a href="/organizer/tournaments/new" class="relative px-6 py-3 rounded-full text-sm font-bold text-slate-600 hover:text-purple-700 transition-all group">
+              <span class="relative z-10 flex items-center gap-2">
+                <span class="text-lg group-hover:rotate-90 transition-transform duration-300">➕</span> Host
+              </span>
+              <div class="absolute inset-0 bg-white/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full shadow-sm"></div>
+            </a>
           <% } %>
-
-          <li class="md:ml-4 mt-4 md:mt-0">
-            <div class="relative group">
-              <a href="/<%= currentUser.role %>" class="flex items-center gap-2 px-5 py-2.5 bg-slate-50 border border-slate-200 text-slate-800 rounded-xl hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700 transition-all font-bold text-sm w-full justify-center md:w-auto shadow-sm group-hover:shadow-md">
-                <div class="w-6 h-6 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center text-xs">
-                  <i class="fas fa-user"></i>
-                </div>
-                <span>Dashboard</span>
-              </a>
-            </div>
-          </li>
-
-          <li class="md:hidden">
-            <a href="/logout" class="block py-2 px-4 text-red-500 rounded-lg hover:bg-red-50 font-bold text-center mt-2 border border-red-100">
-              <i class="fas fa-sign-out-alt mr-2"></i> Log Out
-            </a>
-          </li>
-          
-          <li class="hidden md:block">
-            <a href="/logout" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all" title="Logout">
-              <i class="fas fa-power-off"></i>
-            </a>
-          </li>
-
         <% } %>
-      </ul>
+
+      </div>
+
+      <div class="hidden md:flex items-center gap-4">
+        <% if (!currentUser) { %>
+          <a href="/login" class="px-6 py-3 text-sm font-bold text-slate-600 hover:text-brand-600 transition-colors">
+            Log In
+          </a>
+          <a href="/signup" class="group relative px-8 py-3.5 rounded-2xl bg-slate-900 text-white text-sm font-bold shadow-xl shadow-brand-500/20 hover:shadow-brand-500/40 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-brand-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <span class="relative flex items-center gap-2">
+              Join Now <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </span>
+          </a>
+        <% } else { %>
+          
+          <div class="relative group/user">
+            <a href="/<%= currentUser.role %>" class="flex items-center gap-3 pl-2 pr-6 py-2 rounded-full bg-white/50 border border-white/60 hover:bg-white hover:shadow-lg transition-all duration-300 cursor-pointer">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-500 to-purple-500 text-white flex items-center justify-center text-sm shadow-md ring-2 ring-white">
+                <i class="fas fa-user"></i>
+              </div>
+              <span class="text-sm font-bold text-slate-700 group-hover/user:text-brand-600 transition-colors">Dashboard</span>
+            </a>
+          </div>
+
+          <a href="/logout" class="w-12 h-12 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 hover:shadow-inner transition-all duration-300" title="Logout">
+            <i class="fas fa-power-off"></i>
+          </a>
+        <% } %>
+      </div>
+
+      <div class="flex md:hidden">
+        <button type="button" onclick="toggleMobileMenu()" class="relative w-12 h-12 rounded-2xl bg-slate-50 text-slate-600 hover:bg-brand-50 hover:text-brand-600 focus:outline-none transition-all duration-300 flex items-center justify-center shadow-sm">
+          <i class="fas fa-bars text-xl transform transition-transform duration-300" id="menuIcon"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="md:hidden absolute top-full left-0 w-full bg-white/80 backdrop-blur-3xl border-b border-white/20 shadow-2xl overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] max-h-0 opacity-0">
+    <div class="px-6 py-8 space-y-3">
+      
+      <a href="/player/tournaments" class="flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/50 hover:bg-white hover:shadow-md transition-all group">
+        <span class="w-10 h-10 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">🏆</span>
+        <span class="text-lg font-bold text-slate-700">Browse Tournaments</span>
+      </a>
+
+      <% if (currentUser) { %>
+        <% if (currentUser.role === 'player') { %>
+          <a href="/player/my-tournaments" class="flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/50 hover:bg-white hover:shadow-md transition-all group">
+            <span class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">🎮</span>
+            <span class="text-lg font-bold text-slate-700">My Matches</span>
+          </a>
+        <% } %>
+        <% if (currentUser.role === 'organizer') { %>
+          <a href="/organizer/tournaments/new" class="flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/50 hover:bg-white hover:shadow-md transition-all group">
+            <span class="w-10 h-10 rounded-xl bg-green-100 text-green-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">➕</span>
+            <span class="text-lg font-bold text-slate-700">Host Event</span>
+          </a>
+        <% } %>
+        
+        <div class="h-px bg-slate-200 my-4"></div>
+
+        <a href="/<%= currentUser.role %>" class="flex items-center gap-4 px-6 py-4 rounded-2xl bg-slate-50 hover:bg-white hover:shadow-md transition-all">
+          <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center"><i class="fas fa-user"></i></div>
+          <span class="text-lg font-bold text-slate-900">Dashboard</span>
+        </a>
+        <a href="/logout" class="flex items-center gap-4 px-6 py-4 rounded-2xl text-red-500 hover:bg-red-50 transition-all font-bold">
+          <div class="w-10 h-10 flex items-center justify-center"><i class="fas fa-sign-out-alt"></i></div>
+          Log Out
+        </a>
+
+      <% } else { %>
+        <div class="grid grid-cols-2 gap-4 mt-4">
+          <a href="/login" class="text-center py-4 rounded-2xl bg-white border border-slate-200 text-slate-700 font-bold shadow-sm hover:bg-slate-50">Log In</a>
+          <a href="/signup" class="text-center py-4 rounded-2xl bg-brand-600 text-white font-bold shadow-lg hover:bg-brand-700">Sign Up</a>
+        </div>
+      <% } %>
+
     </div>
   </div>
 </nav>
 
-<div class="h-20"></div>
+<div class="h-28"></div>
 
 <script>
   function toggleMobileMenu() {
-    const menu = document.getElementById('navbar-sticky');
-    menu.classList.toggle('hidden');
-    // Simple animation for mobile menu
-    if (!menu.classList.contains('hidden')) {
-      menu.classList.add('animate-fade-in-down');
+    const menu = document.getElementById('mobile-menu');
+    const icon = document.getElementById('menuIcon');
+    
+    // Toggle Logic
+    if (menu.classList.contains('max-h-0')) {
+      // OPEN
+      menu.classList.remove('max-h-0', 'opacity-0');
+      menu.classList.add('max-h-[800px]', 'opacity-100'); // Large max-height to allow slide
+      
+      // Icon Animation
+      icon.classList.remove('fa-bars');
+      icon.classList.add('fa-times', 'rotate-90');
+    } else {
+      // CLOSE
+      menu.classList.remove('max-h-[800px]', 'opacity-100');
+      menu.classList.add('max-h-0', 'opacity-0');
+      
+      // Icon Animation
+      icon.classList.remove('fa-times', 'rotate-90');
+      icon.classList.add('fa-bars');
     }
   }
 </script>
-
-<style>
-  .animate-fade-in-down {
-    animation: fadeInDown 0.3s ease-out;
-  }
-  @keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-</style>
