@@ -252,79 +252,118 @@ router.post("/tournaments/:id/room", isOrganizer, async (req, res) => {
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Match Credentials</title>
   <style>
-    body { margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; }
-    .card { background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(124, 58, 237, 0.1); max-width: 500px; margin: 40px auto; border: 1px solid #f1f5f9; }
-    .header { background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); padding: 40px 30px; text-align: center; }
-    .content { padding: 40px 30px; }
-    .details-box { background-color: #f5f3ff; border: 1px dashed #8b5cf6; border-radius: 16px; padding: 20px; margin: 25px 0; }
-    .label { font-size: 11px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 4px 0; }
-    .value { font-size: 18px; font-weight: 800; color: #1e293b; margin: 0; font-family: monospace; }
-    .btn { display: block; width: 100%; background-color: #1e293b; color: #ffffff; font-weight: 700; text-align: center; padding: 16px 0; border-radius: 12px; text-decoration: none; font-size: 16px; margin-top: 10px; }
-    .footer { background-color: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; }
+    /* Client-specific resets */
+    body { margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+    img { border: 0; line-height: 100%; outline: none; text-decoration: none; }
+    
+    /* Animations (Progressive Enhancement - works in Apple Mail/iOS) */
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(124, 58, 237, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
+    }
+    .cta-button:hover { background-color: #6d28d9 !important; transform: translateY(-2px); }
   </style>
 </head>
-<body>
+<body style="background-color: #f5f3ff; margin: 0; padding: 40px 0;">
 
-  <div class="card">
+  <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1); margin: 0 auto;">
     
-    <div class="header">
-      <div style="font-size: 48px; margin-bottom: 10px;">🎮</div>
-      <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 800;">Match Credentials</h1>
-      <p style="margin: 5px 0 0; color: #e9d5ff; font-size: 14px; font-weight: 500;">${tournament.name}</p>
-    </div>
+    <tr>
+      <td style="padding: 40px 30px; background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); text-align: center;">
+        <div style="font-size: 40px; margin-bottom: 10px;">🎮</div>
+        <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">Match Credentials</h1>
+        <p style="margin: 5px 0 0; color: #ddd6fe; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">${tournament.name}</p>
+      </td>
+    </tr>
 
-    <div class="content">
-      <p style="margin: 0 0 15px; font-size: 18px; color: #1e293b;">
-        Hi <strong>${r.user.username}</strong> 👋
-      </p>
-      <p style="margin: 0; font-size: 15px; color: #64748b; line-height: 1.6;">
-        The lobby is open! Here are your private access details. Please sit in your assigned slot.
-      </p>
+    <tr>
+      <td style="padding: 40px 30px; background-color: #ffffff;">
+        
+        <p style="margin: 0 0 20px; font-size: 18px; color: #1e293b;">
+          Hi <strong>${r.user.username}</strong> 👋
+        </p>
+        
+        <p style="margin: 0 0 30px; font-size: 16px; color: #64748b; line-height: 1.6;">
+          Your registration has been <strong style="color: #10b981;">accepted</strong>! Get ready to dominate. Here are your private room details.
+        </p>
 
-      <div class="details-box">
-        <table width="100%" cellpadding="0" cellspacing="0">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border: 2px dashed #ddd6fe; border-radius: 16px; margin-bottom: 30px;">
           <tr>
-            <td style="padding-bottom: 20px;">
-              <p class="label">Room ID</p>
-              <p class="value" style="font-size: 22px; color: #7c3aed;">${roomId}</p>
-            </td>
-            <td style="padding-bottom: 20px;">
-              <p class="label">Password</p>
-              <p class="value">${roomPassword}</p>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <p class="label" style="color: #64748b;">Start Time</p>
-              <p class="value" style="font-family: sans-serif;">${matchTime}</p>
-            </td>
-            <td>
-              <p class="label" style="color: #64748b;">Your Slot</p>
-              <p class="value" style="color: #ea580c; font-size: 24px;">#${mySlot}</p>
+            <td style="padding: 25px;">
+              
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td width="50%" style="padding-bottom: 20px;">
+                    <p style="margin: 0; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Room ID</p>
+                    <p style="margin: 5px 0 0; font-size: 20px; font-weight: 800; color: #7c3aed; font-family: monospace;">${roomId}</p>
+                  </td>
+                  <td width="50%" style="padding-bottom: 20px;">
+                    <p style="margin: 0; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Password</p>
+                    <p style="margin: 5px 0 0; font-size: 20px; font-weight: 800; color: #1e293b; font-family: monospace;">${roomPassword}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td width="50%">
+                    <p style="margin: 0; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Start Time</p>
+                    <p style="margin: 5px 0 0; font-size: 16px; font-weight: 600; color: #1e293b;">${matchTime}</p>
+                  </td>
+                  <td width="50%">
+                    <p style="margin: 0; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Your Slot</p>
+                    <p style="margin: 5px 0 0; font-size: 16px; font-weight: 600; color: #7c3aed;">#${mySlot}</p>
+                  </td>
+                </tr>
+              </table>
+
             </td>
           </tr>
         </table>
-      </div>
 
-      <a href="#" class="btn">🚀 Enter Match Room</a>
-      
-      <p style="text-align: center; margin-top: 15px; font-size: 12px; color: #94a3b8;">
-        ⚠️ Join the lobby 10 mins before start.
-      </p>
-    </div>
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td align="center">
+              <a href="#" class="cta-button" style="display: inline-block; padding: 16px 32px; background-color: #7c3aed; color: #ffffff; font-weight: 700; text-decoration: none; border-radius: 12px; font-size: 16px; animation: pulse 2s infinite;">
+                🚀 Enter Match Room
+              </a>
+              <p style="margin-top: 15px; font-size: 12px; color: #94a3b8;">
+                ⚠️ Please join the lobby 10 minutes before start time.
+              </p>
+            </td>
+          </tr>
+        </table>
 
-    <div class="footer">
-      <p style="margin: 0 0 5px;">Hosted by <strong>${organizerName}</strong></p>
-      <p style="margin: 0;">Powered by <strong style="color: #7c3aed;">SVx Arena</strong></p>
-    </div>
+      </td>
+    </tr>
 
-  </div>
+    <tr>
+      <td style="padding: 30px; background-color: #f5f3ff; border-top: 1px solid #ede9fe;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td width="40" valign="top">
+              <div style="width: 40px; height: 40px; background-color: #e0e7ff; border-radius: 50%; text-align: center; line-height: 40px; font-size: 20px;">🛡️</div>
+            </td>
+            <td style="padding-left: 15px;">
+              <p style="margin: 0; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase;">Organizer Contact</p>
+              <p style="margin: 4px 0 0; font-weight: 700; color: #1e293b;">${organizerName}</p>
+              <a href="mailto:${organizerEmail}" style="color: #7c3aed; font-size: 13px; text-decoration: none; font-weight: 500;">${organizerEmail}</a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr>
+      <td style="padding: 15px; text-align: center; background-color: #1e1b4b; color: #6366f1; font-size: 12px; font-weight: 600;">
+        Powered by <strong style="color: #ffffff;">SVxArena</strong>
+      </td>
+    </tr>
+
+  </table>
 
 </body>
 </html>
-        `,
+`,
       });
     }
 
@@ -387,4 +426,5 @@ router.post("/tournaments/:id/results", isOrganizer, async (req, res) => {
 });
 
 module.exports = router;
+
 
