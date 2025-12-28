@@ -67,20 +67,56 @@
         <p class="text-slate-500 mt-2 font-medium">Declare the champions for <span class="text-brand-600 font-bold"><%= tournament.name %></span></p>
       </div>
 
-      <% if (tournament.status !== 'completed') { %>
+      <%
+        const parseTime = (timeStr) => {
+          if (!timeStr) return null;
+          const cleanStr = timeStr.replace(/\./g, '').trim().toUpperCase();
+          const [time, modifier] = cleanStr.split(' ');
+          let [hours, minutes] = time.split(':');
+          hours = parseInt(hours, 10);
+          minutes = parseInt(minutes, 10);
+          if (hours === 12 && modifier === 'AM') hours = 0;
+          if (hours < 12 && modifier === 'PM') hours += 12;
+          return { h: hours, m: minutes };
+        };
+
+        const deadline = new Date(tournament.tournamentDate);
+        if (tournament.registrationCloseTime) {
+           const t = parseTime(tournament.registrationCloseTime);
+           if(t) deadline.setHours(t.h, t.m, 0, 0);
+        } else {
+           deadline.setHours(23, 59, 59, 999);
+        }
+
+        const now = new Date();
+        const isRegClosed = now >= deadline;
+        const isReadyToComplete = (tournament.status === 'ongoing' && isRegClosed) || tournament.status === 'completed';
+      %>
+
+      <% if (!isReadyToComplete) { %>
         
-        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-4">
-          <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-xl shrink-0">
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-8 shadow-sm flex flex-col items-center text-center gap-4">
+          <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-2xl shrink-0 animate-bounce">
             <i class="fas fa-lock"></i>
           </div>
           <div>
-            <h3 class="text-lg font-bold text-amber-900">Tournament Still Active</h3>
-            <p class="text-amber-700 mt-1 text-sm leading-relaxed">
-              This tournament is currently marked as <strong><%= tournament.status %></strong>. You must change the status to 'Completed' in the dashboard before submitting final results.
-            </p>
-            <div class="mt-4">
-               <a href="/organizer/tournaments" class="inline-flex items-center px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-bold hover:bg-amber-700 transition-colors">
-                 <i class="fas fa-arrow-left mr-2"></i> Return to Dashboard
+            <h3 class="text-xl font-bold text-amber-900">Action Not Allowed Yet</h3>
+            
+            <% if (tournament.status !== 'ongoing' && tournament.status !== 'completed') { %>
+              <p class="text-amber-700 mt-2 text-sm leading-relaxed max-w-md mx-auto">
+                The tournament status is currently <strong><%= tournament.status %></strong>. <br>
+                You can only submit results when the tournament is marked as <strong>Ongoing</strong>.
+              </p>
+            <% } else if (!isRegClosed) { %>
+              <p class="text-amber-700 mt-2 text-sm leading-relaxed max-w-md mx-auto">
+                Registration is still <strong>Open</strong> until <%= tournament.registrationCloseTime %>. <br>
+                You cannot finalize results while players can still join.
+              </p>
+            <% } %>
+
+            <div class="mt-6">
+               <a href="/organizer/tournaments/<%= tournament._id %>" class="inline-flex items-center px-6 py-3 bg-white border border-amber-300 text-amber-700 rounded-xl text-sm font-bold hover:bg-amber-50 transition-colors shadow-sm">
+                 <i class="fas fa-arrow-left mr-2"></i> Back to Tournament Details
                </a>
             </div>
           </div>

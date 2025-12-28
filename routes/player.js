@@ -76,29 +76,38 @@ router.get("/my-tournaments", isPlayer, async (req, res) => {
   }
 });
 
-router.get("/tournaments/:id", isPlayer, async (req, res) => {
+router.get("/tournaments/:id", async (req, res) => {
   try {
     const tournament = await Tournament.findById(req.params.id)
       .populate("organizer", "username email")
       .populate("registrations.user", "username");
 
-    if (!tournament) return res.send("Tournament not found");
+    if (!tournament) {
+      return res.send("Tournament not found");
+    }
 
-    const registration = tournament.registrations.find(
-      (r) => r.user && r.user._id.equals(req.user._id)
-    );
+    let registration = null;
+
+    // ✅ SAFE CHECK (important)
+    if (req.user) {
+      registration = tournament.registrations.find(
+        (r) => r.user && r.user._id.equals(req.user._id)
+      );
+    }
 
     res.render("player/tournamentshow", {
       tournament,
-      registration,
-      user: req.user,
+      registration,           // null if not logged in
+      user: req.user || null, // safe for EJS
       registrationOpen: isRegistrationOpen(tournament),
     });
+
   } catch (err) {
     console.error(err);
     res.send("Unable to load tournament");
   }
 });
+
 
 router.get("/tournaments/:id/join", isPlayer, async (req, res) => {
   try {
@@ -201,6 +210,5 @@ router.get("/results/:id", isPlayer, async (req, res) => {
     res.send("Unable to load result");
   }
 });
-
 
 module.exports = router;

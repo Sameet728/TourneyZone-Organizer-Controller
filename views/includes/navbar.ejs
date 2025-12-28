@@ -1,5 +1,5 @@
 <nav class="fixed w-full z-50 top-0 start-0 border-b border-white/30 bg-white/70 backdrop-blur-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-500" id="mainNavbar">
-  <div class="max-w-7xl mx-auto px-6 py-4"> <div class="flex items-center justify-between">
+  <div class="max-w-6xl mx-auto px-6 py-4"> <div class="flex items-center justify-between">
 
       <div class="flex-shrink-0 relative group cursor-pointer">
         <a href="/" class="flex items-center gap-3">
@@ -17,9 +17,9 @@
         </a>
       </div>
 
-      <div class="hidden md:flex items-center gap-1 bg-white/40 backdrop-blur-md px-2 py-1.5 rounded-full border border-white/50 shadow-inner">
+      <div class="hidden md:flex items-center gap-1 bg-white/40 backdrop-blur-md px-2 py-1 rounded-full border border-white/50 shadow-inner">
         
-        <a href="/player/tournaments" class="relative px-6 py-3 rounded-full text-sm font-bold text-slate-600 hover:text-brand-700 transition-all group overflow-hidden">
+        <a href="/player/tournaments" class="relative px-6 py-2 rounded-full text-sm font-bold text-slate-600 hover:text-brand-700 transition-all group overflow-hidden">
           <span class="relative z-10 flex items-center gap-2">
             <span class="text-lg group-hover:animate-bounce">🏆</span> Tournaments
           </span>
@@ -28,7 +28,7 @@
 
         <% if (currentUser) { %>
           <% if (currentUser.role === 'player') { %>
-            <a href="/player/my-tournaments" class="relative px-6 py-3 rounded-full text-sm font-bold text-slate-600 hover:text-brand-700 transition-all group">
+            <a href="/player/my-tournaments" class="relative px-2 py-3 rounded-full text-sm font-bold text-slate-600 hover:text-brand-700 transition-all group">
               <span class="relative z-10 flex items-center gap-2">
                 <span class="text-lg group-hover:animate-spin">🎮</span> My Matches
                 <% if (currentUser.tournamentsJoined?.length > 0) { %>

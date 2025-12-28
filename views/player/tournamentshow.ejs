@@ -21,8 +21,13 @@
             brand: {
               50: '#f5f3ff',
               100: '#ede9fe',
+              200: '#ddd6fe',
+              300: '#c4b5fd',
+              400: '#a78bfa',
               500: '#8b5cf6',
               600: '#7c3aed',
+              700: '#6d28d9',
+              800: '#5b21b6',
               900: '#4c1d95',
             }
           },
@@ -30,6 +35,7 @@
             'float': 'float 3s ease-in-out infinite',
             'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
             'pop': 'pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            'shimmer': 'shimmer 2s linear infinite',
           },
           keyframes: {
             float: {
@@ -39,6 +45,10 @@
             pop: {
               '0%': { transform: 'scale(0.9)', opacity: '0' },
               '100%': { transform: 'scale(1)', opacity: '1' },
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-1000px 0' },
+              '100%': { backgroundPosition: '1000px 0' }
             }
           }
         }
@@ -113,7 +123,7 @@
          timeStatusMessage = "Tournament Ended 🏁";
       }
 
-      // 2. Slot Logic (Pending + Accepted)
+      // 2. Slot Logic
       const filledSlots = tournament.registrations.filter(reg => 
         reg.status === "pending" || reg.status === "accepted"
       ).length;
@@ -210,7 +220,7 @@
             </h3>
 
             <div class="space-y-4 relative z-10">
-              <div class="flex items-center justify-between bg-white/10 backdrop-blur-md border border-yellow-500/40 p-4 rounded-2xl transform hover:scale-[1.02] transition-transform">
+              <div class="flex items-center justify-between bg-white/10 backdrop-blur-md border border-yellow-500/40 p-4 rounded-2xl transform hover:scale-[1.03] transition-transform">
                 <div class="flex items-center gap-4">
                   <div class="text-3xl filter drop-shadow-lg">🥇</div>
                   <div>
@@ -224,7 +234,7 @@
                 </div>
               </div>
 
-              <div class="flex items-center justify-between bg-white/5 backdrop-blur-md border border-slate-500/30 p-4 rounded-2xl hover:bg-white/10 transition-colors">
+              <div class="flex items-center justify-between bg-white/5 backdrop-blur-md border border-slate-500/30 p-4 rounded-2xl hover:bg-white/10 transition-colors transform hover:scale-[1.02] transition-transform">
                 <div class="flex items-center gap-4">
                   <div class="text-3xl opacity-80">🥈</div>
                   <div>
@@ -232,9 +242,13 @@
                     <p class="text-lg font-bold text-white"><%= tournament.result.secondPlace?.teamName || "-" %></p>
                   </div>
                 </div>
+                <div class="text-right hidden sm:block">
+                  <p class="text-[10px] text-slate-400 uppercase">Leader</p>
+                  <p class="text-sm font-medium text-slate-200"><%= tournament.result.firstPlace.leader %></p>
+                </div>
               </div>
 
-              <div class="flex items-center justify-between bg-white/5 backdrop-blur-md border border-orange-500/30 p-4 rounded-2xl hover:bg-white/10 transition-colors">
+              <div class="flex items-center justify-between bg-white/5 backdrop-blur-md border border-orange-500/30 p-4 rounded-2xl hover:bg-white/10 transition-colors transform hover:scale-[1.01] transition-transform">
                 <div class="flex items-center gap-4">
                   <div class="text-3xl opacity-80">🥉</div>
                   <div>
@@ -242,10 +256,83 @@
                     <p class="text-lg font-bold text-white"><%= tournament.result.thirdPlace?.teamName || "-" %></p>
                   </div>
                 </div>
+                <div class="text-right hidden sm:block">
+                  <p class="text-[10px] text-slate-400 uppercase">Leader</p>
+                  <p class="text-sm font-medium text-slate-200"><%= tournament.result.firstPlace.leader %></p>
+                </div>
               </div>
             </div>
           </div>
         <% } %>
+
+        <% if (tournament.teams && tournament.teams.length > 0) { %>
+          <div class="bg-white/80 backdrop-blur-xl border border-white/60 rounded-[2rem] p-8 shadow-xl">
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span class="text-2xl">🛡️</span> Confirmed Teams
+                <span class="ml-2 px-2 py-0.5 rounded-full bg-brand-50 text-brand-600 text-xs font-extrabold border border-brand-100">
+                  <%= tournament.teams.length %>
+                </span>
+              </h2>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <% tournament.teams.forEach((team, index) => { 
+                  // --- TEAM IDENTIFICATION LOGIC ---
+                  let isMyTeam = false;
+                  // Check if user is logged in
+                  if (typeof user !== 'undefined' && user) {
+                    // Check via Username as requested
+                    if (team.leader && team.leader.username && team.leader.username === user.username) {
+                      isMyTeam = true;
+                    }
+                  }
+                  // --- END LOGIC ---
+              %>
+                <div class="relative overflow-hidden p-4 rounded-2xl transition-all duration-300 group
+                  <%= isMyTeam 
+                      ? 'bg-gradient-to-br from-brand-50 to-white border-2 border-brand-500 shadow-lg shadow-brand-500/20 transform -translate-y-1 z-10' 
+                      : 'bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-brand-200 hover:-translate-y-1' 
+                  %>">
+                  
+                  <% if (isMyTeam) { %>
+                    <div class="absolute top-0 right-0 bg-brand-500 text-white text-[9px] font-bold px-3 py-1 rounded-bl-xl shadow-md z-20">
+                      YOUR TEAM
+                    </div>
+                    <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-brand-400 rounded-full filter blur-3xl opacity-20 animate-pulse"></div>
+                  <% } %>
+
+                  <div class="flex items-center justify-between mb-3 relative z-10">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold font-mono transition-colors
+                      <%= isMyTeam ? 'bg-brand-500 text-white shadow-md' : 'bg-slate-50 text-slate-500 group-hover:bg-brand-50 group-hover:text-brand-600' %>">
+                      #<%= index + 1 %>
+                    </div>
+                    
+                    <% if (isMyTeam) { %>
+                      <i class="fas fa-star text-yellow-400 text-sm animate-pulse drop-shadow-sm"></i>
+                    <% } else { %>
+                      <i class="fas fa-check-circle text-green-400 text-sm opacity-50 group-hover:opacity-100 transition-opacity"></i>
+                    <% } %>
+                  </div>
+                  
+                  <div class="font-bold text-slate-800 truncate text-base mb-1 relative z-10" title="<%= team.name %>">
+                    <%= team.name %>
+                  </div>
+                  
+                  <div class="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1.5 relative z-10">
+                    <i class="fas fa-crown <%= isMyTeam ? 'text-brand-500' : 'text-yellow-400' %> text-xs"></i> 
+                    <span class="truncate <%= isMyTeam ? 'text-brand-600 font-extrabold' : '' %>">
+                      <%= team.leader ? team.leader.username : 'Unknown' %>
+                      <%= isMyTeam ? '(You)' : '' %>
+                    </span>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+        <% } %>
+
+        
 
       </div>
 
@@ -255,7 +342,6 @@
           <div class="flex justify-between items-center mb-6">
             <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Registration</h4>
             <% 
-               // Calculate Percentage based on Filled Slots (Pending + Accepted)
                const percent = Math.round((filledSlots / tournament.teamLimit) * 100); 
             %>
             <span class="text-xs font-bold px-2 py-1 rounded bg-slate-100 text-slate-600">
@@ -381,7 +467,7 @@
           <% } %>
 
           <button onclick="shareTournament('<%= tournament._id %>', '<%= tournament.name %>')" 
-             class="w-full mt-4 flex items-center justify-center gap-2 py-3 rounded-xl text-slate-400 font-bold hover:text-brand-600 hover:bg-slate-50 transition-all text-sm group">
+              class="w-full mt-4 flex items-center justify-center gap-2 py-3 rounded-xl text-slate-400 font-bold hover:text-brand-600 hover:bg-slate-50 transition-all text-sm group">
             <i class="fas fa-share-nodes group-hover:scale-110 transition-transform"></i> Share with Squad
           </button>
 

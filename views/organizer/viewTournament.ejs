@@ -28,29 +28,39 @@
           },
           animation: {
             'float': 'float 3s ease-in-out infinite',
+            'bounce-slight': 'bounce-slight 2s infinite',
+            'slide-up': 'slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+            'pop-in': 'pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
           },
           keyframes: {
             float: {
               '0%, 100%': { transform: 'translateY(0)' },
               '50%': { transform: 'translateY(-5px)' },
+            },
+            'bounce-slight': {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-3px)' },
+            },
+            'slide-up': {
+                '0%': { transform: 'translateY(20px)', opacity: '0' },
+                '100%': { transform: 'translateY(0)', opacity: '1' },
+            },
+            'pop-in': {
+                '0%': { transform: 'scale(0.9)', opacity: '0' },
+                '100%': { transform: 'scale(1)', opacity: '1' },
             }
           }
         }
       }
     }
 
-    // --- BUTTON LOGIC: Disable button and show loader on click ---
+    // --- BUTTON LOGIC ---
     function handleApproveSubmit(form) {
       const btn = form.querySelector('button');
       if (!btn) return true;
-
-      // 1. Disable
       btn.disabled = true;
-      // 2. Style
       btn.classList.add('opacity-70', 'cursor-not-allowed', 'pointer-events-none');
-      // 3. Loader Icon
       btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
-      
       return true;
     }
   </script>
@@ -85,12 +95,37 @@
 
   <div class="container mx-auto px-4 py-8 lg:py-12 flex-grow space-y-8">
 
+    <%
+      const parseTime = (timeStr) => {
+        if (!timeStr) return null;
+        const cleanStr = timeStr.replace(/\./g, '').trim().toUpperCase();
+        const [time, modifier] = cleanStr.split(' ');
+        let [hours, minutes] = time.split(':');
+        hours = parseInt(hours, 10);
+        minutes = parseInt(minutes, 10);
+        if (hours === 12 && modifier === 'AM') hours = 0;
+        if (hours < 12 && modifier === 'PM') hours += 12;
+        return { h: hours, m: minutes };
+      };
+
+      // 1. Time Logic
+      const deadline = new Date(tournament.tournamentDate);
+      if (tournament.registrationCloseTime) {
+         const t = parseTime(tournament.registrationCloseTime);
+         if(t) deadline.setHours(t.h, t.m, 0, 0);
+      } else {
+         deadline.setHours(23, 59, 59, 999);
+      }
+
+      const now = new Date();
+    %>
+
     <div class="bg-white/90 backdrop-blur-xl border border-white/60 rounded-3xl p-6 md:p-8 shadow-xl relative overflow-hidden">
       <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-400 via-purple-500 to-indigo-500"></div>
 
       <div class="flex flex-col lg:flex-row justify-between gap-8 mb-8 relative z-10">
         
-        <div>
+        <div class="flex-grow">
           <div class="flex items-center gap-3 mb-3">
             <span class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-600 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-slate-200">
               <i class="fas fa-gamepad text-brand-500"></i> <%= tournament.game %>
@@ -101,10 +136,38 @@
               <%= tournament.status %>
             </span>
           </div>
-          <h1 class="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
-            <%= tournament.name %>
-            <span class="inline-block text-2xl ml-2 animate-float">🎮</span>
-          </h1>
+          
+          <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+            <h1 class="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+              <%= tournament.name %>
+              <span class="inline-block text-2xl ml-2 animate-float">🎮</span>
+            </h1>
+            
+            <div class="flex gap-2">
+              <button onclick="shareTournament('<%= tournament._id %>', '<%= tournament.name %>')" 
+                      class="group inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:text-brand-600 hover:border-brand-200 hover:shadow-lg transition-all active:scale-95 w-fit">
+                <span class="text-lg group-hover:rotate-12 transition-transform">🚀</span>
+                <span>Share Link</span>
+              </button>
+
+              <% if (tournament.status === 'ongoing') { %>
+                <% if (now >= deadline) { %>
+                  <a href="/organizer/tournaments/<%= tournament._id %>/results" 
+                     class="group inline-flex items-center gap-2 px-4 py-2 bg-yellow-500 text-slate-900 rounded-xl text-sm font-bold hover:bg-yellow-400 shadow-lg shadow-yellow-500/20 transition-all active:scale-95">
+                    <i class="fas fa-flag-checkered group-hover:scale-110 transition-transform"></i>
+                    <span>Finish & Add Results</span>
+                  </a>
+                <% } else { %>
+                  <button disabled 
+                          class="group inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-400 rounded-xl text-sm font-bold cursor-not-allowed border border-slate-200" 
+                          title="Wait for registration to close">
+                    <i class="fas fa-clock"></i>
+                    <span>Reg Still Open</span>
+                  </button>
+                <% } %>
+              <% } %>
+            </div>
+          </div>
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full lg:w-auto">
@@ -120,7 +183,6 @@
             <p class="text-[10px] font-bold text-brand-400 uppercase tracking-widest mb-1">Filled</p>
             <p class="text-xl font-extrabold text-brand-900"><%= tournament.acceptedCount %><span class="text-xs text-brand-400 ml-0.5">/<%= tournament.teamLimit %></span></p>
           </div>
-          
         </div>
       </div>
 
@@ -151,41 +213,36 @@
             <p class="text-[10px] font-bold text-slate-400 uppercase">Reg Deadline</p>
             <p class="font-bold text-slate-900"><%= tournament.registrationCloseTime || "Open" %></p>
           </div>
-          
         </div>
+      </div>
 
-        <div class="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/60 shadow-lg overflow-hidden" x-data="{ expanded: false }">
-  <button @click="expanded = !expanded" class="w-full p-5 text-left flex items-center justify-between hover:bg-slate-50/50 transition-colors">
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center">
-        <i class="fas fa-scroll"></i>
-      </div>
-      <div>
-        <h4 class="text-base font-bold text-slate-900 uppercase tracking-widest">Tournament Details</h4>
-        <p class="text-xs text-slate-500 mt-0.5">Rules, format, and additional information</p>
-      </div>
-    </div>
-    <div class="text-slate-400 transition-transform duration-300" :class="{ 'rotate-180': expanded }">
-      <i class="fas fa-chevron-down"></i>
-    </div>
-  </button>
-  
-  <div x-show="expanded" x-collapse class="px-5 pb-5">
-    <div class="pt-4 border-t border-slate-100">
-      <div class="bg-slate-50 rounded-lg p-4">
-        <p class="text-slate-700 leading-relaxed text-sm md:text-base">
-          <%= tournament.description || "No specific rules or description provided for this event." %>
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script src="//unpkg.com/alpinejs" defer></script>
-      
+      <div class="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/60 shadow-lg overflow-hidden mt-6" x-data="{ expanded: false }">
+        <button @click="expanded = !expanded" class="w-full p-5 text-left flex items-center justify-between hover:bg-slate-50/50 transition-colors">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center">
+              <i class="fas fa-scroll"></i>
+            </div>
+            <div>
+              <h4 class="text-base font-bold text-slate-900 uppercase tracking-widest">Tournament Details</h4>
+              <p class="text-xs text-slate-500 mt-0.5">Rules, format, and additional information</p>
+            </div>
+          </div>
+          <div class="text-slate-400 transition-transform duration-300" :class="{ 'rotate-180': expanded }">
+            <i class="fas fa-chevron-down"></i>
+          </div>
+        </button>
         
+        <div x-show="expanded" x-collapse class="px-5 pb-5">
+          <div class="pt-4 border-t border-slate-100">
+            <div class="bg-slate-50 rounded-lg p-4">
+              <p class="text-slate-700 leading-relaxed text-sm md:text-base whitespace-pre-line">
+                <%= tournament.description || "No specific rules or description provided for this event." %>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-      
+      <script src="//unpkg.com/alpinejs" defer></script>
     </div>
 
     <% if (tournament.acceptedCount > 0 && tournament.status !== "completed") { %>
@@ -239,8 +296,6 @@
                 placeholder="e.g 7:30 PM"
                 class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all font-medium text-slate-700 placeholder-slate-300">
             </div>
-
-            
 
           </div>
 
@@ -416,20 +471,90 @@
       </div>
     <% } %>
 
-    <div class="pb-8">
+    <div class="flex justify-between items-center pb-8 border-t border-slate-100 pt-6">
+      
       <a href="/organizer/tournaments" class="inline-flex items-center text-sm font-bold text-slate-500 hover:text-brand-600 transition-colors group">
         <div class="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center mr-2 shadow-sm group-hover:-translate-x-1 transition-transform">
           <i class="fas fa-arrow-left"></i>
         </div>
         Back to Dashboard
       </a>
+
+      <button onclick="document.getElementById('deleteModal').classList.remove('hidden')" 
+              class="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl font-bold text-sm hover:bg-red-100 transition-colors">
+        <i class="fas fa-trash-alt"></i> Delete Tournament
+      </button>
+
     </div>
 
+  </div>
+
+  <div id="deleteModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full animate-pop-in text-center relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-2 bg-red-500"></div>
+      
+      <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+        🚨
+      </div>
+      
+      <h3 class="text-xl font-extrabold text-slate-900 mb-2">Are you sure?</h3>
+      <p class="text-sm text-slate-500 mb-8 leading-relaxed">
+        This action cannot be undone. This will permanently delete 
+        <strong class="text-slate-800"><%= tournament.name %></strong> and all associated data.
+      </p>
+
+      <div class="flex flex-col gap-3">
+        <form action="/organizer/tournaments/<%= tournament._id %>/delete" method="POST">
+          <button type="submit" class="w-full py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-red-500/30">
+            Yes, Delete It
+          </button>
+        </form>
+        <button onclick="document.getElementById('deleteModal').classList.add('hidden')" 
+                class="w-full py-3.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all">
+          Cancel
+        </button>
+      </div>
+    </div>
   </div>
 
   <div class="mt-auto">
     <%- include("../includes/footer") %>
   </div>
+
+  <script>
+    function shareTournament(id, name) {
+      const url = `${window.location.origin}/player/tournaments/${id}`;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: `Join ${name}`,
+          text: `Check out this tournament: ${name}`,
+          url: url
+        }).catch(console.error);
+      } else {
+        navigator.clipboard.writeText(url).then(() => {
+          showToast();
+        }).catch(err => {
+          console.error('Failed to copy: ', err);
+        });
+      }
+    }
+
+    function showToast() {
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-6 right-6 bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl z-[150] flex items-center gap-3 animate-slide-up';
+      toast.innerHTML = '<span class="text-xl">📋</span> <span class="font-bold text-sm">Link Copied!</span>';
+      
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
+  </script>
 
 </body>
 </html>

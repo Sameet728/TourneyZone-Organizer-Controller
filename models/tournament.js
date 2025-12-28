@@ -43,7 +43,7 @@ const tournamentSchema = new Schema(
     prizePool: { type: Number, default: 0 },
     upiId: { type: String, required: false },
     teamLimit: { type: Number, required: true },
-    
+
     // 🔥 DATE & TIME
     tournamentDate: { type: Date, required: true },
     matchTime: { type: String }, // e.g. "6:30 PM"
@@ -58,8 +58,12 @@ const tournamentSchema = new Schema(
     roomDetails: {
       roomId: String,
       roomPassword: String,
-     
+
       sharedAt: Date,
+    },
+    isManuallyCompleted: {
+      type: Boolean,
+      default: false,
     },
     result: {
       firstPlace: { teamName: String, leader: String },
@@ -73,21 +77,50 @@ const tournamentSchema = new Schema(
 
 /* ================= VIRTUALS ================= */
 
-// Tournament status
 tournamentSchema.virtual("status").get(function () {
+
   if (!this.tournamentDate) return "upcoming";
 
-  // Normalize dates to midnight (ignore time for status label)
-  const tDate = new Date(this.tournamentDate);
-  tDate.setHours(0, 0, 0, 0);
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  /* 1️⃣ Organizer-controlled completion (ONLY WAY on same day) */
+  if (this.isManuallyCompleted === true) {
+    return "completed";
+  }
 
-  if (tDate > today) return "upcoming"; // Future date
-  if (tDate < today) return "completed"; // Past date
-  return "ongoing"; // Today
+  // Compare dates in UTC (date only)
+  const t = new Date(this.tournamentDate);
+  const now = new Date();
+
+  const tDateUTC = Date.UTC(
+    t.getUTCFullYear(),
+    t.getUTCMonth(),
+    t.getUTCDate()
+  );
+
+  const todayUTC = Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate()
+  );
+
+  
+
+  /* 2️⃣ Past date → completed */
+  if (todayUTC > tDateUTC) {
+    return "completed";
+  }
+
+  /* 3️⃣ Future date → upcoming */
+  if (todayUTC < tDateUTC) {
+    return "upcoming";
+  }
+
+  /* 4️⃣ SAME DAY → ONGOING ✅ */
+  return "ongoing";
 });
+
+
+
 
 // Accepted teams count
 tournamentSchema.virtual("acceptedCount").get(function () {
@@ -102,12 +135,12 @@ tournamentSchema.virtual("availableSlots").get(function () {
 
 tournamentSchema.virtual("activeRegistrations").get(function () {
   return this.registrations.filter(
-    r => r.status === "pending" || r.status === "accepted"
+    (r) => r.status === "pending" || r.status === "accepted"
   ).length;
 });
-
 
 tournamentSchema.set("toJSON", { virtuals: true });
 tournamentSchema.set("toObject", { virtuals: true });
 
-module.exports = mongoose.models.Tournament || mongoose.model("Tournament", tournamentSchema);
+module.exports =
+  mongoose.models.Tournament || mongoose.model("Tournament", tournamentSchema);
